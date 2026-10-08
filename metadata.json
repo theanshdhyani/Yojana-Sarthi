@@ -1,0 +1,6 @@
+{
+  "name": "Yojana Sarthi - Government Schemes, Made Simple",
+  "description": "A modern civic-tech platform helping Indian citizens discover eligible government schemes, understand benefits in simple language, prepare documents, and track applications.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

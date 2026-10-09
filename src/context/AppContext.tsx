@@ -84,6 +84,8 @@ interface AppContextType {
   removeToast: (id: string) => void;
 
   // Clear & Export & Demo
+  isDemoData: boolean;
+  setIsDemoData: (v: boolean) => void;
   clearAllUserData: () => void;
   loadSampleData: () => void;
 }
@@ -95,6 +97,11 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   const [selectedSchemeId, setSelectedSchemeId] = useState<string | null>(null);
 
   const [answers, setAnswersState] = useState<QuestionnaireAnswers>(StorageService.getAnswers);
+  const [isDemoData, setIsDemoData] = useState<boolean>(() => {
+    // Check if current stored answers match the Rameshwar sample
+    const existing = StorageService.getAnswers();
+    return existing.age === 42 && existing.occupation === 'farmer' && existing.state === 'Uttar Pradesh';
+  });
   const [readyDocumentIds, setReadyDocumentIds] = useState<string[]>(StorageService.getReadyDocuments);
   const [applications, setApplications] = useState<TrackedApplication[]>(StorageService.getApplications);
   const [familyMembers, setFamilyMembers] = useState<FamilyMember[]>(StorageService.getFamilyMembers);
@@ -259,6 +266,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   const clearAllUserData = () => {
     StorageService.clearAllData();
     setAnswersState({});
+    setIsDemoData(false);
     setReadyDocumentIds([]);
     setApplications([]);
     setFamilyMembers([]);
@@ -267,6 +275,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
 
   const loadSampleData = () => {
     StorageService.loadSampleDemoData();
+    setIsDemoData(true);
     setAnswersState(SAMPLE_DEMO_DATA.answers);
     setReadyDocumentIds(SAMPLE_DEMO_DATA.readyDocuments);
     setApplications(SAMPLE_DEMO_DATA.applications);
@@ -327,6 +336,8 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         toasts,
         addToast,
         removeToast,
+        isDemoData,
+        setIsDemoData,
         clearAllUserData,
         loadSampleData
       }}

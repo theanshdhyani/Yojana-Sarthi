@@ -27,7 +27,7 @@ import { SCHEMES_DATABASE } from '../../data/schemesData';
 import { SchemeCategory } from '../../types/scheme';
 
 export const HomeView: React.FC = () => {
-  const { setCurrentView, setSelectedSchemeId, settings, setAnswers, loadSampleData, t } = useApp();
+  const { setCurrentView, setSelectedSchemeId, settings, setAnswers, setIsDemoData, addToast, t } = useApp();
 
   // Interactive Hero Profile Preview switcher
   const [activePersona, setActivePersona] = useState<'farmer' | 'student' | 'woman' | 'senior'>('farmer');
@@ -71,10 +71,15 @@ export const HomeView: React.FC = () => {
     }
   };
 
+  // Only switches the visual preview tab - NEVER silently overwrites user answers
   const handlePersonaSelect = (key: 'farmer' | 'student' | 'woman' | 'senior') => {
     setActivePersona(key);
-    if (key === 'farmer') {
-      setAnswers({
+  };
+
+  const handleLoadPersonaReport = () => {
+    let pAnswers: any = {};
+    if (activePersona === 'farmer') {
+      pAnswers = {
         age: 42,
         gender: 'male',
         state: 'Uttar Pradesh',
@@ -84,9 +89,9 @@ export const HomeView: React.FC = () => {
         annualIncomeBracket: '1lakh_to_2.5lakh',
         landholding: 'small_1_to_2ha',
         hasRationCard: 'bpl'
-      });
-    } else if (key === 'student') {
-      setAnswers({
+      };
+    } else if (activePersona === 'student') {
+      pAnswers = {
         age: 19,
         gender: 'female',
         state: 'Bihar',
@@ -94,9 +99,9 @@ export const HomeView: React.FC = () => {
         socialCategory: 'OBC',
         occupation: 'student',
         annualIncomeBracket: '1lakh_to_2.5lakh'
-      });
-    } else if (key === 'woman') {
-      setAnswers({
+      };
+    } else if (activePersona === 'woman') {
+      pAnswers = {
         age: 36,
         gender: 'female',
         state: 'Rajasthan',
@@ -105,9 +110,9 @@ export const HomeView: React.FC = () => {
         occupation: 'small_business_owner',
         annualIncomeBracket: '1lakh_to_2.5lakh',
         hasRationCard: 'bpl'
-      });
-    } else if (key === 'senior') {
-      setAnswers({
+      };
+    } else if (activePersona === 'senior') {
+      pAnswers = {
         age: 68,
         gender: 'male',
         state: 'Madhya Pradesh',
@@ -117,8 +122,12 @@ export const HomeView: React.FC = () => {
         annualIncomeBracket: 'below_1lakh',
         hasRationCard: 'bpl',
         specialAttributes: ['senior_citizen']
-      });
+      };
     }
+    setAnswers(pAnswers);
+    setIsDemoData(true);
+    addToast(settings.language === 'hi' ? 'नमूना प्रोफ़ाइल लोड की गई' : 'Sample demo profile loaded for inspection', 'info');
+    setCurrentView('results');
   };
 
   const handleSchemeClick = (id: string) => {
@@ -197,7 +206,7 @@ export const HomeView: React.FC = () => {
 
             {/* Right Column: Interactive Editorial Product Artifact */}
             <div className="lg:col-span-5">
-              <div className="bg-[var(--bg-surface)] border border-[var(--border-hairline)] rounded-2xl shadow-sm p-6 space-y-5 relative">
+              <div className="glass-card rounded-3xl p-6 sm:p-7 space-y-5 relative shadow-lg">
                 
                 {/* Visual Label */}
                 <div className="flex items-center justify-between pb-3 border-b border-[var(--border-hairline)]">
@@ -277,10 +286,7 @@ export const HomeView: React.FC = () => {
                 {/* Inspect Action */}
                 <div className="pt-1 flex flex-col gap-2">
                   <button
-                    onClick={() => {
-                      loadSampleData();
-                      setCurrentView('results');
-                    }}
+                    onClick={handleLoadPersonaReport}
                     className="w-full py-2.5 px-4 rounded-xl bg-[var(--accent-saffron)] hover:bg-[var(--accent-saffron-hover)] text-white font-semibold text-xs flex items-center justify-center gap-2 transition-colors shadow-xs"
                   >
                     <span>{settings.language === 'hi' ? 'इस प्रोफ़ाइल के परिणाम देखें' : 'View Full Report for this Profile'}</span>

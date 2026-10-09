@@ -71,22 +71,28 @@ export function evaluateSchemeEligibility(
   // 4. Income Evaluation
   if (rules.maxAnnualIncome !== undefined) {
     totalCriteriaCount++;
-    const incomeMap: Record<string, number> = {
-      below_1lakh: 100000,
-      '1lakh_to_2.5lakh': 250000,
-      '2.5lakh_to_5lakh': 500000,
-      '5lakh_to_8lakh': 800000,
-      above_8lakh: 1200000
-    };
+    if (answers.annualIncomeBracket) {
+      const incomeMap: Record<string, number> = {
+        below_1lakh: 100000,
+        '1lakh_to_2.5lakh': 250000,
+        '2.5lakh_to_5lakh': 500000,
+        '5lakh_to_8lakh': 800000,
+        above_8lakh: 1200000
+      };
 
-    const userIncomeApprox = answers.annualIncomeBracket ? incomeMap[answers.annualIncomeBracket] ?? 300000 : 300000;
-    if (userIncomeApprox <= rules.maxAnnualIncome) {
-      passedCriteriaCount++;
-      matchedReasons.push(`Household income falls within ceiling (≤ ₹${(rules.maxAnnualIncome / 100000).toFixed(1)} Lakh/yr)`);
-      matchedReasonsHindi.push(`पारिवारिक आय सीमा (≤ ₹${(rules.maxAnnualIncome / 100000).toFixed(1)} लाख/वर्ष) के भीतर है`);
+      const userIncomeApprox = incomeMap[answers.annualIncomeBracket] ?? 250000;
+      if (userIncomeApprox <= rules.maxAnnualIncome) {
+        passedCriteriaCount++;
+        matchedReasons.push(`Household income falls within ceiling (≤ ₹${(rules.maxAnnualIncome / 100000).toFixed(1)} Lakh/yr)`);
+        matchedReasonsHindi.push(`पारिवारिक आय सीमा (≤ ₹${(rules.maxAnnualIncome / 100000).toFixed(1)} लाख/वर्ष) के भीतर है`);
+      } else {
+        unmetCriteria.push(`Exceeds income limit of ₹${(rules.maxAnnualIncome / 100000).toFixed(1)} Lakh/yr`);
+        unmetCriteriaHindi.push(`आय सीमा ₹${(rules.maxAnnualIncome / 100000).toFixed(1)} लाख/वर्ष से अधिक है`);
+      }
     } else {
-      unmetCriteria.push(`Exceeds income limit of ₹${(rules.maxAnnualIncome / 100000).toFixed(1)} Lakh/yr`);
-      unmetCriteriaHindi.push(`आय सीमा ₹${(rules.maxAnnualIncome / 100000).toFixed(1)} लाख/वर्ष से अधिक है`);
+      // Income not provided - do not assume a default income
+      unmetCriteria.push(`Annual income not specified (Limit: ≤ ₹${(rules.maxAnnualIncome / 100000).toFixed(1)} Lakh/yr)`);
+      unmetCriteriaHindi.push(`वार्षिक आय विवरण दर्ज नहीं है (पात्रता सीमा: ≤ ₹${(rules.maxAnnualIncome / 100000).toFixed(1)} लाख/वर्ष)`);
     }
   }
 
@@ -151,10 +157,18 @@ export function evaluateSchemeEligibility(
     const userFlags = answers.specialAttributes || [];
     for (const flag of rules.specialFlags) {
       totalCriteriaCount++;
-      if (userFlags.includes(flag)) {
+      const isArtisanMatch =
+        (flag === 'artisan' || flag === 'artisan_craftsperson') &&
+        (userFlags.includes('artisan') || userFlags.includes('artisan_craftsperson') || answers.occupation === 'artisan_craftsperson');
+      const isSeniorMatch =
+        flag === 'senior_citizen' &&
+        (userFlags.includes('senior_citizen') || (answers.age !== undefined && answers.age >= 60));
+      const hasDirectFlag = userFlags.includes(flag);
+
+      if (hasDirectFlag || isArtisanMatch || isSeniorMatch) {
         passedCriteriaCount++;
         matchedReasons.push(`Special condition met: ${flag.replace(/_/g, ' ')}`);
-        matchedReasonsHindi.push(`विशेष पात्रता पूरी: ${flag === 'disability' ? 'दिव्यांगता' : flag === 'widow' ? 'विधवा' : flag === 'girl_child_under_10' ? '10 वर्ष तक की बालिका' : flag === 'pregnant_lactating' ? 'गर्भवती/धात्री माता' : 'छत अधिकार'}`);
+        matchedReasonsHindi.push(`विशेष पात्रता पूरी: ${flag === 'disability' ? 'दिव्यांगता' : flag === 'widow' ? 'विधवा' : flag === 'girl_child_under_10' ? '10 वर्ष तक की बालिका' : flag === 'pregnant_lactating' ? 'गर्भवती/धात्री माता' : flag === 'artisan' ? 'विश्वकर्मा शिल्पी' : 'वरिष्ठ नागरिक'}`);
       } else {
         // If it's a primary flag requirement
         unmetCriteria.push(`Requires specific condition: ${flag.replace(/_/g, ' ')}`);
@@ -163,7 +177,20 @@ export function evaluateSchemeEligibility(
     }
   }
 
-  // Missing documents calculation
+  // 10. Location / State specific rules (if specified)
+  if (rules.statesSupported && rules.statesSupported.length > 0) {
+    totalCriteriaCount++;
+    if (answers.state && rules.statesSupported.some((s) => s.toLowerCase() === answers.state?.toLowerCase())) {
+      passedCriteriaCount++;
+      matchedReasons.push(`State jurisdiction verified (${answers.state})`);
+      matchedReasonsHindi.push(`राज्य क्षेत्राधिकार सत्यापित (${answers.state})`);
+    } else if (answers.state) {
+      unmetCriteria.push(`Applicable in specific states: ${rules.statesSupported.join(', ')}`);
+      unmetCriteriaHindi.push(`केवल निर्दिष्ट राज्यों में लागू: ${rules.statesSupported.join(', ')}`);
+    }
+  }
+
+  // Missing documents calculation (evaluated separately from demographic eligibility)
   const missingDocuments: string[] = [];
   scheme.requiredDocuments.forEach((docRef) => {
     if (docRef.isMandatory && !readyDocumentIds.includes(docRef.id)) {
@@ -174,10 +201,11 @@ export function evaluateSchemeEligibility(
   const baseRatio = totalCriteriaCount > 0 ? passedCriteriaCount / totalCriteriaCount : 1;
   const matchScore = Math.min(100, Math.round(baseRatio * 100));
 
+  // Eligibility estimate separated from document checklist
   let status: MatchStatus = 'possible_match';
-  if (unmetCriteria.length === 0 && matchScore >= 75) {
-    status = missingDocuments.length > 0 ? 'review_required' : 'strong_match';
-  } else if (unmetCriteria.length <= 1 && matchScore >= 50) {
+  if (unmetCriteria.length === 0 && matchScore >= 70) {
+    status = 'strong_match';
+  } else if (unmetCriteria.length <= 1 && matchScore >= 45) {
     status = 'possible_match';
   } else {
     status = 'review_required';

@@ -160,73 +160,75 @@ export const ResultsView: React.FC = () => {
         </div>
       )}
 
-      {/* Overview Stat Cards / Filter Tabs */}
+      {/* Overview Stat Cards / Filter Tabs with Apple Glassmorphism */}
       {hasAnswers && (
         <>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-            <button
-              onClick={() => setActiveTab('all')}
-              className={`p-4 rounded-xl border text-left transition-colors ${
-                activeTab === 'all'
-                  ? 'border-[var(--accent-saffron)] bg-[var(--accent-saffron-light)] font-bold text-[var(--text-primary)]'
-                  : 'border-[var(--border-hairline)] bg-[var(--bg-surface)] hover:bg-[var(--bg-subtle)] text-[var(--text-secondary)]'
-              }`}
-            >
-              <span className="text-2xl font-serif font-bold tabular-nums text-[var(--text-primary)]">
-                {totalCount}
-              </span>
-              <span className="block text-xs text-[var(--text-secondary)] mt-1">
-                {settings.language === 'hi' ? 'कुल योजनाएं' : 'All Schemes'}
-              </span>
-            </button>
+          <div className="glass-toolbar p-2.5 sm:p-3.5 rounded-2xl sm:rounded-3xl shadow-xs">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-3">
+              <button
+                onClick={() => setActiveTab('all')}
+                className={`p-3.5 sm:p-4 rounded-xl sm:rounded-2xl border text-left transition-all ${
+                  activeTab === 'all'
+                    ? 'border-[var(--accent-saffron)] bg-[var(--accent-saffron-light)] font-bold text-[var(--text-primary)] shadow-2xs'
+                    : 'border-[var(--border-hairline)] bg-[var(--bg-surface)] hover:bg-[var(--bg-subtle)] text-[var(--text-secondary)]'
+                }`}
+              >
+                <span className="text-2xl font-serif font-bold tabular-nums text-[var(--text-primary)]">
+                  {totalCount}
+                </span>
+                <span className="block text-xs text-[var(--text-secondary)] mt-1">
+                  {settings.language === 'hi' ? 'कुल योजनाएं' : 'All Schemes'}
+                </span>
+              </button>
 
-            <button
-              onClick={() => setActiveTab('strong_match')}
-              className={`p-4 rounded-xl border text-left transition-colors ${
-                activeTab === 'strong_match'
-                  ? 'border-[var(--accent-green)] bg-[var(--accent-green-light)] font-bold text-[var(--accent-green-text)]'
-                  : 'border-[var(--border-hairline)] bg-[var(--bg-surface)] hover:bg-[var(--bg-subtle)] text-[var(--text-secondary)]'
-              }`}
-            >
-              <span className="text-2xl font-serif font-bold tabular-nums text-[var(--accent-green)]">
-                {strongMatches.length}
-              </span>
-              <span className="block text-xs text-[var(--text-secondary)] mt-1">
-                {t('strongMatches')}
-              </span>
-            </button>
+              <button
+                onClick={() => setActiveTab('strong_match')}
+                className={`p-3.5 sm:p-4 rounded-xl sm:rounded-2xl border text-left transition-all ${
+                  activeTab === 'strong_match'
+                    ? 'border-[var(--accent-green)] bg-[var(--accent-green-light)] font-bold text-[var(--accent-green-text)] shadow-2xs'
+                    : 'border-[var(--border-hairline)] bg-[var(--bg-surface)] hover:bg-[var(--bg-subtle)] text-[var(--text-secondary)]'
+                }`}
+              >
+                <span className="text-2xl font-serif font-bold tabular-nums text-[var(--accent-green)]">
+                  {strongMatches.length}
+                </span>
+                <span className="block text-xs text-[var(--text-secondary)] mt-1">
+                  {t('strongMatches')}
+                </span>
+              </button>
 
-            <button
-              onClick={() => setActiveTab('possible_match')}
-              className={`p-4 rounded-xl border text-left transition-colors ${
-                activeTab === 'possible_match'
-                  ? 'border-[var(--accent-saffron)] bg-[var(--accent-saffron-light)] font-bold text-[var(--accent-saffron-text)]'
-                  : 'border-[var(--border-hairline)] bg-[var(--bg-surface)] hover:bg-[var(--bg-subtle)] text-[var(--text-secondary)]'
-              }`}
-            >
-              <span className="text-2xl font-serif font-bold tabular-nums text-[var(--accent-saffron)]">
-                {possibleMatches.length}
-              </span>
-              <span className="block text-xs text-[var(--text-secondary)] mt-1">
-                {t('possibleMatches')}
-              </span>
-            </button>
+              <button
+                onClick={() => setActiveTab('possible_match')}
+                className={`p-3.5 sm:p-4 rounded-xl sm:rounded-2xl border text-left transition-all ${
+                  activeTab === 'possible_match'
+                    ? 'border-[var(--accent-saffron)] bg-[var(--accent-saffron-light)] font-bold text-[var(--accent-saffron-text)] shadow-2xs'
+                    : 'border-[var(--border-hairline)] bg-[var(--bg-surface)] hover:bg-[var(--bg-subtle)] text-[var(--text-secondary)]'
+                }`}
+              >
+                <span className="text-2xl font-serif font-bold tabular-nums text-[var(--accent-saffron)]">
+                  {possibleMatches.length}
+                </span>
+                <span className="block text-xs text-[var(--text-secondary)] mt-1">
+                  {t('possibleMatches')}
+                </span>
+              </button>
 
-            <button
-              onClick={() => setActiveTab('review_required')}
-              className={`p-4 rounded-xl border text-left transition-colors ${
-                activeTab === 'review_required'
-                  ? 'border-[var(--accent-navy)] bg-[var(--accent-navy-light)] font-bold text-[var(--accent-navy-text)]'
-                  : 'border-[var(--border-hairline)] bg-[var(--bg-surface)] hover:bg-[var(--bg-subtle)] text-[var(--text-secondary)]'
-              }`}
-            >
-              <span className="text-2xl font-serif font-bold tabular-nums text-[var(--accent-navy)]">
-                {reviewRequired.length}
-              </span>
-              <span className="block text-xs text-[var(--text-secondary)] mt-1">
-                {t('reviewRequired')}
-              </span>
-            </button>
+              <button
+                onClick={() => setActiveTab('review_required')}
+                className={`p-3.5 sm:p-4 rounded-xl sm:rounded-2xl border text-left transition-all ${
+                  activeTab === 'review_required'
+                    ? 'border-[var(--accent-navy)] bg-[var(--accent-navy-light)] font-bold text-[var(--accent-navy-text)] shadow-2xs'
+                    : 'border-[var(--border-hairline)] bg-[var(--bg-surface)] hover:bg-[var(--bg-subtle)] text-[var(--text-secondary)]'
+                }`}
+              >
+                <span className="text-2xl font-serif font-bold tabular-nums text-[var(--accent-navy)]">
+                  {reviewRequired.length}
+                </span>
+                <span className="block text-xs text-[var(--text-secondary)] mt-1">
+                  {t('reviewRequired')}
+                </span>
+              </button>
+            </div>
           </div>
 
           {/* Scheme Cards Recommendation List */}

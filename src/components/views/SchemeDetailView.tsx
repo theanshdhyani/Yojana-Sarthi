@@ -130,8 +130,8 @@ export const SchemeDetailView: React.FC = () => {
         </div>
       </div>
 
-      {/* Benefit Banner */}
-      <div className="p-5 rounded-2xl bg-[var(--bg-surface)] border border-emerald-200 dark:border-emerald-900/60 shadow-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+      {/* Benefit Banner & Key Action Surface with Apple Glassmorphism */}
+      <div className="p-6 rounded-3xl glass-card border border-emerald-200/80 dark:border-emerald-800/50 shadow-md flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div className="space-y-1">
           <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-700 dark:text-emerald-400">
             {settings.language === 'hi' ? 'गारंटीकृत सरकारी लाभ' : 'Core Entitlement / Benefit'}

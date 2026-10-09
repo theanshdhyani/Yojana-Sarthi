@@ -21,7 +21,8 @@ export const FamilyModeView: React.FC = () => {
     addFamilyMember, 
     deleteFamilyMember, 
     setSelectedSchemeId, 
-    setCurrentView, 
+    setCurrentView,
+    answers,
     settings, 
     t 
   } = useApp();
@@ -47,11 +48,12 @@ export const FamilyModeView: React.FC = () => {
         age,
         gender,
         occupation,
-        state: 'Uttar Pradesh',
-        residenceArea: 'rural',
-        socialCategory: 'OBC',
-        annualIncomeBracket: '1lakh_to_2.5lakh',
-        hasRationCard: 'bpl'
+        state: answers.state || 'Uttar Pradesh',
+        residenceArea: answers.residenceArea || 'rural',
+        socialCategory: answers.socialCategory || 'General',
+        annualIncomeBracket: answers.annualIncomeBracket || '1lakh_to_2.5lakh',
+        hasRationCard: answers.hasRationCard || 'none',
+        landholding: answers.landholding || 'none'
       },
       notes: notes || undefined
     });
@@ -92,8 +94,8 @@ export const FamilyModeView: React.FC = () => {
         </button>
       </div>
 
-      {/* Household Overview Banner */}
-      <div className="p-6 rounded-2xl border border-[var(--border-hairline)] bg-[var(--bg-surface)] space-y-3">
+      {/* Household Overview Banner with Apple Glassmorphism */}
+      <div className="p-6 sm:p-7 rounded-3xl glass-card space-y-3.5 shadow-md">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Users className="w-5 h-5 text-purple-700 dark:text-purple-400" />

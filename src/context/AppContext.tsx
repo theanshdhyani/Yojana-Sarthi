@@ -37,7 +37,7 @@ interface AppContextType {
 
   // Answers & Evaluation
   answers: QuestionnaireAnswers;
-  setAnswers: (updater: QuestionnaireAnswers | ((prev: QuestionnaireAnswers) => QuestionnaireAnswers)) => void;
+  setAnswers: (updater: QuestionnaireAnswers | ((prev: QuestionnaireAnswers) => QuestionnaireAnswers), isDemo?: boolean) => void;
   evaluatedResults: {
     strongMatches: EvaluatedScheme[];
     possibleMatches: EvaluatedScheme[];
@@ -162,12 +162,26 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     StorageService.saveSettings(updated);
   };
 
-  const setAnswers = (updater: QuestionnaireAnswers | ((prev: QuestionnaireAnswers) => QuestionnaireAnswers)) => {
+  const DEFAULT_PREFERENCES: UserPreferences = {
+    language: 'en',
+    simpleLanguageMode: false,
+    fontSize: 'normal',
+    highContrast: false,
+    reducedMotion: false,
+    theme: 'light',
+    voiceSpeed: 1.0
+  };
+
+  const setAnswers = (
+    updater: QuestionnaireAnswers | ((prev: QuestionnaireAnswers) => QuestionnaireAnswers),
+    isDemo = false
+  ) => {
     setAnswersState((prev) => {
       const next = typeof updater === 'function' ? updater(prev) : updater;
       StorageService.saveAnswers(next);
       return next;
     });
+    setIsDemoData(isDemo);
   };
 
   const toggleDocumentReady = (docId: string) => {
@@ -270,6 +284,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     setReadyDocumentIds([]);
     setApplications([]);
     setFamilyMembers([]);
+    setSettingsState(DEFAULT_PREFERENCES);
     addToast(t('clearDataSuccess'), 'success');
   };
 

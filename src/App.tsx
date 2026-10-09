@@ -2,6 +2,7 @@ import React from 'react';
 import { AppProvider, useApp } from './context/AppContext';
 import { AppHeader } from './components/common/AppHeader';
 import { AppFooter } from './components/common/AppFooter';
+import { MobileGlassDock } from './components/common/MobileGlassDock';
 import { ToastContainer } from './components/common/ToastContainer';
 import { SettingsModal } from './components/views/SettingsModal';
 import { OnboardingModal } from './components/views/OnboardingModal';
@@ -25,7 +26,7 @@ const MainContent: React.FC = () => {
     <main className="min-h-screen flex flex-col justify-between">
       <AppHeader />
 
-      <div className="flex-1">
+      <div className="flex-1 pb-24 md:pb-0">
         {currentView === 'home' && <HomeView />}
         {currentView === 'questionnaire' && <QuestionnaireView />}
         {currentView === 'results' && <ResultsView />}
@@ -39,6 +40,9 @@ const MainContent: React.FC = () => {
       </div>
 
       <AppFooter />
+
+      {/* Floating Apple-Style Mobile Glass Navigation Dock */}
+      <MobileGlassDock />
 
       {/* Global Modals & Notifications */}
       <SettingsModal />

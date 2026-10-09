@@ -124,7 +124,7 @@ export const HomeView: React.FC = () => {
         specialAttributes: ['senior_citizen']
       };
     }
-    setAnswers(pAnswers);
+    setAnswers(pAnswers, true);
     setIsDemoData(true);
     addToast(settings.language === 'hi' ? 'नमूना प्रोफ़ाइल लोड की गई' : 'Sample demo profile loaded for inspection', 'info');
     setCurrentView('results');

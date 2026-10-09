@@ -100,9 +100,21 @@ export function evaluateSchemeEligibility(
   if (rules.requiresLandholding) {
     totalCriteriaCount++;
     if (answers.landholding && answers.landholding !== 'none') {
-      passedCriteriaCount++;
-      matchedReasons.push('Possesses cultivable agricultural landholding');
-      matchedReasonsHindi.push('कृषि योग्य भूमि स्वामित्व उपलब्ध है');
+      if (rules.maxLandholdingHectares) {
+        const isExcessive = answers.landholding === 'medium_large_above_2ha' && rules.maxLandholdingHectares <= 2;
+        if (!isExcessive) {
+          passedCriteriaCount++;
+          matchedReasons.push(`Landholding within permissible ceiling (≤ ${rules.maxLandholdingHectares} ha)`);
+          matchedReasonsHindi.push(`भूमि जोत निर्धारित सीमा (≤ ${rules.maxLandholdingHectares} हेक्टेयर) के भीतर है`);
+        } else {
+          unmetCriteria.push(`Exceeds maximum allowable landholding limit (${rules.maxLandholdingHectares} ha)`);
+          unmetCriteriaHindi.push(`अधिकतम स्वीकार्य भूमि जोत सीमा (${rules.maxLandholdingHectares} हेक्टेयर) से अधिक है`);
+        }
+      } else {
+        passedCriteriaCount++;
+        matchedReasons.push('Possesses cultivable agricultural landholding');
+        matchedReasonsHindi.push('कृषि योग्य भूमि स्वामित्व उपलब्ध है');
+      }
     } else {
       unmetCriteria.push('Requires cultivable agricultural land in applicant or family name');
       unmetCriteriaHindi.push('परिवार के नाम कृषि योग्य भूमि होना आवश्यक है');

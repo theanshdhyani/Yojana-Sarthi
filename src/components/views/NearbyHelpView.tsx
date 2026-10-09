@@ -58,8 +58,8 @@ export const NearbyHelpView: React.FC = () => {
           </p>
         </div>
 
-        {/* Filter Controls Bar */}
-        <div className="p-5 rounded-2xl border border-[var(--border-hairline)] bg-[var(--bg-surface)] grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+        {/* Filter Controls Bar with Apple Glassmorphism */}
+        <div className="p-5 sm:p-6 rounded-3xl glass-toolbar grid grid-cols-1 sm:grid-cols-3 gap-3.5 text-xs shadow-xs">
           <div>
             <label className="block font-semibold text-[var(--text-primary)] mb-1">
               {t('selectState')}

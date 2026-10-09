@@ -126,28 +126,30 @@ export const ApplicationTrackerView: React.FC = () => {
         </button>
       </div>
 
-      {/* Filter Tabs / Quick Stat Bar */}
-      <div className="grid grid-cols-2 sm:grid-cols-5 gap-2.5">
-        {[
-          { id: 'all', label: settings.language === 'hi' ? 'सभी' : 'All', count: statusCounts.all },
-          { id: 'to_apply', label: t('statusToApply'), count: statusCounts.to_apply },
-          { id: 'under_review', label: t('statusUnderReview'), count: statusCounts.under_review },
-          { id: 'approved', label: t('statusApproved'), count: statusCounts.approved },
-          { id: 'action_required', label: t('statusActionRequired'), count: statusCounts.action_required }
-        ].map((tab) => (
-          <button
-            key={tab.id}
-            onClick={() => setFilterStatus(tab.id)}
-            className={`p-3 rounded-xl border text-left transition-colors flex items-center justify-between ${
-              filterStatus === tab.id
-                ? 'border-[var(--accent-saffron)] bg-[var(--accent-saffron-light)] font-bold text-[var(--text-primary)]'
-                : 'border-[var(--border-hairline)] bg-[var(--bg-surface)] hover:bg-[var(--bg-subtle)] text-[var(--text-secondary)]'
-            }`}
-          >
-            <span className="text-xs">{tab.label}</span>
-            <span className="text-xs font-mono tabular-nums font-semibold ml-2">{tab.count}</span>
-          </button>
-        ))}
+      {/* Filter Tabs / Quick Stat Bar with Apple Glassmorphism */}
+      <div className="glass-toolbar p-2 sm:p-2.5 rounded-2xl shadow-xs">
+        <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
+          {[
+            { id: 'all', label: settings.language === 'hi' ? 'सभी' : 'All', count: statusCounts.all },
+            { id: 'to_apply', label: t('statusToApply'), count: statusCounts.to_apply },
+            { id: 'under_review', label: t('statusUnderReview'), count: statusCounts.under_review },
+            { id: 'approved', label: t('statusApproved'), count: statusCounts.approved },
+            { id: 'action_required', label: t('statusActionRequired'), count: statusCounts.action_required }
+          ].map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setFilterStatus(tab.id)}
+              className={`p-2.5 sm:p-3 rounded-xl border text-left transition-colors flex items-center justify-between ${
+                filterStatus === tab.id
+                  ? 'border-[var(--accent-saffron)] bg-[var(--accent-saffron-light)] font-bold text-[var(--text-primary)] shadow-2xs'
+                  : 'border-[var(--border-hairline)] bg-[var(--bg-surface)] hover:bg-[var(--bg-subtle)] text-[var(--text-secondary)]'
+              }`}
+            >
+              <span className="text-xs">{tab.label}</span>
+              <span className="text-xs font-mono tabular-nums font-semibold ml-2">{tab.count}</span>
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* Applications List */}

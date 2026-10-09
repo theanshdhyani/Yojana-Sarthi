@@ -86,20 +86,21 @@ export const AllSchemesView: React.FC = () => {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10 space-y-8">
       
-      {/* Title & Search Bar */}
-      <div className="space-y-4">
-        <div>
-          <span className="text-xs font-bold uppercase tracking-wider text-amber-700 dark:text-amber-400">
-            {settings.language === 'hi' ? 'राष्ट्रीय डायरेक्टरी' : 'National Welfare Directory'}
-          </span>
-          <h1 className="text-2xl sm:text-4xl font-serif font-bold text-[var(--text-primary)]">
-            {t('allSchemesTitle')}
-          </h1>
-          <p className="text-xs sm:text-sm text-[var(--text-secondary)] mt-1">
-            {t('allSchemesSubtitle')}
-          </p>
-        </div>
+      {/* Title */}
+      <div>
+        <span className="text-xs font-bold uppercase tracking-wider text-amber-700 dark:text-amber-400">
+          {settings.language === 'hi' ? 'राष्ट्रीय डायरेक्टरी' : 'National Welfare Directory'}
+        </span>
+        <h1 className="text-2xl sm:text-4xl font-serif font-bold text-[var(--text-primary)]">
+          {t('allSchemesTitle')}
+        </h1>
+        <p className="text-xs sm:text-sm text-[var(--text-secondary)] mt-1">
+          {t('allSchemesSubtitle')}
+        </p>
+      </div>
 
+      {/* Sticky Frosted Glass Search & Filter Toolbar */}
+      <div className="glass-toolbar p-4 sm:p-5 rounded-2xl space-y-3.5 shadow-md sticky top-20 z-20">
         {/* Search input */}
         <div className="relative">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-muted)]" />
@@ -108,7 +109,7 @@ export const AllSchemesView: React.FC = () => {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder={t('searchPlaceholder')}
-            className="w-full pl-11 pr-10 py-3.5 rounded-xl border border-[var(--border-hairline)] bg-[var(--bg-surface)] text-sm text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:border-[var(--accent-saffron)] focus:outline-none shadow-xs"
+            className="w-full pl-11 pr-10 py-3 rounded-xl border border-[var(--border-hairline)] bg-[var(--bg-surface)] text-sm text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:border-[var(--accent-saffron)] focus:outline-none shadow-2xs"
           />
           {searchQuery && (
             <button
@@ -119,41 +120,41 @@ export const AllSchemesView: React.FC = () => {
             </button>
           )}
         </div>
-      </div>
 
-      {/* Filter Row: Categories Horizontal Scrolling Bar */}
-      <div className="space-y-2">
-        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
-          {categories.map((cat) => (
-            <button
-              key={cat.id}
-              onClick={() => setSelectedCategory(cat.id)}
-              className={`whitespace-nowrap px-3.5 py-1.5 rounded-lg text-xs font-medium transition-colors border ${
-                selectedCategory === cat.id
-                  ? 'border-[var(--accent-saffron)] bg-[var(--accent-saffron-light)] font-semibold text-[var(--text-primary)] shadow-2xs'
-                  : 'border-[var(--border-hairline)] bg-[var(--bg-surface)] text-[var(--text-secondary)] hover:bg-[var(--bg-subtle)]'
-              }`}
-            >
-              {cat.label}
-            </button>
-          ))}
-        </div>
+        {/* Filter Row: Categories Horizontal Scrolling Bar */}
+        <div className="space-y-2">
+          <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
+            {categories.map((cat) => (
+              <button
+                key={cat.id}
+                onClick={() => setSelectedCategory(cat.id)}
+                className={`whitespace-nowrap px-3.5 py-1.5 rounded-lg text-xs font-medium transition-colors border ${
+                  selectedCategory === cat.id
+                    ? 'border-[var(--accent-saffron)] bg-[var(--accent-saffron-light)] font-semibold text-[var(--text-primary)] shadow-2xs'
+                    : 'border-[var(--border-hairline)] bg-[var(--bg-surface)] text-[var(--text-secondary)] hover:bg-[var(--bg-subtle)]'
+                }`}
+              >
+                {cat.label}
+              </button>
+            ))}
+          </div>
 
-        {/* Secondary Benefit Type filter */}
-        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none text-[11px]">
-          {benefitTypes.map((b) => (
-            <button
-              key={b.id}
-              onClick={() => setSelectedBenefitType(b.id)}
-              className={`whitespace-nowrap px-2.5 py-1 rounded-md transition-colors border ${
-                selectedBenefitType === b.id
-                  ? 'border-emerald-600 bg-emerald-50 dark:bg-emerald-950/80 text-emerald-900 dark:text-emerald-200 font-bold'
-                  : 'border-[var(--border-hairline)] bg-[var(--bg-surface)] text-[var(--text-muted)] hover:text-[var(--text-secondary)]'
-              }`}
-            >
-              {b.label}
-            </button>
-          ))}
+          {/* Secondary Benefit Type filter */}
+          <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none text-[11px]">
+            {benefitTypes.map((b) => (
+              <button
+                key={b.id}
+                onClick={() => setSelectedBenefitType(b.id)}
+                className={`whitespace-nowrap px-2.5 py-1 rounded-md transition-colors border ${
+                  selectedBenefitType === b.id
+                    ? 'border-emerald-600 bg-emerald-50 dark:bg-emerald-950/80 text-emerald-900 dark:text-emerald-200 font-bold'
+                    : 'border-[var(--border-hairline)] bg-[var(--bg-surface)] text-[var(--text-muted)] hover:text-[var(--text-secondary)]'
+                }`}
+              >
+                {b.label}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 

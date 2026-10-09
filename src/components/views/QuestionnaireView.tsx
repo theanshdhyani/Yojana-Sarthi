@@ -724,8 +724,8 @@ export const QuestionnaireView: React.FC = () => {
         </div>
       )}
 
-      {/* Bottom Navigation Buttons */}
-      <div className="pt-6 border-t border-[var(--border-hairline)] flex items-center justify-between gap-4">
+      {/* Sticky Bottom Navigation Toolbar with Apple Glassmorphism */}
+      <div className="glass-toolbar p-3 sm:p-4 rounded-2xl sm:rounded-3xl shadow-md sticky bottom-22 md:bottom-6 z-20 flex items-center justify-between gap-4">
         <button
           onClick={handleBack}
           className="px-5 py-2.5 rounded-xl border border-[var(--border-hairline)] bg-[var(--bg-surface)] hover:bg-[var(--bg-subtle)] text-xs font-semibold text-[var(--text-secondary)] transition-colors"
@@ -735,7 +735,7 @@ export const QuestionnaireView: React.FC = () => {
 
         <button
           onClick={handleNext}
-          className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-[var(--accent-saffron)] hover:bg-[var(--accent-saffron-hover)] text-white text-xs font-semibold transition-colors shadow-sm"
+          className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-[var(--accent-saffron)] hover:bg-[var(--accent-saffron-hover)] text-white text-xs font-semibold transition-colors shadow-sm"
         >
           <span>{currentStepIndex === totalSteps - 1 ? t('viewResults') : t('continue')}</span>
           <ArrowRight className="w-3.5 h-3.5" />

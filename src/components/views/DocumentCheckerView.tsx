@@ -46,8 +46,8 @@ export const DocumentCheckerView: React.FC = () => {
           </p>
         </div>
 
-        {/* Readiness Meter Card */}
-        <div className="p-5 rounded-2xl border border-[var(--border-hairline)] bg-[var(--bg-surface)] space-y-3">
+        {/* Readiness Meter Card with Apple Glassmorphism */}
+        <div className="p-5 sm:p-6 rounded-3xl glass-card space-y-3.5 shadow-md">
           <div className="flex items-center justify-between">
             <span className="text-sm font-semibold text-[var(--text-primary)]">
               {readyCount} / {totalCount} {settings.language === 'hi' ? 'दस्तावेज़ तैयार हैं' : 'Documents Ready'}

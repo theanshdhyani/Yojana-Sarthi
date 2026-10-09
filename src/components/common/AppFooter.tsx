@@ -10,16 +10,18 @@ export const AppFooter: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
         
         {/* Anti-Scam Guidance Strip */}
-        <div className="mb-12 p-5 rounded-xl border border-amber-200 dark:border-amber-900/60 bg-amber-50/70 dark:bg-amber-950/30 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-          <div className="flex items-start gap-3">
-            <AlertTriangle className="w-5 h-5 text-amber-700 dark:text-amber-400 shrink-0 mt-0.5" />
-            <div>
-              <p className="font-semibold text-slate-900 dark:text-slate-100 text-sm">
+        <div className="mb-12 p-5 sm:p-6 rounded-2xl border border-[var(--warning-border)] bg-[var(--warning-bg)] flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shadow-2xs">
+          <div className="flex items-start gap-4">
+            <div className="p-2 rounded-xl bg-amber-100/90 dark:bg-amber-950/60 text-amber-700 dark:text-amber-400 border border-amber-300/60 dark:border-amber-900/40 shrink-0">
+              <AlertTriangle className="w-5 h-5" />
+            </div>
+            <div className="space-y-1">
+              <p className="font-bold text-[var(--warning-text)] text-sm sm:text-base">
                 {settings.language === 'hi' 
                   ? 'सरकारी योजनाओं के लिए किसी भी बिचौलिये या एजेंट को पैसे न दें।' 
                   : 'Never pay unofficial agents or middlemen for government welfare benefits.'}
               </p>
-              <p className="text-xs text-slate-600 dark:text-slate-400 mt-0.5">
+              <p className="text-xs sm:text-sm text-[var(--warning-desc)] leading-relaxed">
                 {settings.language === 'hi'
                   ? 'सभी आधिकारिक योजना पोर्टल .gov.in या .nic.in पर समाप्त होते हैं। साइबर धोखाधड़ी होने पर तुरंत 1930 डायल करें।'
                   : 'Official government portals always end with .gov.in or .nic.in. Report extortion or cyber frauds immediately at 1930.'}
@@ -29,7 +31,7 @@ export const AppFooter: React.FC = () => {
           <div className="flex items-center gap-2 shrink-0">
             <a
               href="tel:1930"
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-700 hover:bg-amber-800 text-white text-xs font-semibold transition-colors"
+              className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-[var(--accent-saffron)] hover:bg-[var(--accent-saffron-hover)] text-white text-xs font-semibold transition-colors shadow-2xs"
             >
               <PhoneCall className="w-3.5 h-3.5" />
               <span>{settings.language === 'hi' ? 'साइबर हेल्पलाइन 1930' : 'Cyber Helpline: 1930'}</span>
@@ -43,10 +45,10 @@ export const AppFooter: React.FC = () => {
           {/* Brand Col */}
           <div className="md:col-span-1 space-y-3">
             <div className="flex items-baseline gap-2">
-              <span className="text-lg font-serif font-bold text-[var(--text-primary)]">
+              <span className="text-xl font-serif font-bold text-[var(--text-primary)]">
                 Yojana Sarthi
               </span>
-              <span className="text-xs font-sans text-amber-700 dark:text-amber-400">
+              <span className="text-xs font-sans font-semibold text-[var(--accent-saffron)]">
                 योजना सारथी
               </span>
             </div>
@@ -55,8 +57,8 @@ export const AppFooter: React.FC = () => {
                 ? 'भारतीय नागरिकों के लिए एक स्वतंत्र, पारदर्शी और गरिमापूर्ण डिजिटल लोक सेवा मार्गदर्शक।'
                 : 'A calm, independent civic guide helping citizens understand, prepare and access welfare entitlements.'}
             </p>
-            <div className="flex items-center gap-2 text-xs text-emerald-700 dark:text-emerald-400 font-medium">
-              <ShieldCheck className="w-4 h-4" />
+            <div className="flex items-center gap-2 text-xs text-[var(--accent-green-text)] font-semibold">
+              <ShieldCheck className="w-4 h-4 text-[var(--accent-green)]" />
               <span>{t('trustPrivate')}</span>
             </div>
           </div>
@@ -68,32 +70,32 @@ export const AppFooter: React.FC = () => {
             </h4>
             <ul className="space-y-2 text-xs">
               <li>
-                <button onClick={() => setCurrentView('questionnaire')} className="hover:text-[var(--text-primary)] transition-colors">
+                <button onClick={() => setCurrentView('questionnaire')} className="text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors">
                   {t('navFindSchemes')}
                 </button>
               </li>
               <li>
-                <button onClick={() => setCurrentView('all_schemes')} className="hover:text-[var(--text-primary)] transition-colors">
+                <button onClick={() => setCurrentView('all_schemes')} className="text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors">
                   {t('navAllSchemes')}
                 </button>
               </li>
               <li>
-                <button onClick={() => setCurrentView('document_checker')} className="hover:text-[var(--text-primary)] transition-colors">
+                <button onClick={() => setCurrentView('document_checker')} className="text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors">
                   {t('navDocumentChecker')}
                 </button>
               </li>
               <li>
-                <button onClick={() => setCurrentView('tracker')} className="hover:text-[var(--text-primary)] transition-colors">
+                <button onClick={() => setCurrentView('tracker')} className="text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors">
                   {t('navTracker')}
                 </button>
               </li>
               <li>
-                <button onClick={() => setCurrentView('family_mode')} className="hover:text-[var(--text-primary)] transition-colors">
+                <button onClick={() => setCurrentView('family_mode')} className="text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors">
                   {t('navFamilyMode')}
                 </button>
               </li>
               <li>
-                <button onClick={() => setCurrentView('nearby_help')} className="hover:text-[var(--text-primary)] transition-colors">
+                <button onClick={() => setCurrentView('nearby_help')} className="text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors">
                   {t('navNearbyHelp')}
                 </button>
               </li>
@@ -107,27 +109,27 @@ export const AppFooter: React.FC = () => {
             </h4>
             <ul className="space-y-2 text-xs">
               <li>
-                <a href="https://www.india.gov.in" target="_blank" rel="noopener noreferrer" className="hover:text-[var(--text-primary)] transition-colors flex items-center gap-1">
+                <a href="https://www.india.gov.in" target="_blank" rel="noopener noreferrer" className="text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors flex items-center gap-1">
                   <span>National Portal of India</span>
-                  <ExternalLink className="w-3 h-3" />
+                  <ExternalLink className="w-3 h-3 text-[var(--text-muted)]" />
                 </a>
               </li>
               <li>
-                <a href="https://pmkisan.gov.in" target="_blank" rel="noopener noreferrer" className="hover:text-[var(--text-primary)] transition-colors flex items-center gap-1">
+                <a href="https://pmkisan.gov.in" target="_blank" rel="noopener noreferrer" className="text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors flex items-center gap-1">
                   <span>PM-KISAN Portal</span>
-                  <ExternalLink className="w-3 h-3" />
+                  <ExternalLink className="w-3 h-3 text-[var(--text-muted)]" />
                 </a>
               </li>
               <li>
-                <a href="https://beneficiary.nha.gov.in" target="_blank" rel="noopener noreferrer" className="hover:text-[var(--text-primary)] transition-colors flex items-center gap-1">
+                <a href="https://beneficiary.nha.gov.in" target="_blank" rel="noopener noreferrer" className="text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors flex items-center gap-1">
                   <span>Ayushman PM-JAY</span>
-                  <ExternalLink className="w-3 h-3" />
+                  <ExternalLink className="w-3 h-3 text-[var(--text-muted)]" />
                 </a>
               </li>
               <li>
-                <a href="https://cybercrime.gov.in" target="_blank" rel="noopener noreferrer" className="hover:text-[var(--text-primary)] transition-colors flex items-center gap-1">
+                <a href="https://cybercrime.gov.in" target="_blank" rel="noopener noreferrer" className="text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors flex items-center gap-1">
                   <span>Cyber Crime Reporting (1930)</span>
-                  <ExternalLink className="w-3 h-3" />
+                  <ExternalLink className="w-3 h-3 text-[var(--text-muted)]" />
                 </a>
               </li>
             </ul>

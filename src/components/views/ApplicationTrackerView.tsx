@@ -273,8 +273,8 @@ export const ApplicationTrackerView: React.FC = () => {
 
       {/* Add Application Modal */}
       {isAddModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs no-print">
-          <div className="w-full max-w-lg bg-[var(--bg-surface)] border border-[var(--border-hairline)] rounded-2xl p-6 shadow-xl space-y-5">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 glass-scrim no-print">
+          <div className="w-full max-w-lg glass-modal rounded-3xl p-6 sm:p-7 shadow-2xl space-y-5">
             <h3 className="text-lg font-serif font-bold text-[var(--text-primary)]">
               {t('newApplication')}
             </h3>

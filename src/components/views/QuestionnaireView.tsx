@@ -36,11 +36,110 @@ export const QuestionnaireView: React.FC = () => {
   } = useApp();
 
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
+  const [validationError, setValidationError] = useState<string | null>(null);
 
   const totalSteps = 10;
 
+  const validateCurrentStep = (): boolean => {
+    switch (currentStepIndex) {
+      case 0:
+        if (!answers.age || isNaN(answers.age) || answers.age < 1 || answers.age > 115) {
+          setValidationError(
+            settings.language === 'hi'
+              ? 'कृपया आगे बढ़ने के लिए 1 से 115 के बीच एक मान्य आयु दर्ज करें।'
+              : 'Please enter a valid age between 1 and 115 years to continue.'
+          );
+          return false;
+        }
+        break;
+      case 1:
+        if (!answers.gender) {
+          setValidationError(
+            settings.language === 'hi'
+              ? 'कृपया आगे बढ़ने के लिए अपना लिंग चुनें।'
+              : 'Please select a gender option to continue.'
+          );
+          return false;
+        }
+        break;
+      case 2:
+        if (!answers.state) {
+          // If state is not selected, set standard default or validate
+          setAnswers((prev) => ({ ...prev, state: prev.state || 'Uttar Pradesh' }));
+        }
+        break;
+      case 3:
+        if (!answers.residenceArea) {
+          setValidationError(
+            settings.language === 'hi'
+              ? 'कृपया चुनें कि आप गांव (ग्रामीण) में रहते हैं या शहर (शहरी) में।'
+              : 'Please select whether you reside in a rural or urban area.'
+          );
+          return false;
+        }
+        break;
+      case 4:
+        if (!answers.occupation) {
+          setValidationError(
+            settings.language === 'hi'
+              ? 'कृपया अपनी प्राथमिक आजीविका या व्यवसाय चुनें।'
+              : 'Please select your primary occupation or livelihood.'
+          );
+          return false;
+        }
+        break;
+      case 5:
+        if (!answers.annualIncomeBracket) {
+          setValidationError(
+            settings.language === 'hi'
+              ? 'कृपया अपने परिवार की वार्षिक आय का दायरा चुनें।'
+              : 'Please select your annual household income bracket.'
+          );
+          return false;
+        }
+        break;
+      case 6:
+        if (!answers.landholding) {
+          setValidationError(
+            settings.language === 'hi'
+              ? 'कृपया अपनी कृषि भूमि स्वामित्व की स्थिति चुनें।'
+              : 'Please select your agricultural landholding profile.'
+          );
+          return false;
+        }
+        break;
+      case 7:
+        if (!answers.socialCategory) {
+          setValidationError(
+            settings.language === 'hi'
+              ? 'कृपया अपना सामाजिक वर्ग (Category) चुनें।'
+              : 'Please select your social category to check affirmative benefits.'
+          );
+          return false;
+        }
+        break;
+      case 8:
+        if (!answers.hasRationCard) {
+          setValidationError(
+            settings.language === 'hi'
+              ? 'कृपया अपने राशन कार्ड की श्रेणी चुनें।'
+              : 'Please select your ration card category.'
+          );
+          return false;
+        }
+        break;
+      default:
+        break;
+    }
+    setValidationError(null);
+    return true;
+  };
+
   const handleNext = () => {
     stopReading();
+    if (!validateCurrentStep()) {
+      return;
+    }
     if (currentStepIndex < totalSteps - 1) {
       setCurrentStepIndex(currentStepIndex + 1);
     } else {
@@ -50,6 +149,7 @@ export const QuestionnaireView: React.FC = () => {
 
   const handleBack = () => {
     stopReading();
+    setValidationError(null);
     if (currentStepIndex > 0) {
       setCurrentStepIndex(currentStepIndex - 1);
     } else {
@@ -134,7 +234,10 @@ export const QuestionnaireView: React.FC = () => {
                 min="1"
                 max="110"
                 value={answers.age ?? ''}
-                onChange={(e) => setAnswers({ ...answers, age: parseInt(e.target.value) || undefined })}
+                onChange={(e) => {
+                  setValidationError(null);
+                  setAnswers({ ...answers, age: parseInt(e.target.value) || undefined });
+                }}
                 placeholder="e.g. 38"
                 className="w-full text-2xl font-semibold px-4 py-3 rounded-xl border border-[var(--border-hairline)] bg-[var(--bg-subtle)] focus:border-[var(--accent-saffron)] focus:outline-none"
               />
@@ -149,7 +252,10 @@ export const QuestionnaireView: React.FC = () => {
                   <button
                     key={val}
                     type="button"
-                    onClick={() => setAnswers({ ...answers, age: val })}
+                    onClick={() => {
+                      setValidationError(null);
+                      setAnswers({ ...answers, age: val });
+                    }}
                     className={`px-3 py-1.5 rounded-lg border text-xs font-medium transition-colors ${
                       answers.age === val
                         ? 'border-[var(--accent-saffron)] bg-[var(--accent-saffron-light)] font-bold text-[var(--text-primary)]'
@@ -191,7 +297,10 @@ export const QuestionnaireView: React.FC = () => {
               <button
                 key={item.id}
                 type="button"
-                onClick={() => setAnswers({ ...answers, gender: item.id as any })}
+                onClick={() => {
+                  setValidationError(null);
+                  setAnswers({ ...answers, gender: item.id as any });
+                }}
                 className={`p-5 rounded-2xl border text-left transition-all flex flex-col justify-between ${
                   answers.gender === item.id
                     ? 'border-[var(--accent-saffron)] bg-[var(--accent-saffron-light)] shadow-xs'
@@ -272,7 +381,10 @@ export const QuestionnaireView: React.FC = () => {
               <button
                 key={item.id}
                 type="button"
-                onClick={() => setAnswers({ ...answers, residenceArea: item.id as any })}
+                onClick={() => {
+                  setValidationError(null);
+                  setAnswers({ ...answers, residenceArea: item.id as any });
+                }}
                 className={`p-6 rounded-2xl border text-left transition-all flex flex-col justify-between ${
                   answers.residenceArea === item.id
                     ? 'border-[var(--accent-saffron)] bg-[var(--accent-saffron-light)] shadow-xs'
@@ -325,7 +437,10 @@ export const QuestionnaireView: React.FC = () => {
               <button
                 key={item.id}
                 type="button"
-                onClick={() => setAnswers({ ...answers, occupation: item.id as any })}
+                onClick={() => {
+                  setValidationError(null);
+                  setAnswers({ ...answers, occupation: item.id as any });
+                }}
                 className={`p-4 rounded-xl border text-left transition-all flex items-center justify-between ${
                   answers.occupation === item.id
                     ? 'border-[var(--accent-saffron)] bg-[var(--accent-saffron-light)] shadow-xs font-semibold'
@@ -373,7 +488,10 @@ export const QuestionnaireView: React.FC = () => {
               <button
                 key={item.id}
                 type="button"
-                onClick={() => setAnswers({ ...answers, annualIncomeBracket: item.id as any })}
+                onClick={() => {
+                  setValidationError(null);
+                  setAnswers({ ...answers, annualIncomeBracket: item.id as any });
+                }}
                 className={`w-full p-4 rounded-xl border text-left transition-all flex items-center justify-between ${
                   answers.annualIncomeBracket === item.id
                     ? 'border-[var(--accent-saffron)] bg-[var(--accent-saffron-light)] font-semibold shadow-xs'
@@ -417,7 +535,10 @@ export const QuestionnaireView: React.FC = () => {
               <button
                 key={item.id}
                 type="button"
-                onClick={() => setAnswers({ ...answers, landholding: item.id as any })}
+                onClick={() => {
+                  setValidationError(null);
+                  setAnswers({ ...answers, landholding: item.id as any });
+                }}
                 className={`p-5 rounded-2xl border text-left transition-all flex flex-col justify-between ${
                   answers.landholding === item.id
                     ? 'border-[var(--accent-saffron)] bg-[var(--accent-saffron-light)] shadow-xs'
@@ -465,7 +586,10 @@ export const QuestionnaireView: React.FC = () => {
               <button
                 key={item.id}
                 type="button"
-                onClick={() => setAnswers({ ...answers, socialCategory: item.id as any })}
+                onClick={() => {
+                  setValidationError(null);
+                  setAnswers({ ...answers, socialCategory: item.id as any });
+                }}
                 className={`p-4 rounded-xl border text-left transition-all flex items-center justify-between ${
                   answers.socialCategory === item.id
                     ? 'border-[var(--accent-saffron)] bg-[var(--accent-saffron-light)] font-semibold shadow-xs'
@@ -509,7 +633,10 @@ export const QuestionnaireView: React.FC = () => {
               <button
                 key={item.id}
                 type="button"
-                onClick={() => setAnswers({ ...answers, hasRationCard: item.id as any })}
+                onClick={() => {
+                  setValidationError(null);
+                  setAnswers({ ...answers, hasRationCard: item.id as any });
+                }}
                 className={`w-full p-4 rounded-xl border text-left transition-all flex items-center justify-between ${
                   answers.hasRationCard === item.id
                     ? 'border-[var(--accent-saffron)] bg-[var(--accent-saffron-light)] font-semibold shadow-xs'
@@ -583,6 +710,17 @@ export const QuestionnaireView: React.FC = () => {
               );
             })}
           </div>
+        </div>
+      )}
+
+      {/* Accessible Validation Error Banner */}
+      {validationError && (
+        <div 
+          role="alert"
+          className="p-3.5 rounded-xl border border-[var(--warning-border)] bg-[var(--warning-bg)] text-xs font-semibold text-[var(--warning-text)] flex items-center gap-2.5 animate-shake shadow-2xs"
+        >
+          <Info className="w-4 h-4 text-[var(--accent-saffron)] shrink-0" />
+          <span>{validationError}</span>
         </div>
       )}
 

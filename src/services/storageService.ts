@@ -12,22 +12,123 @@ const KEYS = {
   ONBOARDING_SEEN: 'yojana_sarthi_onboarding_v1'
 };
 
+export const SAMPLE_DEMO_DATA = {
+  answers: {
+    age: 42,
+    gender: 'male' as const,
+    state: 'Uttar Pradesh',
+    residenceArea: 'rural' as const,
+    socialCategory: 'OBC' as const,
+    occupation: 'farmer' as const,
+    annualIncomeBracket: '1lakh_to_2.5lakh' as const,
+    landholding: 'small_1_to_2ha' as const,
+    hasRationCard: 'bpl' as const,
+    specialAttributes: []
+  },
+  readyDocuments: ['doc_aadhaar', 'doc_bank_passbook', 'doc_land_records'],
+  applications: [
+    {
+      id: 'app_seed_01',
+      schemeId: 'pm-kisan',
+      schemeName: 'Pradhan Mantri Kisan Samman Nidhi (PM-KISAN)',
+      schemeNameHindi: 'प्रधानमंत्री किसान सम्मान निधि (पीएम-किसान)',
+      beneficiaryName: 'Rameshwar Lal',
+      referenceNumber: 'UP-PMK-2026-904128',
+      appliedDate: '2026-08-14',
+      status: 'approved' as const,
+      portalUrl: 'https://pmkisan.gov.in',
+      notes: 'Land record physical verification completed by Lekhpal on 18 Aug. 17th installment credited.',
+      timeline: [
+        { date: '2026-08-14', title: 'Application Submitted', description: 'Filed online via CSC Center' },
+        { date: '2026-08-20', title: 'Revenue Record Verified', description: 'Patwari confirmed Khasra 142/1' },
+        { date: '2026-09-02', title: 'State Nodal Approval', description: 'DBT mandate registered with NPCI' }
+      ],
+      lastUpdated: '2026-09-02'
+    },
+    {
+      id: 'app_seed_02',
+      schemeId: 'ayushman-bharat-pmjay',
+      schemeName: 'Ayushman Bharat PM-JAY',
+      schemeNameHindi: 'आयुष्मान भारत पीएम-जय',
+      beneficiaryName: 'Smt. Shanti Devi',
+      referenceNumber: 'AB-PMJAY-8830114',
+      appliedDate: '2026-09-12',
+      status: 'under_review' as const,
+      portalUrl: 'https://beneficiary.nha.gov.in',
+      notes: 'e-KYC verified via Face Auth. Awaiting district health officer card generation batch.',
+      timeline: [
+        { date: '2026-09-12', title: 'eKYC Generated', description: 'Aadhaar face authentication successful' },
+        { date: '2026-09-16', title: 'District Queue', description: 'Under verification against SECC database' }
+      ],
+      lastUpdated: '2026-09-16'
+    }
+  ],
+  familyMembers: [
+    {
+      id: 'fam_01',
+      name: 'Rameshwar Lal',
+      relationship: 'self' as const,
+      profile: {
+        age: 48,
+        gender: 'male' as const,
+        occupation: 'farmer' as const,
+        landholding: 'small_1_to_2ha' as const,
+        socialCategory: 'OBC' as const,
+        annualIncomeBracket: '1lakh_to_2.5lakh' as const,
+        hasRationCard: 'bpl' as const
+      },
+      notes: 'Small landholder cultivating wheat and mustard'
+    },
+    {
+      id: 'fam_02',
+      name: 'Shanti Devi',
+      relationship: 'spouse' as const,
+      profile: {
+        age: 44,
+        gender: 'female' as const,
+        occupation: 'homemaker' as const,
+        socialCategory: 'OBC' as const,
+        annualIncomeBracket: '1lakh_to_2.5lakh' as const,
+        hasRationCard: 'bpl' as const
+      },
+      notes: 'Homemaker running small dairy unit'
+    },
+    {
+      id: 'fam_03',
+      name: 'Anjali Kumari',
+      relationship: 'daughter' as const,
+      profile: {
+        age: 19,
+        gender: 'female' as const,
+        occupation: 'student' as const,
+        socialCategory: 'OBC' as const,
+        annualIncomeBracket: '1lakh_to_2.5lakh' as const
+      },
+      notes: 'Undergraduate BSc 2nd year student'
+    },
+    {
+      id: 'fam_04',
+      name: 'Shivcharan Lal',
+      relationship: 'father' as const,
+      profile: {
+        age: 72,
+        gender: 'male' as const,
+        occupation: 'retired' as const,
+        socialCategory: 'OBC' as const,
+        annualIncomeBracket: 'below_1lakh' as const,
+        hasRationCard: 'bpl' as const,
+        specialAttributes: ['senior_citizen']
+      },
+      notes: 'Elderly father requiring regular medical checks'
+    }
+  ]
+};
+
 export const StorageService = {
   getAnswers(): QuestionnaireAnswers {
     try {
       const raw = localStorage.getItem(KEYS.ANSWERS);
-      return raw ? JSON.parse(raw) : {
-        age: 34,
-        gender: 'male',
-        state: 'Uttar Pradesh',
-        residenceArea: 'rural',
-        socialCategory: 'OBC',
-        occupation: 'farmer',
-        annualIncomeBracket: '1lakh_to_2.5lakh',
-        landholding: 'small_1_to_2ha',
-        hasRationCard: 'bpl',
-        specialAttributes: []
-      };
+      return raw ? JSON.parse(raw) : {};
     } catch {
       return {};
     }
@@ -44,9 +145,9 @@ export const StorageService = {
   getReadyDocuments(): string[] {
     try {
       const raw = localStorage.getItem(KEYS.READY_DOCS);
-      return raw ? JSON.parse(raw) : ['doc_aadhaar', 'doc_bank_passbook', 'doc_ration_card'];
+      return raw ? JSON.parse(raw) : [];
     } catch {
-      return ['doc_aadhaar', 'doc_bank_passbook'];
+      return [];
     }
   },
 
@@ -61,49 +162,10 @@ export const StorageService = {
   getApplications(): TrackedApplication[] {
     try {
       const raw = localStorage.getItem(KEYS.TRACKER);
-      if (raw) return JSON.parse(raw);
+      return raw ? JSON.parse(raw) : [];
     } catch {
-      // fallback below
+      return [];
     }
-
-    // Default seeded realistic demo items
-    return [
-      {
-        id: 'app_seed_01',
-        schemeId: 'pm-kisan',
-        schemeName: 'Pradhan Mantri Kisan Samman Nidhi (PM-KISAN)',
-        schemeNameHindi: 'प्रधानमंत्री किसान सम्मान निधि (पीएम-किसान)',
-        beneficiaryName: 'Rameshwar Lal',
-        referenceNumber: 'UP-PMK-2026-904128',
-        appliedDate: '2026-08-14',
-        status: 'approved',
-        portalUrl: 'https://pmkisan.gov.in',
-        notes: 'Land record physical verification completed by Lekhpal on 18 Aug. 17th installment credited.',
-        timeline: [
-          { date: '2026-08-14', title: 'Application Submitted', description: 'Filed online via CSC Center' },
-          { date: '2026-08-20', title: 'Revenue Record Verified', description: 'Patwari confirmed Khasra 142/1' },
-          { date: '2026-09-02', title: 'State Nodal Approval', description: 'DBT mandate registered with NPCI' }
-        ],
-        lastUpdated: '2026-09-02'
-      },
-      {
-        id: 'app_seed_02',
-        schemeId: 'ayushman-bharat-pmjay',
-        schemeName: 'Ayushman Bharat PM-JAY',
-        schemeNameHindi: 'आयुष्मान भारत पीएम-जय',
-        beneficiaryName: 'Smt. Shanti Devi',
-        referenceNumber: 'AB-PMJAY-8830114',
-        appliedDate: '2026-09-12',
-        status: 'under_review',
-        portalUrl: 'https://beneficiary.nha.gov.in',
-        notes: 'e-KYC verified via Face Auth. Awaiting district health officer card generation batch.',
-        timeline: [
-          { date: '2026-09-12', title: 'eKYC Generated', description: 'Aadhaar face authentication successful' },
-          { date: '2026-09-16', title: 'District Queue', description: 'Under verification against SECC database' }
-        ],
-        lastUpdated: '2026-09-16'
-      }
-    ];
   },
 
   saveApplications(apps: TrackedApplication[]): void {
@@ -117,70 +179,10 @@ export const StorageService = {
   getFamilyMembers(): FamilyMember[] {
     try {
       const raw = localStorage.getItem(KEYS.FAMILY);
-      if (raw) return JSON.parse(raw);
+      return raw ? JSON.parse(raw) : [];
     } catch {
-      // fallback
+      return [];
     }
-
-    return [
-      {
-        id: 'fam_01',
-        name: 'Rameshwar Lal',
-        relationship: 'self',
-        profile: {
-          age: 48,
-          gender: 'male',
-          occupation: 'farmer',
-          landholding: 'small_1_to_2ha',
-          socialCategory: 'OBC',
-          annualIncomeBracket: '1lakh_to_2.5lakh',
-          hasRationCard: 'bpl'
-        },
-        notes: 'Small landholder cultivating wheat and mustard'
-      },
-      {
-        id: 'fam_02',
-        name: 'Shanti Devi',
-        relationship: 'spouse',
-        profile: {
-          age: 44,
-          gender: 'female',
-          occupation: 'homemaker',
-          socialCategory: 'OBC',
-          annualIncomeBracket: '1lakh_to_2.5lakh',
-          hasRationCard: 'bpl'
-        },
-        notes: 'Homemaker running small dairy unit'
-      },
-      {
-        id: 'fam_03',
-        name: 'Anjali Kumari',
-        relationship: 'daughter',
-        profile: {
-          age: 19,
-          gender: 'female',
-          occupation: 'student',
-          socialCategory: 'OBC',
-          annualIncomeBracket: '1lakh_to_2.5lakh'
-        },
-        notes: 'Undergraduate BSc 2nd year student'
-      },
-      {
-        id: 'fam_04',
-        name: 'Shivcharan Lal',
-        relationship: 'father',
-        profile: {
-          age: 72,
-          gender: 'male',
-          occupation: 'retired',
-          socialCategory: 'OBC',
-          annualIncomeBracket: 'below_1lakh',
-          hasRationCard: 'bpl',
-          specialAttributes: ['senior_citizen']
-        },
-        notes: 'Elderly father requiring regular medical checks'
-      }
-    ];
   },
 
   saveFamilyMembers(members: FamilyMember[]): void {
@@ -239,6 +241,17 @@ export const StorageService = {
       Object.values(KEYS).forEach((k) => localStorage.removeItem(k));
     } catch (e) {
       console.warn('Clear data failed:', e);
+    }
+  },
+
+  loadSampleDemoData(): void {
+    try {
+      this.saveAnswers(SAMPLE_DEMO_DATA.answers);
+      this.saveReadyDocuments(SAMPLE_DEMO_DATA.readyDocuments);
+      this.saveApplications(SAMPLE_DEMO_DATA.applications);
+      this.saveFamilyMembers(SAMPLE_DEMO_DATA.familyMembers);
+    } catch (e) {
+      console.warn('Loading sample demo data failed:', e);
     }
   },
 

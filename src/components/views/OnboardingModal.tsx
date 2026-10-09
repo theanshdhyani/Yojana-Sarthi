@@ -63,9 +63,9 @@ export const OnboardingModal: React.FC = () => {
   const activeSlide = slides[currentStep];
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/55 backdrop-blur-xs no-print">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 glass-scrim no-print">
       <div 
-        className="w-full max-w-md bg-[var(--bg-surface)] border border-[var(--border-hairline)] rounded-2xl shadow-2xl p-6 sm:p-8 flex flex-col justify-between min-h-[420px]"
+        className="w-full max-w-md glass-modal rounded-3xl shadow-2xl p-6 sm:p-8 flex flex-col justify-between min-h-[420px]"
         role="dialog"
         aria-modal="true"
       >

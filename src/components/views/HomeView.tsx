@@ -10,7 +10,7 @@ import {
   Users, 
   Building2, 
   PhoneCall, 
-  AlertTriangle,
+  AlertTriangle, 
   BadgeCheck,
   Wheat,
   HeartPulse,
@@ -27,7 +27,7 @@ import { SCHEMES_DATABASE } from '../../data/schemesData';
 import { SchemeCategory } from '../../types/scheme';
 
 export const HomeView: React.FC = () => {
-  const { setCurrentView, setSelectedSchemeId, settings, setAnswers, t } = useApp();
+  const { setCurrentView, setSelectedSchemeId, settings, setAnswers, loadSampleData, t } = useApp();
 
   // Interactive Hero Profile Preview switcher
   const [activePersona, setActivePersona] = useState<'farmer' | 'student' | 'woman' | 'senior'>('farmer');
@@ -45,7 +45,7 @@ export const HomeView: React.FC = () => {
     student: {
       name: 'Anjali Kumari',
       role: settings.language === 'hi' ? 'कॉलेज छात्रा, 19 वर्ष' : 'College Student, 19 yrs',
-      state: 'Bihar (Urban/Rural)',
+      state: 'Bihar (Rural/Urban)',
       income: '₹1.5 Lakh/yr (OBC)',
       matches: 2,
       topScheme: 'Post-Matric Scholarship (100% Fee Reimbursement)',
@@ -121,17 +121,6 @@ export const HomeView: React.FC = () => {
     }
   };
 
-  const categories = [
-    { id: 'agriculture', label: settings.language === 'hi' ? 'कृषि एवं किसान' : 'Agriculture & Farming', icon: Wheat, count: 2 },
-    { id: 'health', label: settings.language === 'hi' ? 'स्वास्थ्य एवं चिकित्सा' : 'Health & Medical', icon: HeartPulse, count: 1 },
-    { id: 'housing', label: settings.language === 'hi' ? 'आवास एवं मकान' : 'Housing & Shelter', icon: Home, count: 1 },
-    { id: 'women_children', label: settings.language === 'hi' ? 'महिला एवं बाल कल्याण' : 'Women & Children', icon: Baby, count: 3 },
-    { id: 'education', label: settings.language === 'hi' ? 'शिक्षा एवं छात्रवृत्ति' : 'Education & Learning', icon: GraduationCap, count: 1 },
-    { id: 'livelihood_business', label: settings.language === 'hi' ? 'रोजगार एवं व्यवसाय' : 'Livelihood & MSME', icon: Store, count: 4 },
-    { id: 'social_security', label: settings.language === 'hi' ? 'सामाजिक सुरक्षा एवं पेंशन' : 'Social Security', icon: Shield, count: 3 },
-    { id: 'clean_energy', label: settings.language === 'hi' ? 'सोलर एवं स्वच्छ ऊर्जा' : 'Clean Energy', icon: SunMedium, count: 1 }
-  ];
-
   const handleSchemeClick = (id: string) => {
     setSelectedSchemeId(id);
     setCurrentView('scheme_detail');
@@ -140,7 +129,7 @@ export const HomeView: React.FC = () => {
   const currentPersonaData = personas[activePersona];
 
   return (
-    <div className="space-y-24 md:space-y-32">
+    <div className="space-y-20 md:space-y-28">
       
       {/* 1. HERO SECTION */}
       <section className="pt-6 sm:pt-10">
@@ -151,8 +140,8 @@ export const HomeView: React.FC = () => {
             <div className="lg:col-span-7 space-y-6">
               
               {/* Eyebrow */}
-              <div className="inline-flex items-center gap-2 text-xs font-semibold tracking-wide uppercase text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-900/60 px-3 py-1 rounded-full">
-                <span className="w-1.5 h-1.5 rounded-full bg-amber-600 animate-pulse" />
+              <div className="inline-flex items-center gap-2 text-xs font-semibold tracking-wide uppercase text-[var(--accent-saffron-text)] bg-[var(--accent-saffron-light)] border border-[var(--accent-saffron)]/30 px-3.5 py-1 rounded-full shadow-2xs">
+                <span className="w-1.5 h-1.5 rounded-full bg-[var(--accent-saffron)] animate-pulse" />
                 <span>{t('heroEyebrow')}</span>
               </div>
 
@@ -170,7 +159,7 @@ export const HomeView: React.FC = () => {
               <div className="pt-2 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
                 <button
                   onClick={() => setCurrentView('questionnaire')}
-                  className="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-[var(--accent-saffron)] hover:bg-[var(--accent-saffron-hover)] text-white font-semibold text-sm transition-colors shadow-sm"
+                  className="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-[var(--accent-saffron)] hover:bg-[var(--accent-saffron-hover)] text-white font-semibold text-sm transition-colors shadow-xs"
                 >
                   <span>{t('heroCtaPrimary')}</span>
                   <ArrowRight className="w-4 h-4" />
@@ -178,7 +167,7 @@ export const HomeView: React.FC = () => {
 
                 <button
                   onClick={() => setCurrentView('all_schemes')}
-                  className="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl border border-[var(--border-hairline)] bg-[var(--bg-surface)] hover:bg-[var(--bg-subtle)] text-[var(--text-primary)] font-semibold text-sm transition-colors"
+                  className="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl border border-[var(--border-hairline)] bg-[var(--bg-surface)] hover:bg-[var(--bg-subtle)] text-[var(--text-primary)] font-semibold text-sm transition-colors shadow-2xs"
                 >
                   <span>{t('heroCtaSecondary')}</span>
                 </button>
@@ -187,26 +176,26 @@ export const HomeView: React.FC = () => {
               {/* Quiet Trust Signals */}
               <div className="pt-4 border-t border-[var(--border-hairline)] grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs text-[var(--text-secondary)] font-medium">
                 <div className="flex items-center gap-2">
-                  <BadgeCheck className="w-4 h-4 text-emerald-600 shrink-0" />
+                  <BadgeCheck className="w-4 h-4 text-[var(--accent-green)] shrink-0" />
                   <span>{t('trust100Free')}</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
+                  <ShieldCheck className="w-4 h-4 text-[var(--accent-green)] shrink-0" />
                   <span>{t('trustPrivate')}</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                  <CheckCircle2 className="w-4 h-4 text-[var(--accent-green)] shrink-0" />
                   <span>{t('trustNoAadhaar')}</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                  <CheckCircle2 className="w-4 h-4 text-[var(--accent-green)] shrink-0" />
                   <span>{t('trustOffline')}</span>
                 </div>
               </div>
 
             </div>
 
-            {/* Right Column: Interactive Editorial Product Artifact (Profile → Eligibility → Schemes) */}
+            {/* Right Column: Interactive Editorial Product Artifact */}
             <div className="lg:col-span-5">
               <div className="bg-[var(--bg-surface)] border border-[var(--border-hairline)] rounded-2xl shadow-sm p-6 space-y-5 relative">
                 
@@ -216,24 +205,24 @@ export const HomeView: React.FC = () => {
                     <span className="text-[11px] font-bold uppercase tracking-wider text-[var(--text-muted)]">
                       {settings.language === 'hi' ? 'लाइव पात्रता पूर्वावलोकन' : 'Live Matching Preview'}
                     </span>
-                    <p className="text-xs font-medium text-[var(--text-primary)]">
+                    <p className="text-xs font-semibold text-[var(--text-primary)]">
                       {settings.language === 'hi' ? 'चुनें नागरिक प्रोफ़ाइल:' : 'Select a sample citizen profile:'}
                     </p>
                   </div>
-                  <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-emerald-50 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
+                  <span className="px-2.5 py-0.5 rounded-md text-[10px] font-bold bg-[var(--accent-green-light)] text-[var(--accent-green-text)] border border-[var(--accent-green)]/30">
                     Active Matcher
                   </span>
                 </div>
 
                 {/* Profile Selector Tabs */}
-                <div className="grid grid-cols-4 gap-1 p-1 bg-[var(--bg-subtle)] rounded-lg text-xs font-medium">
+                <div className="grid grid-cols-4 gap-1 p-1 bg-[var(--bg-subtle)] rounded-xl text-xs font-medium">
                   {(['farmer', 'student', 'woman', 'senior'] as const).map((key) => (
                     <button
                       key={key}
                       onClick={() => handlePersonaSelect(key)}
-                      className={`py-1.5 px-2 rounded-md transition-colors text-center capitalize ${
+                      className={`py-1.5 px-2 rounded-lg transition-colors text-center capitalize ${
                         activePersona === key
-                          ? 'bg-[var(--bg-surface)] text-[var(--text-primary)] font-semibold shadow-xs'
+                          ? 'bg-[var(--bg-surface)] text-[var(--text-primary)] font-bold shadow-2xs'
                           : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
                       }`}
                     >
@@ -256,28 +245,28 @@ export const HomeView: React.FC = () => {
                         {currentPersonaData.role} · {currentPersonaData.state}
                       </p>
                     </div>
-                    <span className="text-xs font-semibold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950 px-2 py-1 rounded-md border border-emerald-200 dark:border-emerald-800">
+                    <span className="text-xs font-bold text-[var(--accent-green-text)] bg-[var(--accent-green-light)] px-2.5 py-1 rounded-md border border-[var(--accent-green)]/30">
                       {currentPersonaData.matches} {settings.language === 'hi' ? 'योजनाएं पात्र' : 'Eligible'}
                     </span>
                   </div>
 
-                  <div className="text-xs text-[var(--text-secondary)] pt-2 border-t border-[var(--border-hairline)] flex items-center justify-between">
+                  <div className="text-xs text-[var(--text-secondary)] pt-2 border-t border-[var(--border-hairline)] flex items-center justify-between font-medium">
                     <span>{settings.language === 'hi' ? 'वार्षिक आय:' : 'Annual Income:'} {currentPersonaData.income}</span>
-                    <span className="text-[var(--text-muted)]">No Aadhaar needed</span>
+                    <span className="text-[var(--text-muted)] font-normal">No Aadhaar needed</span>
                   </div>
                 </div>
 
-                {/* Result Arrow Mechanism */}
+                {/* Result Preview Box */}
                 <div className="space-y-2">
-                  <div className="text-[11px] font-semibold text-[var(--text-muted)] uppercase tracking-wider">
+                  <div className="text-[11px] font-bold text-[var(--text-muted)] uppercase tracking-wider">
                     {settings.language === 'hi' ? 'तत्काल सुझाई गई योजनाएं:' : 'Instant Matched Entitlements:'}
                   </div>
-                  <div className="p-3.5 rounded-xl border border-amber-200 dark:border-amber-900/60 bg-amber-50/50 dark:bg-amber-950/30 text-xs space-y-1">
-                    <p className="font-semibold text-slate-900 dark:text-slate-100 flex items-center gap-1.5">
-                      <Sparkles className="w-3.5 h-3.5 text-amber-700" />
+                  <div className="p-3.5 rounded-xl border border-[var(--warning-border)] bg-[var(--warning-bg)] text-xs space-y-1 shadow-2xs">
+                    <p className="font-bold text-[var(--warning-text)] flex items-center gap-1.5">
+                      <Sparkles className="w-3.5 h-3.5 text-[var(--accent-saffron)] shrink-0" />
                       <span>{currentPersonaData.topScheme}</span>
                     </p>
-                    <p className="text-slate-600 dark:text-slate-400 text-[11px]">
+                    <p className="text-[var(--warning-desc)] text-[11px] leading-relaxed">
                       {settings.language === 'hi' 
                         ? 'दस्तावेज़: आधार, बैंक पासबुक, आय/जमीन प्रमाण। कोई बिचौलिया आवश्यक नहीं।'
                         : 'Required: Aadhaar, Bank Passbook, Land/Income cert. No middlemen.'}
@@ -286,13 +275,18 @@ export const HomeView: React.FC = () => {
                 </div>
 
                 {/* Inspect Action */}
-                <button
-                  onClick={() => setCurrentView('results')}
-                  className="w-full py-2.5 px-4 rounded-xl border border-[var(--accent-saffron)] text-[var(--accent-saffron)] hover:bg-[var(--accent-saffron-light)] font-semibold text-xs flex items-center justify-center gap-2 transition-colors"
-                >
-                  <span>{settings.language === 'hi' ? 'इस प्रोफ़ाइल के सभी परिणाम देखें' : 'View Full Report for this Profile'}</span>
-                  <ChevronRight className="w-4 h-4" />
-                </button>
+                <div className="pt-1 flex flex-col gap-2">
+                  <button
+                    onClick={() => {
+                      loadSampleData();
+                      setCurrentView('results');
+                    }}
+                    className="w-full py-2.5 px-4 rounded-xl bg-[var(--accent-saffron)] hover:bg-[var(--accent-saffron-hover)] text-white font-semibold text-xs flex items-center justify-center gap-2 transition-colors shadow-xs"
+                  >
+                    <span>{settings.language === 'hi' ? 'इस प्रोफ़ाइल के परिणाम देखें' : 'View Full Report for this Profile'}</span>
+                    <ChevronRight className="w-4 h-4" />
+                  </button>
+                </div>
 
               </div>
             </div>
@@ -301,12 +295,12 @@ export const HomeView: React.FC = () => {
         </div>
       </section>
 
-      {/* 2. HOW IT WORKS: From Questions to Benefits */}
+      {/* 2. HOW IT WORKS */}
       <section className="border-t border-[var(--border-hairline)] pt-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
           
           <div className="max-w-2xl space-y-2">
-            <span className="text-xs font-bold uppercase tracking-wider text-amber-700 dark:text-amber-400">
+            <span className="text-xs font-bold uppercase tracking-wider text-[var(--accent-saffron)]">
               {settings.language === 'hi' ? 'सरल प्रक्रिया' : 'Step-by-Step Flow'}
             </span>
             <h2 className="text-2xl sm:text-4xl font-serif font-bold text-[var(--text-primary)]">
@@ -326,13 +320,13 @@ export const HomeView: React.FC = () => {
             ].map((step) => (
               <div 
                 key={step.num}
-                className="p-6 rounded-2xl border border-[var(--border-hairline)] bg-[var(--bg-surface)] space-y-3 relative flex flex-col justify-between"
+                className="p-6 rounded-2xl border border-[var(--border-hairline)] bg-[var(--bg-surface)] space-y-3 relative flex flex-col justify-between shadow-2xs"
               >
                 <div>
-                  <span className="text-3xl font-serif font-bold text-amber-800 dark:text-amber-500 tabular-nums">
+                  <span className="text-3xl font-serif font-bold text-[var(--accent-saffron)] tabular-nums">
                     {step.num}
                   </span>
-                  <h3 className="text-base font-semibold text-[var(--text-primary)] mt-3">
+                  <h3 className="text-base font-bold text-[var(--text-primary)] mt-3">
                     {step.title}
                   </h3>
                   <p className="text-xs text-[var(--text-secondary)] leading-relaxed mt-2">
@@ -352,7 +346,7 @@ export const HomeView: React.FC = () => {
           
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
             <div className="max-w-2xl space-y-2">
-              <span className="text-xs font-bold uppercase tracking-wider text-amber-700 dark:text-amber-400">
+              <span className="text-xs font-bold uppercase tracking-wider text-[var(--accent-saffron)]">
                 {settings.language === 'hi' ? 'नागरिक टूल्स' : 'Citizen Utilities'}
               </span>
               <h2 className="text-2xl sm:text-4xl font-serif font-bold text-[var(--text-primary)]">
@@ -369,13 +363,13 @@ export const HomeView: React.FC = () => {
             {/* Tool 1 */}
             <div 
               onClick={() => setCurrentView('questionnaire')}
-              className="p-6 rounded-2xl border border-[var(--border-hairline)] bg-[var(--bg-surface)] hover:border-[var(--accent-saffron)] transition-all cursor-pointer group flex flex-col justify-between"
+              className="p-6 rounded-2xl border border-[var(--border-hairline)] bg-[var(--bg-surface)] hover:border-[var(--accent-saffron)] transition-all cursor-pointer group flex flex-col justify-between shadow-2xs"
             >
               <div className="space-y-3">
-                <div className="p-3 rounded-xl bg-amber-50 dark:bg-amber-950/40 text-amber-700 w-fit">
+                <div className="p-3 rounded-xl bg-[var(--accent-saffron-light)] text-[var(--accent-saffron)] w-fit">
                   <Compass className="w-5 h-5" />
                 </div>
-                <h3 className="text-lg font-semibold text-[var(--text-primary)] group-hover:text-[var(--accent-saffron)] transition-colors">
+                <h3 className="text-lg font-bold text-[var(--text-primary)] group-hover:text-[var(--accent-saffron)] transition-colors">
                   {t('tool1Title')}
                 </h3>
                 <p className="text-xs text-[var(--text-secondary)] leading-relaxed">
@@ -391,13 +385,13 @@ export const HomeView: React.FC = () => {
             {/* Tool 2 */}
             <div 
               onClick={() => setCurrentView('document_checker')}
-              className="p-6 rounded-2xl border border-[var(--border-hairline)] bg-[var(--bg-surface)] hover:border-[var(--accent-saffron)] transition-all cursor-pointer group flex flex-col justify-between"
+              className="p-6 rounded-2xl border border-[var(--border-hairline)] bg-[var(--bg-surface)] hover:border-[var(--accent-saffron)] transition-all cursor-pointer group flex flex-col justify-between shadow-2xs"
             >
               <div className="space-y-3">
-                <div className="p-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 w-fit">
+                <div className="p-3 rounded-xl bg-[var(--accent-green-light)] text-[var(--accent-green)] w-fit">
                   <FileText className="w-5 h-5" />
                 </div>
-                <h3 className="text-lg font-semibold text-[var(--text-primary)] group-hover:text-[var(--accent-saffron)] transition-colors">
+                <h3 className="text-lg font-bold text-[var(--text-primary)] group-hover:text-[var(--accent-saffron)] transition-colors">
                   {t('tool2Title')}
                 </h3>
                 <p className="text-xs text-[var(--text-secondary)] leading-relaxed">
@@ -413,13 +407,13 @@ export const HomeView: React.FC = () => {
             {/* Tool 3 */}
             <div 
               onClick={() => setCurrentView('tracker')}
-              className="p-6 rounded-2xl border border-[var(--border-hairline)] bg-[var(--bg-surface)] hover:border-[var(--accent-saffron)] transition-all cursor-pointer group flex flex-col justify-between"
+              className="p-6 rounded-2xl border border-[var(--border-hairline)] bg-[var(--bg-surface)] hover:border-[var(--accent-saffron)] transition-all cursor-pointer group flex flex-col justify-between shadow-2xs"
             >
               <div className="space-y-3">
-                <div className="p-3 rounded-xl bg-blue-50 dark:bg-blue-950/40 text-blue-700 w-fit">
+                <div className="p-3 rounded-xl bg-[var(--accent-navy-light)] text-[var(--accent-navy)] w-fit">
                   <CheckCircle2 className="w-5 h-5" />
                 </div>
-                <h3 className="text-lg font-semibold text-[var(--text-primary)] group-hover:text-[var(--accent-saffron)] transition-colors">
+                <h3 className="text-lg font-bold text-[var(--text-primary)] group-hover:text-[var(--accent-saffron)] transition-colors">
                   {t('tool3Title')}
                 </h3>
                 <p className="text-xs text-[var(--text-secondary)] leading-relaxed">
@@ -435,13 +429,13 @@ export const HomeView: React.FC = () => {
             {/* Tool 4 */}
             <div 
               onClick={() => setCurrentView('family_mode')}
-              className="p-6 rounded-2xl border border-[var(--border-hairline)] bg-[var(--bg-surface)] hover:border-[var(--accent-saffron)] transition-all cursor-pointer group flex flex-col justify-between"
+              className="p-6 rounded-2xl border border-[var(--border-hairline)] bg-[var(--bg-surface)] hover:border-[var(--accent-saffron)] transition-all cursor-pointer group flex flex-col justify-between shadow-2xs"
             >
               <div className="space-y-3">
-                <div className="p-3 rounded-xl bg-purple-50 dark:bg-purple-950/40 text-purple-700 w-fit">
+                <div className="p-3 rounded-xl bg-purple-50 dark:bg-purple-950/40 text-purple-700 dark:text-purple-400 w-fit">
                   <Users className="w-5 h-5" />
                 </div>
-                <h3 className="text-lg font-semibold text-[var(--text-primary)] group-hover:text-[var(--accent-saffron)] transition-colors">
+                <h3 className="text-lg font-bold text-[var(--text-primary)] group-hover:text-[var(--accent-saffron)] transition-colors">
                   {t('tool4Title')}
                 </h3>
                 <p className="text-xs text-[var(--text-secondary)] leading-relaxed">
@@ -457,13 +451,13 @@ export const HomeView: React.FC = () => {
             {/* Tool 5 */}
             <div 
               onClick={() => setCurrentView('nearby_help')}
-              className="p-6 rounded-2xl border border-[var(--border-hairline)] bg-[var(--bg-surface)] hover:border-[var(--accent-saffron)] transition-all cursor-pointer group flex flex-col justify-between"
+              className="p-6 rounded-2xl border border-[var(--border-hairline)] bg-[var(--bg-surface)] hover:border-[var(--accent-saffron)] transition-all cursor-pointer group flex flex-col justify-between shadow-2xs"
             >
               <div className="space-y-3">
-                <div className="p-3 rounded-xl bg-orange-50 dark:bg-orange-950/40 text-orange-700 w-fit">
+                <div className="p-3 rounded-xl bg-orange-50 dark:bg-orange-950/40 text-orange-700 dark:text-orange-400 w-fit">
                   <Building2 className="w-5 h-5" />
                 </div>
-                <h3 className="text-lg font-semibold text-[var(--text-primary)] group-hover:text-[var(--accent-saffron)] transition-colors">
+                <h3 className="text-lg font-bold text-[var(--text-primary)] group-hover:text-[var(--accent-saffron)] transition-colors">
                   {t('tool5Title')}
                 </h3>
                 <p className="text-xs text-[var(--text-secondary)] leading-relaxed">
@@ -479,13 +473,13 @@ export const HomeView: React.FC = () => {
             {/* Tool 6 */}
             <div 
               onClick={() => setCurrentView('all_schemes')}
-              className="p-6 rounded-2xl border border-[var(--border-hairline)] bg-[var(--bg-surface)] hover:border-[var(--accent-saffron)] transition-all cursor-pointer group flex flex-col justify-between"
+              className="p-6 rounded-2xl border border-[var(--border-hairline)] bg-[var(--bg-surface)] hover:border-[var(--accent-saffron)] transition-all cursor-pointer group flex flex-col justify-between shadow-2xs"
             >
               <div className="space-y-3">
-                <div className="p-3 rounded-xl bg-rose-50 dark:bg-rose-950/40 text-rose-700 w-fit">
+                <div className="p-3 rounded-xl bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-400 w-fit">
                   <Sparkles className="w-5 h-5" />
                 </div>
-                <h3 className="text-lg font-semibold text-[var(--text-primary)] group-hover:text-[var(--accent-saffron)] transition-colors">
+                <h3 className="text-lg font-bold text-[var(--text-primary)] group-hover:text-[var(--accent-saffron)] transition-colors">
                   {t('tool6Title')}
                 </h3>
                 <p className="text-xs text-[var(--text-secondary)] leading-relaxed">
@@ -509,7 +503,7 @@ export const HomeView: React.FC = () => {
           
           <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
             <div className="space-y-1">
-              <span className="text-xs font-bold uppercase tracking-wider text-amber-700 dark:text-amber-400">
+              <span className="text-xs font-bold uppercase tracking-wider text-[var(--accent-saffron)]">
                 {settings.language === 'hi' ? 'राष्ट्रीय कल्याणकारी योजनाएं' : 'National Directory'}
               </span>
               <h2 className="text-2xl sm:text-3xl font-serif font-bold text-[var(--text-primary)]">
@@ -535,14 +529,14 @@ export const HomeView: React.FC = () => {
               <div
                 key={scheme.id}
                 onClick={() => handleSchemeClick(scheme.id)}
-                className="p-5 rounded-2xl border border-[var(--border-hairline)] bg-[var(--bg-surface)] hover:border-[var(--accent-saffron)] transition-all cursor-pointer flex flex-col justify-between group"
+                className="p-5 rounded-2xl border border-[var(--border-hairline)] bg-[var(--bg-surface)] hover:border-[var(--accent-saffron)] transition-all cursor-pointer flex flex-col justify-between group shadow-2xs"
               >
                 <div className="space-y-3">
-                  <div className="flex items-center justify-between text-xs text-[var(--text-secondary)]">
-                    <span className="font-semibold text-amber-700 dark:text-amber-400">
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="font-bold text-[var(--accent-saffron)]">
                       {settings.language === 'hi' ? scheme.categoryLabelHindi : scheme.categoryLabel}
                     </span>
-                    <span className="tabular-nums font-mono text-[11px] text-[var(--text-muted)]">
+                    <span className="tabular-nums font-mono text-[11px] text-[var(--text-muted)] font-semibold">
                       {scheme.shortCode}
                     </span>
                   </div>
@@ -551,7 +545,7 @@ export const HomeView: React.FC = () => {
                     {settings.language === 'hi' ? scheme.nameHindi : scheme.name}
                   </h3>
 
-                  <div className="p-2.5 rounded-lg bg-[var(--bg-subtle)] text-xs font-medium text-emerald-800 dark:text-emerald-300">
+                  <div className="p-2.5 rounded-lg bg-[var(--accent-green-light)] text-xs font-semibold text-[var(--accent-green-text)] border border-[var(--accent-green)]/20">
                     {settings.language === 'hi' ? scheme.benefitHeadlineHindi : scheme.benefitHeadline}
                   </div>
 
@@ -580,10 +574,10 @@ export const HomeView: React.FC = () => {
       {/* 5. TRUST & PRIVACY SECTION */}
       <section className="border-t border-[var(--border-hairline)] pt-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="p-8 sm:p-12 rounded-3xl border border-[var(--border-hairline)] bg-[var(--bg-surface)] space-y-8">
+          <div className="p-8 sm:p-12 rounded-3xl border border-[var(--border-hairline)] bg-[var(--bg-surface)] space-y-8 shadow-xs">
             
             <div className="max-w-2xl space-y-2">
-              <span className="text-xs font-bold uppercase tracking-wider text-emerald-700 dark:text-emerald-400 flex items-center gap-1.5">
+              <span className="text-xs font-bold uppercase tracking-wider text-[var(--accent-green)] flex items-center gap-1.5">
                 <ShieldCheck className="w-4 h-4" />
                 <span>{settings.language === 'hi' ? 'नागरिक संप्रभुता' : 'Citizen Privacy'}</span>
               </span>
@@ -597,7 +591,7 @@ export const HomeView: React.FC = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-2">
               <div className="space-y-2.5 p-5 rounded-2xl bg-[var(--bg-subtle)] border border-[var(--border-hairline)]">
-                <h3 className="font-semibold text-sm text-[var(--text-primary)]">
+                <h3 className="font-bold text-sm text-[var(--text-primary)]">
                   {t('privacyPillar1Title')}
                 </h3>
                 <p className="text-xs text-[var(--text-secondary)] leading-relaxed">
@@ -606,7 +600,7 @@ export const HomeView: React.FC = () => {
               </div>
 
               <div className="space-y-2.5 p-5 rounded-2xl bg-[var(--bg-subtle)] border border-[var(--border-hairline)]">
-                <h3 className="font-semibold text-sm text-[var(--text-primary)]">
+                <h3 className="font-bold text-sm text-[var(--text-primary)]">
                   {t('privacyPillar2Title')}
                 </h3>
                 <p className="text-xs text-[var(--text-secondary)] leading-relaxed">
@@ -615,7 +609,7 @@ export const HomeView: React.FC = () => {
               </div>
 
               <div className="space-y-2.5 p-5 rounded-2xl bg-[var(--bg-subtle)] border border-[var(--border-hairline)]">
-                <h3 className="font-semibold text-sm text-[var(--text-primary)]">
+                <h3 className="font-bold text-sm text-[var(--text-primary)]">
                   {t('privacyPillar3Title')}
                 </h3>
                 <p className="text-xs text-[var(--text-secondary)] leading-relaxed">
@@ -628,44 +622,48 @@ export const HomeView: React.FC = () => {
         </div>
       </section>
 
-      {/* 6. ANTI-SCAM CITIZEN PROTECTION */}
+      {/* 6. ANTI-SCAM CITIZEN PROTECTION — CRITICAL CONTRAST FIX */}
       <section className="border-t border-[var(--border-hairline)] pt-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="p-8 sm:p-10 rounded-3xl border border-amber-300 dark:border-amber-900 bg-amber-50/60 dark:bg-amber-950/20 space-y-6">
+          <div className="p-8 sm:p-12 rounded-3xl border border-[var(--warning-border)] bg-[var(--warning-bg)] space-y-6 shadow-sm">
             
-            <div className="flex items-start gap-4">
-              <AlertTriangle className="w-7 h-7 text-amber-700 dark:text-amber-400 shrink-0 mt-1" />
+            {/* Visual Hierarchy: WARNING ICON -> HEADING -> SUPPORTING COPY */}
+            <div className="space-y-4">
+              <div className="w-12 h-12 rounded-2xl bg-amber-100/90 dark:bg-amber-950/60 border border-amber-300/60 dark:border-amber-900/40 flex items-center justify-center text-amber-700 dark:text-amber-400 shadow-2xs">
+                <AlertTriangle className="w-6 h-6 shrink-0" />
+              </div>
+
               <div className="space-y-2">
-                <h3 className="text-xl sm:text-2xl font-serif font-bold text-slate-900 dark:text-slate-100">
+                <h3 className="text-2xl sm:text-3xl font-serif font-bold text-[var(--warning-text)] tracking-tight leading-snug">
                   {t('antiScamTitle')}
                 </h3>
-                <p className="text-xs sm:text-sm text-slate-700 dark:text-slate-300">
+                <p className="text-sm sm:text-base text-[var(--warning-desc)] leading-relaxed max-w-3xl">
                   {t('antiScamSubtitle')}
                 </p>
               </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
-              <div className="p-4 rounded-xl bg-white dark:bg-slate-900/80 border border-amber-200 dark:border-amber-900/40 text-xs text-slate-700 dark:text-slate-300 leading-relaxed">
+              <div className="p-4 sm:p-5 rounded-2xl bg-[var(--warning-card-bg)] border border-[var(--warning-card-border)] text-xs sm:text-sm text-[var(--warning-desc)] leading-relaxed shadow-2xs">
                 {t('antiScamPoint1')}
               </div>
-              <div className="p-4 rounded-xl bg-white dark:bg-slate-900/80 border border-amber-200 dark:border-amber-900/40 text-xs text-slate-700 dark:text-slate-300 leading-relaxed">
+              <div className="p-4 sm:p-5 rounded-2xl bg-[var(--warning-card-bg)] border border-[var(--warning-card-border)] text-xs sm:text-sm text-[var(--warning-desc)] leading-relaxed shadow-2xs">
                 {t('antiScamPoint2')}
               </div>
-              <div className="p-4 rounded-xl bg-white dark:bg-slate-900/80 border border-amber-200 dark:border-amber-900/40 text-xs text-slate-700 dark:text-slate-300 leading-relaxed">
+              <div className="p-4 sm:p-5 rounded-2xl bg-[var(--warning-card-bg)] border border-[var(--warning-card-border)] text-xs sm:text-sm text-[var(--warning-desc)] leading-relaxed shadow-2xs">
                 {t('antiScamPoint3')}
               </div>
             </div>
 
-            <div className="pt-2 flex flex-wrap items-center justify-between gap-3 text-xs">
-              <span className="font-semibold text-amber-900 dark:text-amber-200">
+            <div className="pt-2 flex flex-wrap items-center justify-between gap-3 text-xs sm:text-sm border-t border-[var(--warning-border)]/60">
+              <span className="font-bold text-[var(--warning-text)]">
                 {t('cybercrimeHelpline')}
               </span>
               <a
                 href="https://cybercrime.gov.in"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="font-semibold text-amber-800 dark:text-amber-300 underline hover:text-amber-950"
+                className="font-semibold text-[var(--warning-link)] hover:underline transition-opacity"
               >
                 Visit cybercrime.gov.in →
               </a>
@@ -694,7 +692,7 @@ export const HomeView: React.FC = () => {
             </button>
             <button
               onClick={() => setCurrentView('all_schemes')}
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-xl border border-[var(--border-hairline)] bg-[var(--bg-surface)] hover:bg-[var(--bg-subtle)] text-[var(--text-primary)] font-semibold text-sm transition-colors"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-xl border border-[var(--border-hairline)] bg-[var(--bg-surface)] hover:bg-[var(--bg-subtle)] text-[var(--text-primary)] font-semibold text-sm transition-colors shadow-2xs"
             >
               <span>{t('heroCtaSecondary')}</span>
             </button>

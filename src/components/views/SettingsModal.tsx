@@ -48,15 +48,15 @@ export const SettingsModal: React.FC = () => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs no-print">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 glass-scrim no-print">
       <div 
-        className="w-full max-w-xl max-h-[90vh] overflow-y-auto bg-[var(--bg-surface)] border border-[var(--border-hairline)] rounded-2xl shadow-xl flex flex-col"
+        className="w-full max-w-xl max-h-[90vh] overflow-y-auto glass-modal rounded-3xl shadow-2xl flex flex-col"
         role="dialog"
         aria-modal="true"
         aria-labelledby="settings-heading"
       >
         {/* Header */}
-        <div className="p-5 border-b border-[var(--border-hairline)] flex items-center justify-between sticky top-0 bg-[var(--bg-surface)] z-10">
+        <div className="p-5 border-b border-[var(--border-hairline)] flex items-center justify-between sticky top-0 bg-[var(--bg-surface)]/90 backdrop-blur-md z-10">
           <div>
             <h3 id="settings-heading" className="text-lg font-serif font-bold text-[var(--text-primary)]">
               {t('settings')}

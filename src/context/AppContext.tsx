@@ -4,7 +4,7 @@ import { Scheme, EvaluatedScheme } from '../types/scheme';
 import { TrackedApplication } from '../types/tracker';
 import { FamilyMember } from '../types/family';
 import { UserPreferences, AppLanguage } from '../types/settings';
-import { StorageService } from '../services/storageService';
+import { StorageService, SAMPLE_DEMO_DATA } from '../services/storageService';
 import { evaluateAllSchemes, evaluateSchemeEligibility } from '../services/eligibilityEngine';
 import { SCHEMES_DATABASE } from '../data/schemesData';
 import { TRANSLATIONS } from '../data/translations';
@@ -83,8 +83,9 @@ interface AppContextType {
   addToast: (message: string, type?: ToastMessage['type']) => void;
   removeToast: (id: string) => void;
 
-  // Clear & Export
+  // Clear & Export & Demo
   clearAllUserData: () => void;
+  loadSampleData: () => void;
 }
 
 const AppContext = createContext<AppContextType | null>(null);
@@ -264,6 +265,15 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     addToast(t('clearDataSuccess'), 'success');
   };
 
+  const loadSampleData = () => {
+    StorageService.loadSampleDemoData();
+    setAnswersState(SAMPLE_DEMO_DATA.answers);
+    setReadyDocumentIds(SAMPLE_DEMO_DATA.readyDocuments);
+    setApplications(SAMPLE_DEMO_DATA.applications);
+    setFamilyMembers(SAMPLE_DEMO_DATA.familyMembers);
+    addToast(settings.language === 'hi' ? 'नमूना डेटा लोड किया गया' : 'Sample demo profile loaded', 'success');
+  };
+
   const t = (key: keyof typeof TRANSLATIONS.en): string => {
     const lang = settings.language === 'hi' ? 'hi' : 'en';
     const dict = TRANSLATIONS[lang] || TRANSLATIONS.en;
@@ -317,7 +327,8 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         toasts,
         addToast,
         removeToast,
-        clearAllUserData
+        clearAllUserData,
+        loadSampleData
       }}
     >
       {children}

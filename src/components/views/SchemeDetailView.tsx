@@ -267,12 +267,12 @@ export const SchemeDetailView: React.FC = () => {
 
         <div className="space-y-3">
           {s.commonRejectionReasons.map((rej, i) => (
-            <div key={i} className="p-3.5 rounded-xl bg-white dark:bg-slate-900/80 border border-amber-200 dark:border-amber-900/40 text-xs space-y-1">
-              <p className="font-semibold text-slate-900 dark:text-slate-100">
+            <div key={i} className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-amber-200/80 dark:border-amber-900/40 text-xs space-y-1.5 shadow-2xs">
+              <p className="font-bold text-slate-900 dark:text-slate-100">
                 {settings.language === 'hi' ? rej.titleHindi : rej.title}
               </p>
-              <p className="text-slate-600 dark:text-slate-400">
-                <span className="font-medium text-emerald-700 dark:text-emerald-400">
+              <p className="text-slate-700 dark:text-slate-300 leading-relaxed">
+                <span className="font-semibold text-emerald-800 dark:text-emerald-400">
                   {settings.language === 'hi' ? 'समाधान: ' : 'Remedy: '}
                 </span>
                 {settings.language === 'hi' ? rej.tipHindi : rej.tip}

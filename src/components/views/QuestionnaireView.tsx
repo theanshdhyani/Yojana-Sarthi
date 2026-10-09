@@ -18,7 +18,8 @@ import {
   HeartHandshake,
   Sun,
   Home,
-  CheckCircle2
+  CheckCircle2,
+  RotateCcw
 } from 'lucide-react';
 import { INDIAN_STATES_DISTRICTS } from '../../data/statesAndDistricts';
 import { QuestionnaireAnswers } from '../../types/questionnaire';
@@ -32,6 +33,8 @@ export const QuestionnaireView: React.FC = () => {
     readAloud, 
     stopReading, 
     isSpeaking,
+    isDemoData,
+    setIsDemoData,
     t 
   } = useApp();
 
@@ -63,9 +66,13 @@ export const QuestionnaireView: React.FC = () => {
         }
         break;
       case 2:
-        if (!answers.state) {
-          // If state is not selected, set standard default or validate
-          setAnswers((prev) => ({ ...prev, state: prev.state || 'Uttar Pradesh' }));
+        if (!answers.state || answers.state.trim() === '') {
+          setValidationError(
+            settings.language === 'hi'
+              ? 'कृपया आगे बढ़ने के लिए अपना राज्य या केंद्र शासित प्रदेश चुनें।'
+              : 'Please select your State or Union Territory to continue.'
+          );
+          return false;
         }
         break;
       case 3:
@@ -147,6 +154,14 @@ export const QuestionnaireView: React.FC = () => {
     }
   };
 
+  const handleResetToBlank = () => {
+    stopReading();
+    setAnswers({});
+    setIsDemoData(false);
+    setCurrentStepIndex(0);
+    setValidationError(null);
+  };
+
   const handleBack = () => {
     stopReading();
     setValidationError(null);
@@ -180,11 +195,25 @@ export const QuestionnaireView: React.FC = () => {
             <span>{t('back')}</span>
           </button>
 
-          <span className="text-xs font-mono font-semibold text-[var(--accent-saffron)] px-3 py-1 rounded-full bg-[var(--accent-saffron-light)]/60 border border-[var(--accent-saffron)]/30 tracking-wider">
-            {settings.language === 'hi' 
-              ? `प्रश्न ${String(currentStepIndex + 1).padStart(2, '0')} / ${String(totalSteps).padStart(2, '0')}`
-              : `Question ${String(currentStepIndex + 1).padStart(2, '0')} of ${String(totalSteps).padStart(2, '0')}`}
-          </span>
+          <div className="flex items-center gap-2">
+            {Object.keys(answers).length > 0 && (
+              <button
+                type="button"
+                onClick={handleResetToBlank}
+                className="inline-flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-xl border border-rose-300/70 dark:border-rose-900/60 bg-rose-50/60 dark:bg-rose-950/30 text-rose-700 dark:text-rose-300 hover:bg-rose-100/70 transition-all font-medium"
+                title={settings.language === 'hi' ? 'सभी उत्तर साफ करें और नया मूल्यांकन शुरू करें' : 'Clear all answers and start fresh'}
+              >
+                <RotateCcw className="w-3 h-3" />
+                <span>{settings.language === 'hi' ? 'पुनरारंभ (साफ करें)' : 'Start Blank / Reset'}</span>
+              </button>
+            )}
+
+            <span className="text-xs font-mono font-semibold text-[var(--accent-saffron)] px-3 py-1 rounded-full bg-[var(--accent-saffron-light)]/60 border border-[var(--accent-saffron)]/30 tracking-wider">
+              {settings.language === 'hi' 
+                ? `प्रश्न ${String(currentStepIndex + 1).padStart(2, '0')} / ${String(totalSteps).padStart(2, '0')}`
+                : `Question ${String(currentStepIndex + 1).padStart(2, '0')} of ${String(totalSteps).padStart(2, '0')}`}
+            </span>
+          </div>
         </div>
 
         {/* Hairline Progress Bar */}
@@ -342,10 +371,16 @@ export const QuestionnaireView: React.FC = () => {
               {settings.language === 'hi' ? 'राज्य का चयन करें' : 'Select State'}
             </label>
             <select
-              value={answers.state || 'Uttar Pradesh'}
-              onChange={(e) => setAnswers({ ...answers, state: e.target.value })}
+              value={answers.state || ''}
+              onChange={(e) => {
+                setValidationError(null);
+                setAnswers({ ...answers, state: e.target.value });
+              }}
               className="w-full text-base px-4 py-3 rounded-xl border border-[var(--border-hairline)] bg-[var(--bg-subtle)] text-[var(--text-primary)] focus:border-[var(--accent-saffron)] focus:outline-none transition-colors"
             >
+              <option value="" disabled>
+                {settings.language === 'hi' ? '-- अपना राज्य / केंद्र शासित प्रदेश चुनें --' : '-- Select your State / UT --'}
+              </option>
               {INDIAN_STATES_DISTRICTS.map((s) => (
                 <option key={s.state} value={s.state}>
                   {s.state} ({s.stateHindi})
@@ -444,7 +479,7 @@ export const QuestionnaireView: React.FC = () => {
                 className={`p-4 rounded-xl border text-left transition-all flex items-center justify-between ${
                   answers.occupation === item.id
                     ? 'border-[var(--accent-saffron)] bg-[var(--accent-saffron-light)] shadow-xs font-semibold'
-                    : 'border-[var(--border-hairline)] bg-[var(--bg-surface)] hover:bg-[var(--bg-subtle)]'
+                    : 'bobbin-surface-card hover:border-amber-300/40'
                 }`}
               >
                 <div className="flex items-center gap-3">
@@ -495,7 +530,7 @@ export const QuestionnaireView: React.FC = () => {
                 className={`w-full p-4 rounded-xl border text-left transition-all flex items-center justify-between ${
                   answers.annualIncomeBracket === item.id
                     ? 'border-[var(--accent-saffron)] bg-[var(--accent-saffron-light)] font-semibold shadow-xs'
-                    : 'border-[var(--border-hairline)] bg-[var(--bg-surface)] hover:bg-[var(--bg-subtle)]'
+                    : 'bobbin-surface-card hover:border-amber-300/40'
                 }`}
               >
                 <span className="text-xs sm:text-sm text-[var(--text-primary)]">{item.label}</span>
@@ -542,7 +577,7 @@ export const QuestionnaireView: React.FC = () => {
                 className={`p-5 rounded-2xl border text-left transition-all flex flex-col justify-between ${
                   answers.landholding === item.id
                     ? 'border-[var(--accent-saffron)] bg-[var(--accent-saffron-light)] shadow-xs'
-                    : 'border-[var(--border-hairline)] bg-[var(--bg-surface)] hover:bg-[var(--bg-subtle)]'
+                    : 'bobbin-surface-card hover:border-amber-300/40'
                 }`}
               >
                 <div>
@@ -593,7 +628,7 @@ export const QuestionnaireView: React.FC = () => {
                 className={`p-4 rounded-xl border text-left transition-all flex items-center justify-between ${
                   answers.socialCategory === item.id
                     ? 'border-[var(--accent-saffron)] bg-[var(--accent-saffron-light)] font-semibold shadow-xs'
-                    : 'border-[var(--border-hairline)] bg-[var(--bg-surface)] hover:bg-[var(--bg-subtle)]'
+                    : 'bobbin-surface-card hover:border-amber-300/40'
                 }`}
               >
                 <span className="text-xs sm:text-sm text-[var(--text-primary)]">{item.label}</span>
@@ -640,7 +675,7 @@ export const QuestionnaireView: React.FC = () => {
                 className={`w-full p-4 rounded-xl border text-left transition-all flex items-center justify-between ${
                   answers.hasRationCard === item.id
                     ? 'border-[var(--accent-saffron)] bg-[var(--accent-saffron-light)] font-semibold shadow-xs'
-                    : 'border-[var(--border-hairline)] bg-[var(--bg-surface)] hover:bg-[var(--bg-subtle)]'
+                    : 'bobbin-surface-card hover:border-amber-300/40'
                 }`}
               >
                 <span className="text-xs sm:text-sm text-[var(--text-primary)]">{item.label}</span>
@@ -697,7 +732,7 @@ export const QuestionnaireView: React.FC = () => {
                   className={`w-full p-4 rounded-xl border text-left transition-all flex items-center justify-between ${
                     isChecked
                       ? 'border-[var(--accent-saffron)] bg-[var(--accent-saffron-light)] font-semibold shadow-xs'
-                      : 'border-[var(--border-hairline)] bg-[var(--bg-surface)] hover:bg-[var(--bg-subtle)]'
+                      : 'bobbin-surface-card hover:border-amber-300/40'
                   }`}
                 >
                   <span className="text-xs sm:text-sm text-[var(--text-primary)]">{item.label}</span>

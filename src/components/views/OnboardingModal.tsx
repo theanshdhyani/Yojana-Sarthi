@@ -11,7 +11,7 @@ import {
 } from 'lucide-react';
 
 export const OnboardingModal: React.FC = () => {
-  const { isOnboardingOpen, setIsOnboardingOpen, setCurrentView, settings } = useApp();
+  const { isOnboardingOpen, setIsOnboardingOpen, startNewAssessment, settings } = useApp();
   const [currentStep, setCurrentStep] = useState(0);
 
   if (!isOnboardingOpen) return null;
@@ -52,7 +52,7 @@ export const OnboardingModal: React.FC = () => {
       setCurrentStep(currentStep + 1);
     } else {
       setIsOnboardingOpen(false);
-      setCurrentView('questionnaire');
+      startNewAssessment();
     }
   };
 

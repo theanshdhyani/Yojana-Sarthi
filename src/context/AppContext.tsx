@@ -88,6 +88,7 @@ interface AppContextType {
   setIsDemoData: (v: boolean) => void;
   clearAllUserData: () => void;
   loadSampleData: () => void;
+  startNewAssessment: () => void;
 }
 
 const AppContext = createContext<AppContextType | null>(null);
@@ -298,6 +299,15 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     addToast(settings.language === 'hi' ? 'नमूना डेटा लोड किया गया' : 'Sample demo profile loaded', 'success');
   };
 
+  const startNewAssessment = () => {
+    stopReading();
+    setAnswersState({});
+    StorageService.saveAnswers({});
+    setIsDemoData(false);
+    setCurrentView('questionnaire');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   const t = (key: keyof typeof TRANSLATIONS.en): string => {
     const lang = settings.language === 'hi' ? 'hi' : 'en';
     const dict = TRANSLATIONS[lang] || TRANSLATIONS.en;
@@ -354,7 +364,8 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         isDemoData,
         setIsDemoData,
         clearAllUserData,
-        loadSampleData
+        loadSampleData,
+        startNewAssessment
       }}
     >
       {children}

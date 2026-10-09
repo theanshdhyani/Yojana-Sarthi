@@ -25,7 +25,7 @@ import { SCHEMES_DATABASE } from '../../data/schemesData';
 import civicHeroBg from '../../assets/images/civic_hero_bg_1791566634546.jpg';
 
 export const HomeView: React.FC = () => {
-  const { setCurrentView, setSelectedSchemeId, settings, setAnswers, setIsDemoData, addToast, t } = useApp();
+  const { setCurrentView, setSelectedSchemeId, settings, setAnswers, setIsDemoData, startNewAssessment, addToast, t } = useApp();
 
   // Interactive Hero Profile Preview switcher
   const [activePersona, setActivePersona] = useState<'farmer' | 'student' | 'woman' | 'senior' | 'artisan'>('farmer');
@@ -251,7 +251,7 @@ export const HomeView: React.FC = () => {
               {/* CTAs */}
               <div className="pt-2 flex flex-col sm:flex-row items-stretch sm:items-center gap-3.5">
                 <button
-                  onClick={() => setCurrentView('questionnaire')}
+                  onClick={() => startNewAssessment()}
                   className="inline-flex items-center justify-center gap-2 px-7 py-4 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-semibold text-sm transition-all shadow-lg hover:shadow-amber-500/25 active:scale-[0.98]"
                 >
                   <span>{t('heroCtaPrimary')}</span>
@@ -815,7 +815,7 @@ export const HomeView: React.FC = () => {
             </p>
             <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3.5">
               <button
-                onClick={() => setCurrentView('questionnaire')}
+                onClick={() => startNewAssessment()}
                 className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-xl bg-[var(--accent-saffron)] hover:bg-[var(--accent-saffron-hover)] text-white font-semibold text-sm transition-all shadow-md active:scale-[0.98]"
               >
                 <span>{t('heroCtaPrimary')}</span>

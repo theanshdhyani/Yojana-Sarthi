@@ -35,10 +35,16 @@ export const QuestionnaireView: React.FC = () => {
     isSpeaking,
     isDemoData,
     setIsDemoData,
+    startNewAssessment,
+    continuePreviousAssessment,
+    showResumePrompt,
+    setShowResumePrompt,
+    hasSavedAnswers,
+    questionnaireStepIndex: currentStepIndex,
+    setQuestionnaireStepIndex: setCurrentStepIndex,
     t 
   } = useApp();
 
-  const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const [validationError, setValidationError] = useState<string | null>(null);
 
   const totalSteps = 10;
@@ -155,10 +161,7 @@ export const QuestionnaireView: React.FC = () => {
   };
 
   const handleResetToBlank = () => {
-    stopReading();
-    setAnswers({});
-    setIsDemoData(false);
-    setCurrentStepIndex(0);
+    startNewAssessment();
     setValidationError(null);
   };
 
@@ -184,6 +187,94 @@ export const QuestionnaireView: React.FC = () => {
   return (
     <div className="max-w-3xl mx-auto px-4 sm:px-6 py-6 sm:py-10 space-y-8">
       
+      {/* Resume Incomplete Assessment Choice Modal */}
+      {showResumePrompt && hasSavedAnswers && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 glass-scrim no-print animate-in fade-in duration-200">
+          <div 
+            className="w-full max-w-md glass-modal rounded-3xl p-6 sm:p-7 shadow-2xl space-y-5 animate-in zoom-in-95 duration-200 border border-[var(--glass-modal-border)]"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="resume-assessment-heading"
+          >
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-2xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center text-amber-600 dark:text-amber-400 shrink-0">
+                <Sparkles className="w-5 h-5" />
+              </div>
+              <div>
+                <h3 id="resume-assessment-heading" className="text-lg font-serif font-bold text-[var(--text-primary)]">
+                  {settings.language === 'hi' ? 'सहेजा गया मूल्यांकन मिला' : 'Saved Assessment Found'}
+                </h3>
+                <p className="text-xs text-[var(--text-secondary)]">
+                  {settings.language === 'hi' ? 'आपके पास पहले से भरे गए उत्तर उपलब्ध हैं' : 'You have an assessment with answered questions'}
+                </p>
+              </div>
+            </div>
+
+            {/* Summary of saved fields */}
+            <div className="p-3.5 rounded-2xl bg-[var(--bg-subtle)] border border-[var(--border-hairline)] text-xs space-y-1.5 text-[var(--text-secondary)]">
+              <div className="font-semibold text-[var(--text-primary)] flex items-center justify-between">
+                <span>{settings.language === 'hi' ? 'दर्ज विवरण:' : 'Recorded Data:'}</span>
+                <span className="text-[10px] text-amber-600 dark:text-amber-400 font-mono">
+                  {Object.values(answers).filter(v => v !== undefined && v !== '' && (!Array.isArray(v) || v.length > 0)).length} {settings.language === 'hi' ? 'उत्तर' : 'fields'}
+                </span>
+              </div>
+              <div className="flex flex-wrap gap-1.5 pt-1">
+                {answers.age && (
+                  <span className="px-2 py-0.5 rounded-md bg-[var(--bg-surface)] border border-[var(--border-hairline)] text-[11px]">
+                    Age: {answers.age}
+                  </span>
+                )}
+                {answers.gender && (
+                  <span className="px-2 py-0.5 rounded-md bg-[var(--bg-surface)] border border-[var(--border-hairline)] text-[11px] capitalize">
+                    {answers.gender}
+                  </span>
+                )}
+                {answers.state && (
+                  <span className="px-2 py-0.5 rounded-md bg-[var(--bg-surface)] border border-[var(--border-hairline)] text-[11px]">
+                    {answers.state}
+                  </span>
+                )}
+                {answers.occupation && (
+                  <span className="px-2 py-0.5 rounded-md bg-[var(--bg-surface)] border border-[var(--border-hairline)] text-[11px] capitalize">
+                    {answers.occupation.replace(/_/g, ' ')}
+                  </span>
+                )}
+              </div>
+            </div>
+
+            <p className="text-xs text-[var(--text-secondary)] leading-relaxed">
+              {settings.language === 'hi'
+                ? 'क्या आप एक नया मूल्यांकन खाली फॉर्म से शुरू करना चाहते हैं, या अपने पिछले उत्तरों को जारी रखना चाहते हैं?'
+                : 'Would you like to start a brand-new assessment with blank answers, or resume your saved progress?'}
+            </p>
+
+            {/* Actions: Start New Assessment is the clear primary action */}
+            <div className="pt-2 flex flex-col gap-2.5">
+              <button
+                type="button"
+                onClick={() => {
+                  startNewAssessment();
+                }}
+                className="w-full py-3 px-4 rounded-xl bg-[var(--accent-saffron)] hover:bg-[var(--accent-saffron-hover)] text-white font-semibold text-xs transition-all shadow-md active:scale-[0.98] flex items-center justify-center gap-2"
+              >
+                <span>{settings.language === 'hi' ? 'नया मूल्यांकन शुरू करें (खाली फॉर्म)' : 'Start New Assessment'}</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  continuePreviousAssessment();
+                }}
+                className="w-full py-2.5 px-4 rounded-xl border border-[var(--border-hairline)] bg-[var(--bg-surface)] hover:bg-[var(--bg-subtle)] text-[var(--text-primary)] font-semibold text-xs transition-all shadow-2xs active:scale-[0.98]"
+              >
+                {settings.language === 'hi' ? 'पिछला मूल्यांकन जारी रखें' : 'Continue Previous Assessment'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Top Header & Progress */}
       <div className="p-5 sm:p-6 rounded-3xl glass-card space-y-4 shadow-sm border border-[var(--glass-panel-border)]">
         <div className="flex items-center justify-between">

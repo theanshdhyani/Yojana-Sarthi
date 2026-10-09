@@ -48,12 +48,12 @@ export const FamilyModeView: React.FC = () => {
         age,
         gender,
         occupation,
-        state: answers.state || 'Uttar Pradesh',
-        residenceArea: answers.residenceArea || 'rural',
-        socialCategory: answers.socialCategory || 'General',
-        annualIncomeBracket: answers.annualIncomeBracket || '1lakh_to_2.5lakh',
-        hasRationCard: answers.hasRationCard || 'none',
-        landholding: answers.landholding || 'none'
+        state: answers.state,
+        residenceArea: answers.residenceArea,
+        socialCategory: answers.socialCategory,
+        annualIncomeBracket: answers.annualIncomeBracket,
+        hasRationCard: answers.hasRationCard,
+        landholding: answers.landholding
       },
       notes: notes || undefined
     });

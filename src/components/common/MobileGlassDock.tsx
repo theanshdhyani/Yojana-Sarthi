@@ -31,6 +31,8 @@ export const MobileGlassDock: React.FC = () => {
     setIsSettingsOpen, 
     settings, 
     updateSettings, 
+    openFindSchemes,
+    continuePreviousAssessment,
     t 
   } = useApp();
 
@@ -124,7 +126,11 @@ export const MobileGlassDock: React.FC = () => {
   }
 
   const handleNav = (view: AppView) => {
-    setCurrentView(view);
+    if (view === 'questionnaire') {
+      openFindSchemes();
+    } else {
+      setCurrentView(view);
+    }
     setIsMoreOpen(false);
   };
 
@@ -149,7 +155,13 @@ export const MobileGlassDock: React.FC = () => {
           <div className="pointer-events-auto mb-2 w-full animate-fade-in">
             <div className="glass-floating-action p-2 pl-3.5 pr-2.5 flex items-center justify-between gap-2.5 shadow-lg">
               <button
-                onClick={() => handleNav(contextualAction!.targetView)}
+                onClick={() => {
+                  if (contextualAction!.targetView === 'questionnaire') {
+                    continuePreviousAssessment();
+                  } else {
+                    handleNav(contextualAction!.targetView);
+                  }
+                }}
                 className="flex items-center gap-2.5 flex-1 text-left min-w-0"
               >
                 <div className="p-1.5 rounded-full bg-white/70 dark:bg-white/10 shrink-0">

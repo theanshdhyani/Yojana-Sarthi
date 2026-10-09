@@ -89,6 +89,13 @@ interface AppContextType {
   clearAllUserData: () => void;
   loadSampleData: () => void;
   startNewAssessment: () => void;
+  openFindSchemes: () => void;
+  continuePreviousAssessment: () => void;
+  showResumePrompt: boolean;
+  setShowResumePrompt: (show: boolean) => void;
+  hasSavedAnswers: boolean;
+  questionnaireStepIndex: number;
+  setQuestionnaireStepIndex: (step: number) => void;
 }
 
 const AppContext = createContext<AppContextType | null>(null);
@@ -98,11 +105,9 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   const [selectedSchemeId, setSelectedSchemeId] = useState<string | null>(null);
 
   const [answers, setAnswersState] = useState<QuestionnaireAnswers>(StorageService.getAnswers);
-  const [isDemoData, setIsDemoData] = useState<boolean>(() => {
-    // Check if current stored answers match the Rameshwar sample
-    const existing = StorageService.getAnswers();
-    return existing.age === 42 && existing.occupation === 'farmer' && existing.state === 'Uttar Pradesh';
-  });
+  const [isDemoData, setIsDemoDataState] = useState<boolean>(StorageService.isDemoMode);
+  const [showResumePrompt, setShowResumePrompt] = useState(false);
+  const [questionnaireStepIndex, setQuestionnaireStepIndex] = useState(0);
   const [readyDocumentIds, setReadyDocumentIds] = useState<string[]>(StorageService.getReadyDocuments);
   const [applications, setApplications] = useState<TrackedApplication[]>(StorageService.getApplications);
   const [familyMembers, setFamilyMembers] = useState<FamilyMember[]>(StorageService.getFamilyMembers);
@@ -173,6 +178,11 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     voiceSpeed: 1.0
   };
 
+  const setIsDemoData = (isDemo: boolean) => {
+    setIsDemoDataState(isDemo);
+    StorageService.setDemoMode(isDemo);
+  };
+
   const setAnswers = (
     updater: QuestionnaireAnswers | ((prev: QuestionnaireAnswers) => QuestionnaireAnswers),
     isDemo = false
@@ -182,7 +192,8 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       StorageService.saveAnswers(next);
       return next;
     });
-    setIsDemoData(isDemo);
+    setIsDemoDataState(isDemo);
+    StorageService.setDemoMode(isDemo);
   };
 
   const toggleDocumentReady = (docId: string) => {
@@ -281,7 +292,10 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   const clearAllUserData = () => {
     StorageService.clearAllData();
     setAnswersState({});
-    setIsDemoData(false);
+    setIsDemoDataState(false);
+    StorageService.setDemoMode(false);
+    setShowResumePrompt(false);
+    setQuestionnaireStepIndex(0);
     setReadyDocumentIds([]);
     setApplications([]);
     setFamilyMembers([]);
@@ -291,7 +305,9 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
 
   const loadSampleData = () => {
     StorageService.loadSampleDemoData();
-    setIsDemoData(true);
+    setIsDemoDataState(true);
+    StorageService.setDemoMode(true);
+    setShowResumePrompt(false);
     setAnswersState(SAMPLE_DEMO_DATA.answers);
     setReadyDocumentIds(SAMPLE_DEMO_DATA.readyDocuments);
     setApplications(SAMPLE_DEMO_DATA.applications);
@@ -303,8 +319,38 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     stopReading();
     setAnswersState({});
     StorageService.saveAnswers({});
-    setIsDemoData(false);
+    setIsDemoDataState(false);
+    StorageService.setDemoMode(false);
+    setShowResumePrompt(false);
+    setQuestionnaireStepIndex(0);
     setCurrentView('questionnaire');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const continuePreviousAssessment = () => {
+    stopReading();
+    setShowResumePrompt(false);
+    setCurrentView('questionnaire');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const hasSavedAnswers = Object.values(answers).some(
+    (v) => v !== undefined && v !== '' && (Array.isArray(v) ? v.length > 0 : true)
+  );
+
+  const openFindSchemes = () => {
+    stopReading();
+    const saved = StorageService.getAnswers();
+    const hasExisting = Object.values(saved).some(
+      (v) => v !== undefined && v !== '' && (Array.isArray(v) ? v.length > 0 : true)
+    );
+
+    if (hasExisting) {
+      setShowResumePrompt(true);
+      setCurrentView('questionnaire');
+    } else {
+      startNewAssessment();
+    }
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -365,7 +411,14 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         setIsDemoData,
         clearAllUserData,
         loadSampleData,
-        startNewAssessment
+        startNewAssessment,
+        openFindSchemes,
+        continuePreviousAssessment,
+        showResumePrompt,
+        setShowResumePrompt,
+        hasSavedAnswers,
+        questionnaireStepIndex,
+        setQuestionnaireStepIndex
       }}
     >
       {children}

@@ -21,6 +21,7 @@ export const AppHeader: React.FC = () => {
     isSpeaking,
     stopReading,
     isOnline,
+    openFindSchemes,
     t
   } = useApp();
 
@@ -37,7 +38,11 @@ export const AppHeader: React.FC = () => {
   ];
 
   const handleNavClick = (viewId: any) => {
-    setCurrentView(viewId);
+    if (viewId === 'questionnaire') {
+      openFindSchemes();
+    } else {
+      setCurrentView(viewId);
+    }
     setMobileMenuOpen(false);
   };
 
@@ -130,7 +135,7 @@ export const AppHeader: React.FC = () => {
 
           {/* Primary CTA */}
           <button
-            onClick={() => handleNavClick('questionnaire')}
+            onClick={() => openFindSchemes()}
             className="hidden sm:inline-flex items-center gap-1.5 px-4 py-2 text-xs font-semibold text-white bg-[var(--accent-saffron)] hover:bg-[var(--accent-saffron-hover)] rounded-lg transition-colors shadow-xs"
           >
             <span>{t('heroCtaPrimary')}</span>
@@ -169,7 +174,10 @@ export const AppHeader: React.FC = () => {
 
           <div className="pt-2 border-t border-[var(--border-hairline)] flex flex-col gap-2">
             <button
-              onClick={() => handleNavClick('questionnaire')}
+              onClick={() => {
+                openFindSchemes();
+                setMobileMenuOpen(false);
+              }}
               className="w-full py-2.5 text-center text-sm font-semibold text-white bg-[var(--accent-saffron)] hover:bg-[var(--accent-saffron-hover)] rounded-xl shadow-xs"
             >
               {t('heroCtaPrimary')}

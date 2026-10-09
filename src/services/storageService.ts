@@ -9,7 +9,8 @@ const KEYS = {
   TRACKER: 'yojana_sarthi_tracker_v1',
   FAMILY: 'yojana_sarthi_family_v1',
   SETTINGS: 'yojana_sarthi_settings_v1',
-  ONBOARDING_SEEN: 'yojana_sarthi_onboarding_v1'
+  ONBOARDING_SEEN: 'yojana_sarthi_onboarding_v1',
+  IS_DEMO: 'yojana_sarthi_is_demo_v1'
 };
 
 export const SAMPLE_DEMO_DATA = {
@@ -236,6 +237,26 @@ export const StorageService = {
     }
   },
 
+  isDemoMode(): boolean {
+    try {
+      return localStorage.getItem(KEYS.IS_DEMO) === 'true';
+    } catch {
+      return false;
+    }
+  },
+
+  setDemoMode(isDemo: boolean): void {
+    try {
+      if (isDemo) {
+        localStorage.setItem(KEYS.IS_DEMO, 'true');
+      } else {
+        localStorage.removeItem(KEYS.IS_DEMO);
+      }
+    } catch (e) {
+      console.warn('LocalStorage save failed:', e);
+    }
+  },
+
   clearAllData(): void {
     try {
       Object.values(KEYS).forEach((k) => localStorage.removeItem(k));
@@ -250,6 +271,7 @@ export const StorageService = {
       this.saveReadyDocuments(SAMPLE_DEMO_DATA.readyDocuments);
       this.saveApplications(SAMPLE_DEMO_DATA.applications);
       this.saveFamilyMembers(SAMPLE_DEMO_DATA.familyMembers);
+      this.setDemoMode(true);
     } catch (e) {
       console.warn('Loading sample demo data failed:', e);
     }

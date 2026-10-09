@@ -25,7 +25,17 @@ import { SCHEMES_DATABASE } from '../../data/schemesData';
 import civicHeroBg from '../../assets/images/civic_hero_bg_1791566634546.jpg';
 
 export const HomeView: React.FC = () => {
-  const { setCurrentView, setSelectedSchemeId, settings, setAnswers, setIsDemoData, startNewAssessment, addToast, t } = useApp();
+  const { 
+    setCurrentView, 
+    setSelectedSchemeId, 
+    settings, 
+    setAnswers, 
+    setIsDemoData, 
+    startNewAssessment, 
+    openFindSchemes, 
+    addToast, 
+    t 
+  } = useApp();
 
   // Interactive Hero Profile Preview switcher
   const [activePersona, setActivePersona] = useState<'farmer' | 'student' | 'woman' | 'senior' | 'artisan'>('farmer');
@@ -185,7 +195,7 @@ export const HomeView: React.FC = () => {
     <div className="space-y-20 md:space-y-28">
       
       {/* 1. CINEMATIC BOBBIN-INSPIRED HERO SECTION */}
-      <section className="relative -mx-4 sm:-mx-6 lg:-mx-8 -mt-6 sm:-mt-8 overflow-hidden">
+      <section className="relative overflow-hidden w-full">
         
         {/* Full-bleed Art-Directed Photographic Civic Background */}
         <div className="absolute inset-0 z-0">
@@ -210,7 +220,7 @@ export const HomeView: React.FC = () => {
         </div>
 
         {/* Hero Content Container */}
-        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 sm:pt-20 pb-20 sm:pb-28">
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 sm:pt-14 pb-16 sm:pb-24">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-10 items-center">
             
             {/* Left Column: Proposition, Typography & CTAs */}
@@ -251,7 +261,7 @@ export const HomeView: React.FC = () => {
               {/* CTAs */}
               <div className="pt-2 flex flex-col sm:flex-row items-stretch sm:items-center gap-3.5">
                 <button
-                  onClick={() => startNewAssessment()}
+                  onClick={() => openFindSchemes()}
                   className="inline-flex items-center justify-center gap-2 px-7 py-4 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-semibold text-sm transition-all shadow-lg hover:shadow-amber-500/25 active:scale-[0.98]"
                 >
                   <span>{t('heroCtaPrimary')}</span>
@@ -648,7 +658,11 @@ export const HomeView: React.FC = () => {
               onClick={() => setCurrentView('all_schemes')}
               className="inline-flex items-center gap-1.5 text-xs font-semibold text-[var(--accent-saffron)] hover:underline"
             >
-              <span>{settings.language === 'hi' ? 'सभी 18 योजनाएं देखें' : 'View all 18 schemes'}</span>
+              <span>
+                {settings.language === 'hi' 
+                  ? `सभी ${SCHEMES_DATABASE.length} योजनाएं देखें` 
+                  : `View all ${SCHEMES_DATABASE.length} schemes`}
+              </span>
               <ArrowRight className="w-3.5 h-3.5" />
             </button>
           </div>
@@ -815,7 +829,7 @@ export const HomeView: React.FC = () => {
             </p>
             <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3.5">
               <button
-                onClick={() => startNewAssessment()}
+                onClick={() => openFindSchemes()}
                 className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-xl bg-[var(--accent-saffron)] hover:bg-[var(--accent-saffron-hover)] text-white font-semibold text-sm transition-all shadow-md active:scale-[0.98]"
               >
                 <span>{t('heroCtaPrimary')}</span>

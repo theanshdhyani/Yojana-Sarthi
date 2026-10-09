@@ -124,7 +124,7 @@ export const FamilyModeView: React.FC = () => {
           return (
             <div
               key={member.id}
-              className="p-6 rounded-2xl border border-[var(--border-hairline)] bg-[var(--bg-surface)] space-y-4"
+              className="bobbin-surface-card p-6 sm:p-7 rounded-3xl space-y-4 shadow-sm"
             >
               <div className="flex items-start justify-between gap-3">
                 <div className="flex items-start gap-3">

@@ -170,7 +170,7 @@ export const QuestionnaireView: React.FC = () => {
     <div className="max-w-3xl mx-auto px-4 sm:px-6 py-6 sm:py-10 space-y-8">
       
       {/* Top Header & Progress */}
-      <div className="space-y-4">
+      <div className="p-5 sm:p-6 rounded-3xl glass-card space-y-4 shadow-sm border border-[var(--glass-panel-border)]">
         <div className="flex items-center justify-between">
           <button
             onClick={handleBack}
@@ -180,7 +180,7 @@ export const QuestionnaireView: React.FC = () => {
             <span>{t('back')}</span>
           </button>
 
-          <span className="text-xs font-mono font-semibold text-[var(--text-muted)] tracking-wider">
+          <span className="text-xs font-mono font-semibold text-[var(--accent-saffron)] px-3 py-1 rounded-full bg-[var(--accent-saffron-light)]/60 border border-[var(--accent-saffron)]/30 tracking-wider">
             {settings.language === 'hi' 
               ? `प्रश्न ${String(currentStepIndex + 1).padStart(2, '0')} / ${String(totalSteps).padStart(2, '0')}`
               : `Question ${String(currentStepIndex + 1).padStart(2, '0')} of ${String(totalSteps).padStart(2, '0')}`}
@@ -188,9 +188,9 @@ export const QuestionnaireView: React.FC = () => {
         </div>
 
         {/* Hairline Progress Bar */}
-        <div className="w-full h-1.5 bg-[var(--border-hairline)] rounded-full overflow-hidden">
+        <div className="w-full h-2 bg-[var(--border-hairline)]/60 rounded-full overflow-hidden p-0.5">
           <div
-            className="h-full bg-[var(--accent-saffron)] transition-all duration-300 rounded-full"
+            className="h-full bg-gradient-to-r from-amber-500 via-[var(--accent-saffron)] to-emerald-600 transition-all duration-300 rounded-full shadow-xs"
             style={{ width: `${((currentStepIndex + 1) / totalSteps) * 100}%` }}
           />
         </div>
@@ -224,7 +224,7 @@ export const QuestionnaireView: React.FC = () => {
             </p>
           </div>
 
-          <div className="p-6 rounded-2xl border border-[var(--border-hairline)] bg-[var(--bg-surface)] space-y-6">
+          <div className="p-6 rounded-3xl glass-card border border-[var(--glass-panel-border)] space-y-6 shadow-sm">
             <div>
               <label className="block text-xs font-semibold text-[var(--text-primary)] mb-2">
                 {settings.language === 'hi' ? 'आयु दर्ज करें (संख्या में)' : 'Enter Age (Years)'}
@@ -239,7 +239,7 @@ export const QuestionnaireView: React.FC = () => {
                   setAnswers({ ...answers, age: parseInt(e.target.value) || undefined });
                 }}
                 placeholder="e.g. 38"
-                className="w-full text-2xl font-semibold px-4 py-3 rounded-xl border border-[var(--border-hairline)] bg-[var(--bg-subtle)] focus:border-[var(--accent-saffron)] focus:outline-none"
+                className="w-full text-2xl font-semibold px-4 py-3 rounded-xl border border-[var(--border-hairline)] bg-[var(--bg-subtle)] focus:border-[var(--accent-saffron)] focus:outline-none transition-colors"
               />
             </div>
 
@@ -256,9 +256,9 @@ export const QuestionnaireView: React.FC = () => {
                       setValidationError(null);
                       setAnswers({ ...answers, age: val });
                     }}
-                    className={`px-3 py-1.5 rounded-lg border text-xs font-medium transition-colors ${
+                    className={`px-3.5 py-1.5 rounded-xl border text-xs font-medium transition-all ${
                       answers.age === val
-                        ? 'border-[var(--accent-saffron)] bg-[var(--accent-saffron-light)] font-bold text-[var(--text-primary)]'
+                        ? 'border-[var(--accent-saffron)] bg-[var(--accent-saffron-light)] font-bold text-[var(--accent-saffron-text)] shadow-xs'
                         : 'border-[var(--border-hairline)] hover:bg-[var(--bg-subtle)] text-[var(--text-secondary)]'
                     }`}
                   >
@@ -303,8 +303,8 @@ export const QuestionnaireView: React.FC = () => {
                 }}
                 className={`p-5 rounded-2xl border text-left transition-all flex flex-col justify-between ${
                   answers.gender === item.id
-                    ? 'border-[var(--accent-saffron)] bg-[var(--accent-saffron-light)] shadow-xs'
-                    : 'border-[var(--border-hairline)] bg-[var(--bg-surface)] hover:bg-[var(--bg-subtle)]'
+                    ? 'border-[var(--accent-saffron)] bg-[var(--accent-saffron-light)] shadow-xs font-semibold'
+                    : 'bobbin-surface-card'
                 }`}
               >
                 <div>
@@ -337,14 +337,14 @@ export const QuestionnaireView: React.FC = () => {
             </p>
           </div>
 
-          <div className="p-6 rounded-2xl border border-[var(--border-hairline)] bg-[var(--bg-surface)] space-y-4">
+          <div className="p-6 rounded-3xl glass-card border border-[var(--glass-panel-border)] space-y-4 shadow-sm">
             <label className="block text-xs font-semibold text-[var(--text-primary)]">
               {settings.language === 'hi' ? 'राज्य का चयन करें' : 'Select State'}
             </label>
             <select
               value={answers.state || 'Uttar Pradesh'}
               onChange={(e) => setAnswers({ ...answers, state: e.target.value })}
-              className="w-full text-base px-4 py-3 rounded-xl border border-[var(--border-hairline)] bg-[var(--bg-subtle)] text-[var(--text-primary)] focus:border-[var(--accent-saffron)] focus:outline-none"
+              className="w-full text-base px-4 py-3 rounded-xl border border-[var(--border-hairline)] bg-[var(--bg-subtle)] text-[var(--text-primary)] focus:border-[var(--accent-saffron)] focus:outline-none transition-colors"
             >
               {INDIAN_STATES_DISTRICTS.map((s) => (
                 <option key={s.state} value={s.state}>
@@ -387,8 +387,8 @@ export const QuestionnaireView: React.FC = () => {
                 }}
                 className={`p-6 rounded-2xl border text-left transition-all flex flex-col justify-between ${
                   answers.residenceArea === item.id
-                    ? 'border-[var(--accent-saffron)] bg-[var(--accent-saffron-light)] shadow-xs'
-                    : 'border-[var(--border-hairline)] bg-[var(--bg-surface)] hover:bg-[var(--bg-subtle)]'
+                    ? 'border-[var(--accent-saffron)] bg-[var(--accent-saffron-light)] shadow-xs font-semibold'
+                    : 'bobbin-surface-card'
                 }`}
               >
                 <div>

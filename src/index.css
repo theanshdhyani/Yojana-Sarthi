@@ -248,7 +248,7 @@
 
 /* Cinematic Bobbin Hero Surface & Ambient Effects */
 .bobbin-hero-panel {
-  background: rgba(255, 255, 255, 0.84);
+  background: rgba(255, 255, 255, 0.86);
   backdrop-filter: blur(36px) saturate(190%);
   -webkit-backdrop-filter: blur(36px) saturate(190%);
   border: 1px solid rgba(255, 255, 255, 0.95);
@@ -296,17 +296,45 @@
 
 .bobbin-surface-card {
   background: var(--glass-panel-bg);
-  backdrop-filter: blur(24px) saturate(160%);
-  -webkit-backdrop-filter: blur(24px) saturate(160%);
-  border: 1px solid var(--border-hairline);
-  box-shadow: 0 8px 24px -4px rgba(15, 23, 42, 0.04), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(24px) saturate(170%);
+  -webkit-backdrop-filter: blur(24px) saturate(170%);
+  border: 1px solid var(--glass-panel-border);
+  box-shadow: 0 10px 30px -4px rgba(15, 23, 42, 0.05), inset 0 1px 0 rgba(255, 255, 255, 0.7);
   transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .bobbin-surface-card:hover {
   transform: translateY(-2px);
   border-color: var(--accent-saffron);
-  box-shadow: 0 16px 36px -6px rgba(180, 83, 9, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  box-shadow: 0 18px 40px -6px rgba(180, 83, 9, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.85);
+}
+
+.dark .bobbin-surface-card {
+  background: rgba(22, 28, 42, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.11);
+  box-shadow: 0 12px 32px -4px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.dark .bobbin-surface-card:hover {
+  border-color: rgba(245, 158, 11, 0.6);
+  box-shadow: 0 20px 48px -6px rgba(0, 0, 0, 0.65), inset 0 1px 0 rgba(255, 255, 255, 0.18);
+}
+
+/* Glass Section Container (Light Tinted Ambient Backing) */
+.glass-section-banner {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.7) 0%, rgba(255, 255, 255, 0.5) 100%);
+  backdrop-filter: blur(28px) saturate(175%);
+  -webkit-backdrop-filter: blur(28px) saturate(175%);
+  border: 1px solid rgba(255, 255, 255, 0.85);
+  box-shadow: 0 16px 36px -6px rgba(15, 23, 42, 0.07), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+
+.dark .glass-section-banner {
+  background: linear-gradient(135deg, rgba(24, 32, 48, 0.7) 0%, rgba(18, 24, 38, 0.55) 100%);
+  backdrop-filter: blur(28px) saturate(175%);
+  -webkit-backdrop-filter: blur(28px) saturate(175%);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 20px 44px -8px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.14);
 }
 
 /* Main Mobile Floating Glass Dock */

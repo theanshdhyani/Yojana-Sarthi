@@ -125,7 +125,7 @@ export const NearbyHelpView: React.FC = () => {
           {filteredCenters.map((center) => (
             <div
               key={center.id}
-              className="p-6 rounded-2xl border border-[var(--border-hairline)] bg-[var(--bg-surface)] space-y-4"
+              className="bobbin-surface-card p-6 sm:p-7 rounded-3xl space-y-4 shadow-sm"
             >
               <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
                 <div className="space-y-1">

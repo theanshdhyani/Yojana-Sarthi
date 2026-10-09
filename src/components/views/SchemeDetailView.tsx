@@ -168,7 +168,7 @@ export const SchemeDetailView: React.FC = () => {
       </div>
 
       {/* Simple Language Explanation / Full Description */}
-      <div className="p-6 rounded-2xl border border-[var(--border-hairline)] bg-[var(--bg-surface)] space-y-3">
+      <div className="bobbin-surface-card p-6 sm:p-7 rounded-3xl space-y-3 shadow-xs">
         <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-amber-700 dark:text-amber-400">
           <Sparkles className="w-4 h-4" />
           <span>{settings.language === 'hi' ? 'योजना का सरल विवरण' : 'Scheme Overview in Plain Language'}</span>
@@ -184,7 +184,7 @@ export const SchemeDetailView: React.FC = () => {
       </div>
 
       {/* Eligibility Criteria */}
-      <div className="p-6 rounded-2xl border border-[var(--border-hairline)] bg-[var(--bg-surface)] space-y-4">
+      <div className="bobbin-surface-card p-6 sm:p-7 rounded-3xl space-y-4 shadow-xs">
         <h3 className="text-base font-serif font-bold text-[var(--text-primary)] flex items-center gap-2">
           <ShieldCheck className="w-5 h-5 text-emerald-600" />
           <span>{t('eligibilityCriteria')}</span>
@@ -195,7 +195,7 @@ export const SchemeDetailView: React.FC = () => {
       </div>
 
       {/* Required Documents */}
-      <div className="p-6 rounded-2xl border border-[var(--border-hairline)] bg-[var(--bg-surface)] space-y-4">
+      <div className="bobbin-surface-card p-6 sm:p-7 rounded-3xl space-y-4 shadow-xs">
         <div className="flex items-center justify-between">
           <h3 className="text-base font-serif font-bold text-[var(--text-primary)] flex items-center gap-2">
             <FileCheck2 className="w-5 h-5 text-blue-600" />

@@ -120,10 +120,10 @@ export const DocumentCheckerView: React.FC = () => {
           return (
             <div
               key={doc.id}
-              className={`p-6 rounded-2xl border transition-all space-y-4 ${
+              className={`p-6 rounded-3xl transition-all space-y-4 ${
                 isReady
-                  ? 'border-emerald-200 dark:border-emerald-900/60 bg-[var(--bg-surface)]'
-                  : 'border-[var(--border-hairline)] bg-[var(--bg-surface)]'
+                  ? 'border border-emerald-300 dark:border-emerald-700/80 bg-emerald-50/40 dark:bg-emerald-950/20 backdrop-blur-xl shadow-xs'
+                  : 'bobbin-surface-card'
               }`}
             >
               {/* Row 1: Title & Toggle Button */}

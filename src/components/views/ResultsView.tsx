@@ -240,7 +240,7 @@ export const ResultsView: React.FC = () => {
               return (
                 <div
                   key={s.id}
-                  className="p-6 rounded-2xl border border-[var(--border-hairline)] bg-[var(--bg-surface)] hover:border-[var(--accent-saffron)] transition-all space-y-4 shadow-2xs"
+                  className="bobbin-surface-card p-6 rounded-3xl space-y-4 shadow-sm"
                 >
                   {/* Row 1: Header & Status Badge */}
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">

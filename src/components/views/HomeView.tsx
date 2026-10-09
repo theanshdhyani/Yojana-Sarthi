@@ -9,38 +9,41 @@ import {
   Compass, 
   Users, 
   Building2, 
-  PhoneCall, 
   AlertTriangle, 
   BadgeCheck,
   Wheat,
   HeartPulse,
-  Home,
-  Baby,
   GraduationCap,
   Store,
   Shield,
-  SunMedium,
-  Check,
+  Hammer,
+  Landmark,
+  ExternalLink,
   ChevronRight
 } from 'lucide-react';
 import { SCHEMES_DATABASE } from '../../data/schemesData';
-import { SchemeCategory } from '../../types/scheme';
+import civicHeroBg from '../../assets/images/civic_hero_bg_1791566634546.jpg';
 
 export const HomeView: React.FC = () => {
   const { setCurrentView, setSelectedSchemeId, settings, setAnswers, setIsDemoData, addToast, t } = useApp();
 
   // Interactive Hero Profile Preview switcher
-  const [activePersona, setActivePersona] = useState<'farmer' | 'student' | 'woman' | 'senior'>('farmer');
+  const [activePersona, setActivePersona] = useState<'farmer' | 'student' | 'woman' | 'senior' | 'artisan'>('farmer');
 
   const personas = {
     farmer: {
-      name: 'Rameshwar',
+      name: 'Rameshwar Sharma',
       role: settings.language === 'hi' ? 'सीमांत किसान, 42 वर्ष' : 'Marginal Farmer, 42 yrs',
       state: 'Uttar Pradesh (Rural)',
       income: '₹1.8 Lakh/yr',
       matches: 3,
+      totalBenefitValue: '₹84,000/yr',
       topScheme: 'PM-KISAN (₹6,000/yr) + PM Surya Ghar (₹78k subsidy)',
-      category: 'agriculture'
+      category: 'agriculture',
+      schemes: [
+        { name: 'PM-KISAN Samman Nidhi', benefit: '₹6,000 / year direct cash', tag: 'Direct Benefit Transfer' },
+        { name: 'PM Surya Ghar: Muft Bijli', benefit: 'Up to ₹78,000 rooftop solar subsidy', tag: 'Clean Energy' }
+      ]
     },
     student: {
       name: 'Anjali Kumari',
@@ -48,31 +51,60 @@ export const HomeView: React.FC = () => {
       state: 'Bihar (Rural/Urban)',
       income: '₹1.5 Lakh/yr (OBC)',
       matches: 2,
+      totalBenefitValue: '100% Fees + ₹12,000/yr',
       topScheme: 'Post-Matric Scholarship (100% Fee Reimbursement)',
-      category: 'education'
+      category: 'education',
+      schemes: [
+        { name: 'Post-Matric Scholarship', benefit: '100% Tuition fee + monthly maintenance', tag: 'Higher Education' },
+        { name: 'Skill India Digital Mission', benefit: 'Free industry-certified training + stipend', tag: 'Skill Training' }
+      ]
     },
     woman: {
       name: 'Sunita Devi',
       role: settings.language === 'hi' ? 'स्व-रोजगार महिला, 36 वर्ष' : 'Small Entrepreneur, 36 yrs',
-      state: 'Rajasthan',
+      state: 'Rajasthan (Rural)',
       income: '₹1.2 Lakh/yr',
       matches: 4,
-      topScheme: 'PM Mudra Shishu (₹50k) + Ujjwala 2.0 (Free LPG)',
-      category: 'women_children'
+      totalBenefitValue: '₹50,000 Loan + Free LPG',
+      topScheme: 'PM Mudra Shishu (₹50k collateral-free loan) + Ujjwala 2.0',
+      category: 'women_children',
+      schemes: [
+        { name: 'PM Mudra Yojana (Shishu)', benefit: '₹50,000 collateral-free enterprise loan', tag: 'Micro Credit' },
+        { name: 'PM Ujjwala Yojana 2.0', benefit: 'Free LPG connection + subsidized cylinder', tag: 'Household Welfare' }
+      ]
     },
     senior: {
       name: 'Shivcharan Lal',
       role: settings.language === 'hi' ? 'वरिष्ठ नागरिक, 68 वर्ष' : 'Senior Citizen, 68 yrs',
-      state: 'Madhya Pradesh',
+      state: 'Madhya Pradesh (Rural)',
       income: '₹60,000/yr (BPL)',
       matches: 3,
+      totalBenefitValue: '₹5 Lakh Health Cover',
       topScheme: 'Ayushman Bharat (₹5 Lakh cover) + Old Age Pension',
-      category: 'social_security'
+      category: 'social_security',
+      schemes: [
+        { name: 'Ayushman Bharat (PM-JAY)', benefit: '₹5 Lakh / year cashless family treatment', tag: 'Hospitalization' },
+        { name: 'Indira Gandhi National Pension', benefit: 'Monthly old-age pension to bank account', tag: 'Social Pension' }
+      ]
+    },
+    artisan: {
+      name: 'Mohan Lal Vishwakarma',
+      role: settings.language === 'hi' ? 'पारंपरिक काष्ठशिल्पी, 29 वर्ष' : 'Traditional Carpenter, 29 yrs',
+      state: 'Gujarat (Rural)',
+      income: '₹1.6 Lakh/yr',
+      matches: 3,
+      totalBenefitValue: '₹15,000 Kit + ₹3 Lakh Loan',
+      topScheme: 'PM Vishwakarma Toolkit Grant (₹15,000) + 5% Collateral-Free Loan',
+      category: 'employment',
+      schemes: [
+        { name: 'PM Vishwakarma Yojana', benefit: '₹15,000 modern toolkit grant + 5% credit', tag: 'Artisan Welfare' },
+        { name: 'Atal Pension Yojana', benefit: 'Guaranteed government pension up to ₹5,000/mo', tag: 'Retirement' }
+      ]
     }
   };
 
   // Only switches the visual preview tab - NEVER silently overwrites user answers
-  const handlePersonaSelect = (key: 'farmer' | 'student' | 'woman' | 'senior') => {
+  const handlePersonaSelect = (key: 'farmer' | 'student' | 'woman' | 'senior' | 'artisan') => {
     setActivePersona(key);
   };
 
@@ -123,6 +155,18 @@ export const HomeView: React.FC = () => {
         hasRationCard: 'bpl',
         specialAttributes: ['senior_citizen']
       };
+    } else if (activePersona === 'artisan') {
+      pAnswers = {
+        age: 29,
+        gender: 'male',
+        state: 'Gujarat',
+        residenceArea: 'rural',
+        socialCategory: 'OBC',
+        occupation: 'artisan_craftsperson',
+        annualIncomeBracket: '1lakh_to_2.5lakh',
+        hasRationCard: 'bpl',
+        specialAttributes: ['traditional_artisan']
+      };
     }
     setAnswers(pAnswers, true);
     setIsDemoData(true);
@@ -140,35 +184,75 @@ export const HomeView: React.FC = () => {
   return (
     <div className="space-y-20 md:space-y-28">
       
-      {/* 1. HERO SECTION */}
-      <section className="pt-6 sm:pt-10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center">
+      {/* 1. CINEMATIC BOBBIN-INSPIRED HERO SECTION */}
+      <section className="relative -mx-4 sm:-mx-6 lg:-mx-8 -mt-6 sm:-mt-8 overflow-hidden">
+        
+        {/* Full-bleed Art-Directed Photographic Civic Background */}
+        <div className="absolute inset-0 z-0">
+          <img 
+            src={civicHeroBg} 
+            alt="Vibrant Indian civic community at sunrise" 
+            className="w-full h-full object-cover object-center scale-105 transform origin-top filter brightness-[0.92] contrast-[1.05]"
+          />
+          
+          {/* Multi-layered cinematic dark gradient overlay protecting text contrast */}
+          <div className="absolute inset-0 bg-gradient-to-b from-slate-950/88 via-slate-950/78 to-[var(--bg-canvas)]" />
+          
+          {/* Atmospheric light glows */}
+          <div 
+            className="absolute top-1/4 left-1/4 w-96 h-96 rounded-full pointer-events-none opacity-40 blur-3xl"
+            style={{ background: 'radial-gradient(circle, rgba(245, 158, 11, 0.35) 0%, transparent 70%)' }}
+          />
+          <div 
+            className="absolute top-1/3 right-1/4 w-96 h-96 rounded-full pointer-events-none opacity-30 blur-3xl"
+            style={{ background: 'radial-gradient(circle, rgba(34, 197, 94, 0.25) 0%, transparent 70%)' }}
+          />
+        </div>
+
+        {/* Hero Content Container */}
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 sm:pt-20 pb-20 sm:pb-28">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-10 items-center">
             
-            {/* Left Column: Proposition & CTA */}
-            <div className="lg:col-span-7 space-y-6">
+            {/* Left Column: Proposition, Typography & CTAs */}
+            <div className="lg:col-span-7 space-y-6 sm:space-y-7">
               
-              {/* Eyebrow */}
-              <div className="inline-flex items-center gap-2 text-xs font-semibold tracking-wide uppercase text-[var(--accent-saffron-text)] bg-[var(--accent-saffron-light)] border border-[var(--accent-saffron)]/30 px-3.5 py-1 rounded-full shadow-2xs">
-                <span className="w-1.5 h-1.5 rounded-full bg-[var(--accent-saffron)] animate-pulse" />
+              {/* Eyebrow Badge with Frost Effect */}
+              <div className="inline-flex items-center gap-2.5 text-xs font-semibold tracking-wide uppercase text-amber-200 bg-white/10 backdrop-blur-md border border-white/20 px-4 py-1.5 rounded-full shadow-lg">
+                <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
                 <span>{t('heroEyebrow')}</span>
+                <span className="text-white/40">·</span>
+                <span className="text-emerald-300 font-medium">Official Welfare</span>
               </div>
 
-              {/* Headline */}
-              <h1 className="text-3xl sm:text-5xl lg:text-6xl font-serif font-bold text-[var(--text-primary)] tracking-tight leading-[1.15] text-balance">
-                {t('heroTitle')}
+              {/* Cinematic Bold Headline with Gradient Accent */}
+              <h1 className="text-3xl sm:text-5xl lg:text-6xl font-serif font-bold text-white tracking-tight leading-[1.12] text-balance drop-shadow-md">
+                {settings.language === 'hi' ? (
+                  <>
+                    हर नागरिक का अधिकार,
+                    <span className="block mt-2 bg-gradient-to-r from-amber-300 via-amber-400 to-orange-400 bg-clip-text text-transparent">
+                      बिना बिचौलियों के। सीधे खाते में।
+                    </span>
+                  </>
+                ) : (
+                  <>
+                    Discover Government Schemes You Qualify For.
+                    <span className="block mt-2 bg-gradient-to-r from-amber-300 via-amber-400 to-orange-400 bg-clip-text text-transparent">
+                      Directly. Transparently. Without Middlemen.
+                    </span>
+                  </>
+                )}
               </h1>
 
-              {/* Subtitle */}
-              <p className="text-base sm:text-lg text-[var(--text-secondary)] leading-relaxed max-w-xl">
+              {/* Subtitle with High Legibility */}
+              <p className="text-base sm:text-lg text-slate-200 leading-relaxed max-w-2xl font-normal drop-shadow-xs">
                 {t('heroSubtitle')}
               </p>
 
               {/* CTAs */}
-              <div className="pt-2 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+              <div className="pt-2 flex flex-col sm:flex-row items-stretch sm:items-center gap-3.5">
                 <button
                   onClick={() => setCurrentView('questionnaire')}
-                  className="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-[var(--accent-saffron)] hover:bg-[var(--accent-saffron-hover)] text-white font-semibold text-sm transition-colors shadow-xs"
+                  className="inline-flex items-center justify-center gap-2 px-7 py-4 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-semibold text-sm transition-all shadow-lg hover:shadow-amber-500/25 active:scale-[0.98]"
                 >
                   <span>{t('heroCtaPrimary')}</span>
                   <ArrowRight className="w-4 h-4" />
@@ -176,120 +260,160 @@ export const HomeView: React.FC = () => {
 
                 <button
                   onClick={() => setCurrentView('all_schemes')}
-                  className="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl border border-[var(--border-hairline)] bg-[var(--bg-surface)] hover:bg-[var(--bg-subtle)] text-[var(--text-primary)] font-semibold text-sm transition-colors shadow-2xs"
+                  className="inline-flex items-center justify-center gap-2 px-7 py-4 rounded-xl border border-white/25 bg-white/10 hover:bg-white/20 backdrop-blur-md text-white font-semibold text-sm transition-all shadow-md active:scale-[0.98]"
                 >
                   <span>{t('heroCtaSecondary')}</span>
                 </button>
               </div>
 
-              {/* Quiet Trust Signals */}
-              <div className="pt-4 border-t border-[var(--border-hairline)] grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs text-[var(--text-secondary)] font-medium">
-                <div className="flex items-center gap-2">
-                  <BadgeCheck className="w-4 h-4 text-[var(--accent-green)] shrink-0" />
+              {/* Unboxed Quiet Trust Signals with High Contrast */}
+              <div className="pt-5 border-t border-white/15 flex flex-wrap items-center gap-y-2 gap-x-5 text-xs text-slate-200 font-medium">
+                <div className="flex items-center gap-1.5">
+                  <BadgeCheck className="w-4 h-4 text-emerald-400 shrink-0" />
                   <span>{t('trust100Free')}</span>
                 </div>
-                <div className="flex items-center gap-2">
-                  <ShieldCheck className="w-4 h-4 text-[var(--accent-green)] shrink-0" />
+                <span className="text-white/30 hidden sm:inline" aria-hidden="true">·</span>
+                <div className="flex items-center gap-1.5">
+                  <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
                   <span>{t('trustPrivate')}</span>
                 </div>
-                <div className="flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-[var(--accent-green)] shrink-0" />
+                <span className="text-white/30 hidden sm:inline" aria-hidden="true">·</span>
+                <div className="flex items-center gap-1.5">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
                   <span>{t('trustNoAadhaar')}</span>
                 </div>
-                <div className="flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-[var(--accent-green)] shrink-0" />
+                <span className="text-white/30 hidden sm:inline" aria-hidden="true">·</span>
+                <div className="flex items-center gap-1.5">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
                   <span>{t('trustOffline')}</span>
                 </div>
               </div>
 
             </div>
 
-            {/* Right Column: Interactive Editorial Product Artifact */}
-            <div className="lg:col-span-5">
-              <div className="glass-card rounded-3xl p-6 sm:p-7 space-y-5 relative shadow-lg">
+            {/* Right Column: Large Floating Translucent Product Interface Panel */}
+            <div className="lg:col-span-5 relative">
+              
+              {/* Satellite Floating Glass Badge 1: Top Right */}
+              <div className="bobbin-satellite-chip absolute -top-4 -right-2 sm:-top-5 sm:-right-4 hidden sm:flex items-center gap-2 px-3.5 py-2 rounded-2xl z-20 text-xs font-semibold text-[var(--text-primary)]">
+                <div className="w-6 h-6 rounded-lg bg-[var(--accent-green-light)] flex items-center justify-center text-[var(--accent-green)]">
+                  <Landmark className="w-3.5 h-3.5" />
+                </div>
+                <span>DBT Direct to Bank</span>
+              </div>
+
+              {/* Satellite Floating Glass Badge 2: Bottom Left */}
+              <div className="bobbin-satellite-chip absolute -bottom-4 -left-2 sm:-bottom-5 sm:-left-4 hidden sm:flex items-center gap-2 px-3.5 py-2 rounded-2xl z-20 text-xs font-semibold text-[var(--text-primary)]">
+                <div className="w-6 h-6 rounded-lg bg-rose-100 dark:bg-rose-950/60 flex items-center justify-center text-rose-700 dark:text-rose-400">
+                  <HeartPulse className="w-3.5 h-3.5" />
+                </div>
+                <span>₹5 Lakh Free Health Cover</span>
+              </div>
+
+              {/* Main Translucent Product Panel */}
+              <div className="bobbin-hero-panel rounded-3xl p-5 sm:p-7 space-y-5 relative shadow-2xl">
                 
-                {/* Visual Label */}
-                <div className="flex items-center justify-between pb-3 border-b border-[var(--border-hairline)]">
-                  <div className="space-y-0.5">
-                    <span className="text-[11px] font-bold uppercase tracking-wider text-[var(--text-muted)]">
-                      {settings.language === 'hi' ? 'लाइव पात्रता पूर्वावलोकन' : 'Live Matching Preview'}
+                {/* Window Chrome Header Bar */}
+                <div className="flex items-center justify-between pb-3.5 border-b border-[var(--border-hairline)]">
+                  <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-1.5">
+                      <span className="w-2.5 h-2.5 rounded-full bg-rose-500/80" />
+                      <span className="w-2.5 h-2.5 rounded-full bg-amber-500/80" />
+                      <span className="w-2.5 h-2.5 rounded-full bg-emerald-500/80" />
+                    </div>
+                    <span className="text-[11px] font-mono font-medium text-[var(--text-muted)] ml-2">
+                      matcher-engine.local
                     </span>
-                    <p className="text-xs font-semibold text-[var(--text-primary)]">
-                      {settings.language === 'hi' ? 'चुनें नागरिक प्रोफ़ाइल:' : 'Select a sample citizen profile:'}
-                    </p>
                   </div>
-                  <span className="px-2.5 py-0.5 rounded-md text-[10px] font-bold bg-[var(--accent-green-light)] text-[var(--accent-green-text)] border border-[var(--accent-green)]/30">
-                    Active Matcher
+                  <span className="px-2.5 py-0.5 rounded-md text-[10px] font-bold bg-[var(--accent-green-light)] text-[var(--accent-green-text)] border border-[var(--accent-green)]/30 flex items-center gap-1">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[var(--accent-green)] animate-pulse" />
+                    <span>On-Device Engine</span>
                   </span>
                 </div>
 
-                {/* Profile Selector Tabs */}
-                <div className="grid grid-cols-4 gap-1 p-1 bg-[var(--bg-subtle)] rounded-xl text-xs font-medium">
-                  {(['farmer', 'student', 'woman', 'senior'] as const).map((key) => (
-                    <button
-                      key={key}
-                      onClick={() => handlePersonaSelect(key)}
-                      className={`py-1.5 px-2 rounded-lg transition-colors text-center capitalize ${
-                        activePersona === key
-                          ? 'bg-[var(--bg-surface)] text-[var(--text-primary)] font-bold shadow-2xs'
-                          : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
-                      }`}
-                    >
-                      {key === 'farmer' ? (settings.language === 'hi' ? 'किसान' : 'Farmer')
-                        : key === 'student' ? (settings.language === 'hi' ? 'विद्यार्थी' : 'Student')
-                        : key === 'woman' ? (settings.language === 'hi' ? 'महिला' : 'Woman')
-                        : (settings.language === 'hi' ? 'बुजुर्ग' : 'Senior')}
-                    </button>
-                  ))}
+                {/* Profile Selector Segmented Control Tabs */}
+                <div className="space-y-1.5">
+                  <div className="text-[11px] font-bold uppercase tracking-wider text-[var(--text-muted)]">
+                    {settings.language === 'hi' ? 'नागरिक प्रोफ़ाइल चुनें:' : 'Select Citizen Persona:'}
+                  </div>
+                  <div className="grid grid-cols-5 gap-1 p-1 bg-[var(--bg-subtle)] rounded-xl text-[11px] font-medium">
+                    {(['farmer', 'student', 'woman', 'senior', 'artisan'] as const).map((key) => (
+                      <button
+                        key={key}
+                        onClick={() => handlePersonaSelect(key)}
+                        className={`py-1.5 px-1 rounded-lg transition-colors text-center truncate ${
+                          activePersona === key
+                            ? 'bg-[var(--bg-surface)] text-[var(--text-primary)] font-bold shadow-xs'
+                            : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
+                        }`}
+                        title={key}
+                      >
+                        {key === 'farmer' ? (settings.language === 'hi' ? 'किसान' : 'Farmer')
+                          : key === 'student' ? (settings.language === 'hi' ? 'छात्रा' : 'Student')
+                          : key === 'woman' ? (settings.language === 'hi' ? 'महिला' : 'Woman')
+                          : key === 'senior' ? (settings.language === 'hi' ? 'बुजुर्ग' : 'Senior')
+                          : (settings.language === 'hi' ? 'शिल्पी' : 'Artisan')}
+                      </button>
+                    ))}
+                  </div>
                 </div>
 
-                {/* Layered Profile Card */}
-                <div className="p-4 rounded-xl border border-[var(--border-hairline)] bg-[var(--bg-subtle)] space-y-3">
-                  <div className="flex items-center justify-between">
+                {/* Active Profile Summary Card */}
+                <div className="p-3.5 sm:p-4 rounded-xl border border-[var(--border-hairline)] bg-[var(--bg-surface)] space-y-2.5 shadow-2xs">
+                  <div className="flex items-start justify-between gap-2">
                     <div>
-                      <h4 className="font-serif font-bold text-base text-[var(--text-primary)]">
-                        {currentPersonaData.name}
+                      <h4 className="font-serif font-bold text-base text-[var(--text-primary)] flex items-center gap-1.5">
+                        <span>{currentPersonaData.name}</span>
                       </h4>
                       <p className="text-xs text-[var(--text-secondary)]">
                         {currentPersonaData.role} · {currentPersonaData.state}
                       </p>
                     </div>
-                    <span className="text-xs font-bold text-[var(--accent-green-text)] bg-[var(--accent-green-light)] px-2.5 py-1 rounded-md border border-[var(--accent-green)]/30">
+                    <span className="text-[11px] font-bold text-[var(--accent-green-text)] bg-[var(--accent-green-light)] px-2.5 py-1 rounded-md border border-[var(--accent-green)]/30 shrink-0">
                       {currentPersonaData.matches} {settings.language === 'hi' ? 'योजनाएं पात्र' : 'Eligible'}
                     </span>
                   </div>
 
                   <div className="text-xs text-[var(--text-secondary)] pt-2 border-t border-[var(--border-hairline)] flex items-center justify-between font-medium">
-                    <span>{settings.language === 'hi' ? 'वार्षिक आय:' : 'Annual Income:'} {currentPersonaData.income}</span>
-                    <span className="text-[var(--text-muted)] font-normal">No Aadhaar needed</span>
+                    <span>{settings.language === 'hi' ? 'आय:' : 'Income:'} {currentPersonaData.income}</span>
+                    <span className="text-[var(--accent-saffron-text)] font-semibold">Value: {currentPersonaData.totalBenefitValue}</span>
                   </div>
                 </div>
 
-                {/* Result Preview Box */}
+                {/* Live Matched Schemes Micro-Cards */}
                 <div className="space-y-2">
-                  <div className="text-[11px] font-bold text-[var(--text-muted)] uppercase tracking-wider">
-                    {settings.language === 'hi' ? 'तत्काल सुझाई गई योजनाएं:' : 'Instant Matched Entitlements:'}
+                  <div className="text-[11px] font-bold text-[var(--text-muted)] uppercase tracking-wider flex items-center justify-between">
+                    <span>{settings.language === 'hi' ? 'सुझाई गई योजनाएं:' : 'Instant Matched Entitlements:'}</span>
+                    <span className="text-[10px] text-[var(--accent-green)] font-semibold">100% Direct DBT</span>
                   </div>
-                  <div className="p-3.5 rounded-xl border border-[var(--warning-border)] bg-[var(--warning-bg)] text-xs space-y-1 shadow-2xs">
-                    <p className="font-bold text-[var(--warning-text)] flex items-center gap-1.5">
-                      <Sparkles className="w-3.5 h-3.5 text-[var(--accent-saffron)] shrink-0" />
-                      <span>{currentPersonaData.topScheme}</span>
-                    </p>
-                    <p className="text-[var(--warning-desc)] text-[11px] leading-relaxed">
-                      {settings.language === 'hi' 
-                        ? 'दस्तावेज़: आधार, बैंक पासबुक, आय/जमीन प्रमाण। कोई बिचौलिया आवश्यक नहीं।'
-                        : 'Required: Aadhaar, Bank Passbook, Land/Income cert. No middlemen.'}
-                    </p>
+                  
+                  <div className="space-y-1.5">
+                    {currentPersonaData.schemes.map((sch, idx) => (
+                      <div key={idx} className="p-3 rounded-xl border border-[var(--border-hairline)] bg-[var(--bg-subtle)] flex items-center justify-between text-xs">
+                        <div className="space-y-0.5">
+                          <p className="font-bold text-[var(--text-primary)] flex items-center gap-1.5">
+                            <Sparkles className="w-3.5 h-3.5 text-[var(--accent-saffron)] shrink-0" />
+                            <span>{sch.name}</span>
+                          </p>
+                          <p className="text-[11px] text-[var(--text-secondary)]">
+                            {sch.benefit}
+                          </p>
+                        </div>
+                        <span className="text-[10px] font-semibold text-[var(--text-muted)] bg-[var(--bg-surface)] px-2 py-0.5 rounded border border-[var(--border-hairline)] shrink-0 ml-2">
+                          {sch.tag}
+                        </span>
+                      </div>
+                    ))}
                   </div>
                 </div>
 
-                {/* Inspect Action */}
-                <div className="pt-1 flex flex-col gap-2">
+                {/* Inspect Action CTA */}
+                <div className="pt-1">
                   <button
                     onClick={handleLoadPersonaReport}
-                    className="w-full py-2.5 px-4 rounded-xl bg-[var(--accent-saffron)] hover:bg-[var(--accent-saffron-hover)] text-white font-semibold text-xs flex items-center justify-center gap-2 transition-colors shadow-xs"
+                    className="w-full py-3 px-4 rounded-xl bg-[var(--accent-saffron)] hover:bg-[var(--accent-saffron-hover)] text-white font-semibold text-xs flex items-center justify-center gap-2 transition-colors shadow-xs active:scale-[0.99]"
                   >
-                    <span>{settings.language === 'hi' ? 'इस प्रोफ़ाइल के परिणाम देखें' : 'View Full Report for this Profile'}</span>
+                    <span>{settings.language === 'hi' ? 'इस प्रोफ़ाइल के सभी परिणाम देखें' : 'View Full Report for this Profile'}</span>
                     <ChevronRight className="w-4 h-4" />
                   </button>
                 </div>
@@ -301,13 +425,13 @@ export const HomeView: React.FC = () => {
         </div>
       </section>
 
-      {/* 2. HOW IT WORKS */}
+      {/* 2. HOW IT WORKS — ELEVATED BOBBIN GLASS CARDS */}
       <section className="border-t border-[var(--border-hairline)] pt-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
           
           <div className="max-w-2xl space-y-2">
             <span className="text-xs font-bold uppercase tracking-wider text-[var(--accent-saffron)]">
-              {settings.language === 'hi' ? 'सरल प्रक्रिया' : 'Step-by-Step Flow'}
+              {settings.language === 'hi' ? 'सरल पारदर्शी प्रक्रिया' : 'Step-by-Step Citizen Journey'}
             </span>
             <h2 className="text-2xl sm:text-4xl font-serif font-bold text-[var(--text-primary)]">
               {t('howItWorksTitle')}
@@ -326,7 +450,7 @@ export const HomeView: React.FC = () => {
             ].map((step) => (
               <div 
                 key={step.num}
-                className="p-6 rounded-2xl border border-[var(--border-hairline)] bg-[var(--bg-surface)] space-y-3 relative flex flex-col justify-between shadow-2xs"
+                className="bobbin-surface-card p-6 rounded-2xl space-y-3 relative flex flex-col justify-between"
               >
                 <div>
                   <span className="text-3xl font-serif font-bold text-[var(--accent-saffron)] tabular-nums">
@@ -346,7 +470,7 @@ export const HomeView: React.FC = () => {
         </div>
       </section>
 
-      {/* 3. FEATURED TOOLS */}
+      {/* 3. FEATURED TOOLS — TRANSLUCENT TILES */}
       <section className="border-t border-[var(--border-hairline)] pt-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
           
@@ -369,7 +493,7 @@ export const HomeView: React.FC = () => {
             {/* Tool 1 */}
             <div 
               onClick={() => setCurrentView('questionnaire')}
-              className="p-6 rounded-2xl border border-[var(--border-hairline)] bg-[var(--bg-surface)] hover:border-[var(--accent-saffron)] transition-all cursor-pointer group flex flex-col justify-between shadow-2xs"
+              className="bobbin-surface-card p-6 rounded-2xl cursor-pointer group flex flex-col justify-between"
             >
               <div className="space-y-3">
                 <div className="p-3 rounded-xl bg-[var(--accent-saffron-light)] text-[var(--accent-saffron)] w-fit">
@@ -391,7 +515,7 @@ export const HomeView: React.FC = () => {
             {/* Tool 2 */}
             <div 
               onClick={() => setCurrentView('document_checker')}
-              className="p-6 rounded-2xl border border-[var(--border-hairline)] bg-[var(--bg-surface)] hover:border-[var(--accent-saffron)] transition-all cursor-pointer group flex flex-col justify-between shadow-2xs"
+              className="bobbin-surface-card p-6 rounded-2xl cursor-pointer group flex flex-col justify-between"
             >
               <div className="space-y-3">
                 <div className="p-3 rounded-xl bg-[var(--accent-green-light)] text-[var(--accent-green)] w-fit">
@@ -413,7 +537,7 @@ export const HomeView: React.FC = () => {
             {/* Tool 3 */}
             <div 
               onClick={() => setCurrentView('tracker')}
-              className="p-6 rounded-2xl border border-[var(--border-hairline)] bg-[var(--bg-surface)] hover:border-[var(--accent-saffron)] transition-all cursor-pointer group flex flex-col justify-between shadow-2xs"
+              className="bobbin-surface-card p-6 rounded-2xl cursor-pointer group flex flex-col justify-between"
             >
               <div className="space-y-3">
                 <div className="p-3 rounded-xl bg-[var(--accent-navy-light)] text-[var(--accent-navy)] w-fit">
@@ -435,7 +559,7 @@ export const HomeView: React.FC = () => {
             {/* Tool 4 */}
             <div 
               onClick={() => setCurrentView('family_mode')}
-              className="p-6 rounded-2xl border border-[var(--border-hairline)] bg-[var(--bg-surface)] hover:border-[var(--accent-saffron)] transition-all cursor-pointer group flex flex-col justify-between shadow-2xs"
+              className="bobbin-surface-card p-6 rounded-2xl cursor-pointer group flex flex-col justify-between"
             >
               <div className="space-y-3">
                 <div className="p-3 rounded-xl bg-purple-50 dark:bg-purple-950/40 text-purple-700 dark:text-purple-400 w-fit">
@@ -457,7 +581,7 @@ export const HomeView: React.FC = () => {
             {/* Tool 5 */}
             <div 
               onClick={() => setCurrentView('nearby_help')}
-              className="p-6 rounded-2xl border border-[var(--border-hairline)] bg-[var(--bg-surface)] hover:border-[var(--accent-saffron)] transition-all cursor-pointer group flex flex-col justify-between shadow-2xs"
+              className="bobbin-surface-card p-6 rounded-2xl cursor-pointer group flex flex-col justify-between"
             >
               <div className="space-y-3">
                 <div className="p-3 rounded-xl bg-orange-50 dark:bg-orange-950/40 text-orange-700 dark:text-orange-400 w-fit">
@@ -479,7 +603,7 @@ export const HomeView: React.FC = () => {
             {/* Tool 6 */}
             <div 
               onClick={() => setCurrentView('all_schemes')}
-              className="p-6 rounded-2xl border border-[var(--border-hairline)] bg-[var(--bg-surface)] hover:border-[var(--accent-saffron)] transition-all cursor-pointer group flex flex-col justify-between shadow-2xs"
+              className="bobbin-surface-card p-6 rounded-2xl cursor-pointer group flex flex-col justify-between"
             >
               <div className="space-y-3">
                 <div className="p-3 rounded-xl bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-400 w-fit">
@@ -503,7 +627,7 @@ export const HomeView: React.FC = () => {
         </div>
       </section>
 
-      {/* 4. SCHEME CATALOGUE PREVIEW BY CATEGORIES */}
+      {/* 4. SCHEME CATALOGUE PREVIEW */}
       <section className="border-t border-[var(--border-hairline)] pt-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
           
@@ -535,7 +659,7 @@ export const HomeView: React.FC = () => {
               <div
                 key={scheme.id}
                 onClick={() => handleSchemeClick(scheme.id)}
-                className="p-5 rounded-2xl border border-[var(--border-hairline)] bg-[var(--bg-surface)] hover:border-[var(--accent-saffron)] transition-all cursor-pointer flex flex-col justify-between group shadow-2xs"
+                className="bobbin-surface-card p-5 rounded-2xl cursor-pointer flex flex-col justify-between group"
               >
                 <div className="space-y-3">
                   <div className="flex items-center justify-between text-xs">
@@ -577,10 +701,10 @@ export const HomeView: React.FC = () => {
         </div>
       </section>
 
-      {/* 5. TRUST & PRIVACY SECTION */}
+      {/* 5. TRUST & CITIZEN PRIVACY VAULT */}
       <section className="border-t border-[var(--border-hairline)] pt-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="p-8 sm:p-12 rounded-3xl border border-[var(--border-hairline)] bg-[var(--bg-surface)] space-y-8 shadow-xs">
+          <div className="bobbin-hero-panel p-8 sm:p-12 rounded-3xl space-y-8 shadow-md">
             
             <div className="max-w-2xl space-y-2">
               <span className="text-xs font-bold uppercase tracking-wider text-[var(--accent-green)] flex items-center gap-1.5">
@@ -596,7 +720,7 @@ export const HomeView: React.FC = () => {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-2">
-              <div className="space-y-2.5 p-5 rounded-2xl bg-[var(--bg-subtle)] border border-[var(--border-hairline)]">
+              <div className="space-y-2.5 p-5 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-hairline)] shadow-2xs">
                 <h3 className="font-bold text-sm text-[var(--text-primary)]">
                   {t('privacyPillar1Title')}
                 </h3>
@@ -605,7 +729,7 @@ export const HomeView: React.FC = () => {
                 </p>
               </div>
 
-              <div className="space-y-2.5 p-5 rounded-2xl bg-[var(--bg-subtle)] border border-[var(--border-hairline)]">
+              <div className="space-y-2.5 p-5 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-hairline)] shadow-2xs">
                 <h3 className="font-bold text-sm text-[var(--text-primary)]">
                   {t('privacyPillar2Title')}
                 </h3>
@@ -614,7 +738,7 @@ export const HomeView: React.FC = () => {
                 </p>
               </div>
 
-              <div className="space-y-2.5 p-5 rounded-2xl bg-[var(--bg-subtle)] border border-[var(--border-hairline)]">
+              <div className="space-y-2.5 p-5 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-hairline)] shadow-2xs">
                 <h3 className="font-bold text-sm text-[var(--text-primary)]">
                   {t('privacyPillar3Title')}
                 </h3>
@@ -628,7 +752,7 @@ export const HomeView: React.FC = () => {
         </div>
       </section>
 
-      {/* 6. ANTI-SCAM CITIZEN PROTECTION — CRITICAL CONTRAST FIX */}
+      {/* 6. ANTI-SCAM CITIZEN PROTECTION — STRICT CONTRAST PRESERVED */}
       <section className="border-t border-[var(--border-hairline)] pt-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="p-8 sm:p-12 rounded-3xl border border-[var(--warning-border)] bg-[var(--warning-bg)] space-y-6 shadow-sm">
@@ -679,29 +803,31 @@ export const HomeView: React.FC = () => {
         </div>
       </section>
 
-      {/* 7. FINAL CALL TO ACTION */}
+      {/* 7. FINAL CALL TO ACTION — LUMINOUS BILLBOARD */}
       <section className="border-t border-[var(--border-hairline)] pt-16 pb-8">
-        <div className="max-w-4xl mx-auto px-4 text-center space-y-6">
-          <h2 className="text-3xl sm:text-4xl font-serif font-bold text-[var(--text-primary)] text-balance">
-            {t('finalCtaTitle')}
-          </h2>
-          <p className="text-sm sm:text-base text-[var(--text-secondary)] max-w-xl mx-auto">
-            {t('finalCtaSubtitle')}
-          </p>
-          <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3">
-            <button
-              onClick={() => setCurrentView('questionnaire')}
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-xl bg-[var(--accent-saffron)] hover:bg-[var(--accent-saffron-hover)] text-white font-semibold text-sm transition-colors shadow-sm"
-            >
-              <span>{t('heroCtaPrimary')}</span>
-              <ArrowRight className="w-4 h-4" />
-            </button>
-            <button
-              onClick={() => setCurrentView('all_schemes')}
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-xl border border-[var(--border-hairline)] bg-[var(--bg-surface)] hover:bg-[var(--bg-subtle)] text-[var(--text-primary)] font-semibold text-sm transition-colors shadow-2xs"
-            >
-              <span>{t('heroCtaSecondary')}</span>
-            </button>
+        <div className="max-w-5xl mx-auto px-4">
+          <div className="bobbin-hero-panel p-8 sm:p-14 rounded-3xl text-center space-y-6 shadow-xl">
+            <h2 className="text-3xl sm:text-4xl font-serif font-bold text-[var(--text-primary)] text-balance">
+              {t('finalCtaTitle')}
+            </h2>
+            <p className="text-sm sm:text-base text-[var(--text-secondary)] max-w-xl mx-auto">
+              {t('finalCtaSubtitle')}
+            </p>
+            <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3.5">
+              <button
+                onClick={() => setCurrentView('questionnaire')}
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-xl bg-[var(--accent-saffron)] hover:bg-[var(--accent-saffron-hover)] text-white font-semibold text-sm transition-all shadow-md active:scale-[0.98]"
+              >
+                <span>{t('heroCtaPrimary')}</span>
+                <ArrowRight className="w-4 h-4" />
+              </button>
+              <button
+                onClick={() => setCurrentView('all_schemes')}
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-xl border border-[var(--border-hairline)] bg-[var(--bg-surface)] hover:bg-[var(--bg-subtle)] text-[var(--text-primary)] font-semibold text-sm transition-all shadow-2xs active:scale-[0.98]"
+              >
+                <span>{t('heroCtaSecondary')}</span>
+              </button>
+            </div>
           </div>
         </div>
       </section>

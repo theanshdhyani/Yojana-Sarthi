@@ -183,7 +183,7 @@ export const AllSchemesView: React.FC = () => {
             <div
               key={scheme.id}
               onClick={() => handleSchemeClick(scheme.id)}
-              className="p-5 rounded-2xl border border-[var(--border-hairline)] bg-[var(--bg-surface)] hover:border-[var(--accent-saffron)] transition-all cursor-pointer flex flex-col justify-between group shadow-2xs hover:shadow-sm"
+              className="bobbin-surface-card p-5 rounded-2xl cursor-pointer flex flex-col justify-between group"
             >
               <div className="space-y-3">
                 <div className="flex items-center justify-between text-xs text-[var(--text-secondary)]">

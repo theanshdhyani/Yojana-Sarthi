@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { 
   Sparkles, 
@@ -13,6 +13,13 @@ import {
 export const OnboardingModal: React.FC = () => {
   const { isOnboardingOpen, setIsOnboardingOpen, startNewAssessment, settings } = useApp();
   const [currentStep, setCurrentStep] = useState(0);
+
+  useEffect(() => {
+    if (!isOnboardingOpen) return;
+    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && setIsOnboardingOpen(false);
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, [isOnboardingOpen, setIsOnboardingOpen]);
 
   if (!isOnboardingOpen) return null;
 
@@ -65,9 +72,10 @@ export const OnboardingModal: React.FC = () => {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 glass-scrim no-print">
       <div 
-        className="w-full max-w-md glass-modal rounded-3xl shadow-2xl p-6 sm:p-8 flex flex-col justify-between min-h-[420px]"
+        className="w-full max-w-md glass-modal rounded-[2rem] p-6 sm:p-8 flex flex-col justify-between min-h-[420px]"
         role="dialog"
         aria-modal="true"
+        aria-labelledby="onboarding-heading"
       >
         {/* Top controls */}
         <div className="flex items-center justify-between">
@@ -93,10 +101,10 @@ export const OnboardingModal: React.FC = () => {
 
         {/* Center Content */}
         <div className="py-8 text-center space-y-4 flex flex-col items-center">
-          <div className="p-4 rounded-2xl bg-[var(--bg-subtle)] border border-[var(--border-hairline)] inline-flex items-center justify-center mb-2">
+          <div className="w-20 h-20 rounded-[1.375rem] glass-card inline-flex items-center justify-center mb-2">
             {activeSlide.icon}
           </div>
-          <h3 className="text-xl sm:text-2xl font-serif font-bold text-[var(--text-primary)] tracking-tight">
+          <h3 id="onboarding-heading" className="text-2xl sm:text-[1.75rem] font-bold text-[var(--text-primary)] tracking-tight">
             {activeSlide.title}
           </h3>
           <p className="text-xs sm:text-sm text-[var(--text-secondary)] leading-relaxed max-w-sm">
@@ -117,7 +125,7 @@ export const OnboardingModal: React.FC = () => {
 
           <button
             onClick={handleNext}
-            className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-[var(--accent-saffron)] hover:bg-[var(--accent-saffron-hover)] text-white text-xs font-semibold transition-colors shadow-xs"
+            className="inline-flex items-center gap-2 h-11 px-6 rounded-full bg-[var(--accent-saffron)] hover:bg-[var(--accent-saffron-hover)] text-white text-sm font-semibold"
           >
             <span>
               {currentStep === slides.length - 1

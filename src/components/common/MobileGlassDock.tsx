@@ -76,9 +76,12 @@ export const MobileGlassDock: React.FC = () => {
   }
 
   // Calculate real application state for contextual action capsule
-  const answeredCount = Object.keys(answers).filter(
-    (k) => (answers as any)[k] !== undefined && (answers as any)[k] !== ''
-  ).length;
+  // Nine required questions; the tenth (special conditions) is optional.
+  const TOTAL_QUESTIONS = 10;
+  const answeredCount = (Object.keys(answers) as (keyof typeof answers)[]).filter((k) => {
+    const v = answers[k];
+    return v !== undefined && v !== '' && (!Array.isArray(v) || v.length > 0);
+  }).length;
 
   const totalMatches = evaluatedResults.strongMatches.length + evaluatedResults.possibleMatches.length;
   const readyDocsCount = readyDocumentIds.length;
@@ -94,11 +97,14 @@ export const MobileGlassDock: React.FC = () => {
   let contextualAction: ContextualAction | null = null;
 
   if (!isActionDismissed) {
-    if (answeredCount > 0 && answeredCount < 6 && currentView !== 'questionnaire') {
+    if (answeredCount > 0 && answeredCount < TOTAL_QUESTIONS - 1 && currentView !== 'questionnaire') {
       contextualAction = {
         icon: <Sparkles className="w-4 h-4 text-[var(--accent-saffron)] shrink-0" />,
         title: settings.language === 'hi' ? 'प्रश्नावली जारी रखें' : 'Continue Questionnaire',
-        subtitle: settings.language === 'hi' ? `${answeredCount}/7 उत्तर दिए गए` : `${answeredCount}/7 questions filled`,
+        subtitle:
+          settings.language === 'hi'
+            ? `${answeredCount}/${TOTAL_QUESTIONS} उत्तर दिए गए`
+            : `${answeredCount}/${TOTAL_QUESTIONS} questions filled`,
         targetView: 'questionnaire'
       };
     } else if (totalMatches > 0 && currentView !== 'results' && answeredCount >= 3) {
@@ -164,7 +170,7 @@ export const MobileGlassDock: React.FC = () => {
                 }}
                 className="flex items-center gap-2.5 flex-1 text-left min-w-0"
               >
-                <div className="p-1.5 rounded-full bg-white/70 dark:bg-white/10 shrink-0">
+                <div className="p-1.5 rounded-full bg-[var(--bg-surface)] shrink-0">
                   {contextualAction.icon}
                 </div>
                 <div className="min-w-0 flex-1">
@@ -193,7 +199,7 @@ export const MobileGlassDock: React.FC = () => {
         {isMoreOpen && (
           <div
             ref={moreMenuRef}
-            className="pointer-events-auto mb-3 w-full glass-modal rounded-3xl p-4 shadow-2xl space-y-3 animate-in fade-in zoom-in-95 duration-200"
+            className="pointer-events-auto mb-3 w-full glass-modal rounded-3xl p-4 space-y-3"
             role="dialog"
             aria-label="More navigation destinations"
           >
@@ -366,7 +372,7 @@ export const MobileGlassDock: React.FC = () => {
                 {settings.language === 'hi' ? 'आवेदन' : 'Tracker'}
               </span>
               {applications.length > 0 && (
-                <span className="absolute top-1 right-2 w-2 h-2 rounded-full bg-[var(--accent-saffron)] ring-2 ring-white dark:ring-slate-900" />
+                <span className="absolute top-1.5 right-3 w-2 h-2 rounded-full bg-orange-500 ring-2 ring-[var(--glass-dock-active-bg)]" />
               )}
             </button>
           </div>

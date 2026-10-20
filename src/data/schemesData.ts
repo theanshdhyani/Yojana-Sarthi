@@ -27,7 +27,8 @@ export const SCHEMES_DATABASE: Scheme[] = [
       occupations: ['farmer'],
       requiresLandholding: true,
       maxAnnualIncome: 800000,
-      gender: 'all'
+      gender: 'all',
+      excludedOccupations: ['government_employee']
     },
     requiredDocuments: [
       { id: 'doc_aadhaar', name: 'Aadhaar Card', nameHindi: 'आधार कार्ड', isMandatory: true, purpose: 'Biometric identity & eKYC verification', purposeHindi: 'पहचान व ई-केवाईसी सत्यापन' },
@@ -75,7 +76,8 @@ export const SCHEMES_DATABASE: Scheme[] = [
     rules: {
       maxAnnualIncome: 300000,
       requiresBPL: true,
-      gender: 'all'
+      gender: 'all',
+      universalFromAge: 70
     },
     requiredDocuments: [
       { id: 'doc_aadhaar', name: 'Aadhaar Card', nameHindi: 'आधार कार्ड', isMandatory: true, purpose: 'Individual biometric KYC', purposeHindi: 'व्यक्तिगत बायोमेट्रिक केवाईसी' },
@@ -198,8 +200,8 @@ export const SCHEMES_DATABASE: Scheme[] = [
     categoryLabel: 'Women & Family Welfare',
     categoryLabelHindi: 'महिला एवं बाल कल्याण',
     benefitType: 'cash_transfer',
-    benefitHeadline: 'High interest rate (8.2% p.a.) + 100% Tax-Free returns for girl child education & marriage',
-    benefitHeadlineHindi: '8.2% उच्चतम ब्याज दर + 100% कर-मुक्त रिटर्न बेटी की शिक्षा व विवाह हेतु',
+    benefitHeadline: 'Govt-backed interest (8.2% p.a. at last revision, reset quarterly) + tax-free returns for a daughter’s education & marriage',
+    benefitHeadlineHindi: 'सरकारी गारंटी वाला ब्याज (पिछली समीक्षा में 8.2%, हर तिमाही बदलता है) + बेटी की शिक्षा व विवाह हेतु कर-मुक्त रिटर्न',
     summary: 'A small-deposit savings scheme for girl children that offers the highest sovereign interest rate, compound growth, and complete tax exemption under Section 80C.',
     summaryHindi: 'बालिकाओं के लिए उच्च ब्याज वाली छोटी बचत योजना, जो उच्च शिक्षा एवं विवाह के लिए गारंटीकृत सुरक्षित कोष तैयार करती है।',
     simpleLanguageSummary: 'If you have a daughter under 10 years of age, you can open an account in a Post Office or bank with just ₹250. The government gives the highest safe interest (8.2%), and all profit is completely tax-free.',
@@ -211,7 +213,8 @@ export const SCHEMES_DATABASE: Scheme[] = [
     rules: {
       maxAge: 10,
       gender: 'female',
-      specialFlags: ['girl_child_under_10']
+      specialFlags: ['girl_child_under_10'],
+      beneficiaryIsHouseholdMember: true
     },
     requiredDocuments: [
       { id: 'doc_aadhaar', name: 'Birth Certificate of Girl Child & Guardian Aadhaar', nameHindi: 'बालिका का जन्म प्रमाण पत्र एवं अभिभावक का आधार', isMandatory: true, purpose: 'Proof of age and parental relationship', purposeHindi: 'आयु व अभिभावक संबंध का प्रमाण' },
@@ -393,7 +396,8 @@ export const SCHEMES_DATABASE: Scheme[] = [
       requiresBPL: true,
       maxAnnualIncome: 100000,
       gender: 'all',
-      specialFlags: ['senior_citizen']
+      specialFlags: ['senior_citizen'],
+      beneficiaryIsHouseholdMember: true
     },
     requiredDocuments: [
       { id: 'doc_aadhaar', name: 'Aadhaar Card', nameHindi: 'आधार कार्ड', isMandatory: true, purpose: 'Age proof (60+ years) and biometric verification', purposeHindi: 'आयु प्रमाण (60+ वर्ष) व पहचान सत्यापन' },
@@ -441,7 +445,8 @@ export const SCHEMES_DATABASE: Scheme[] = [
       gender: 'female',
       requiresBPL: true,
       maxAnnualIncome: 120000,
-      specialFlags: ['widow']
+      specialFlags: ['widow'],
+      beneficiaryIsHouseholdMember: true
     },
     requiredDocuments: [
       { id: 'doc_aadhaar', name: 'Aadhaar Card of Applicant', nameHindi: 'महिला का आधार कार्ड', isMandatory: true, purpose: 'Identity and age verification (40-79 years)', purposeHindi: 'पहचान व आयु सत्यापन' },
@@ -626,7 +631,8 @@ export const SCHEMES_DATABASE: Scheme[] = [
       minAge: 19,
       gender: 'female',
       specialFlags: ['pregnant_lactating'],
-      maxAnnualIncome: 800000
+      maxAnnualIncome: 800000,
+      beneficiaryIsHouseholdMember: true
     },
     requiredDocuments: [
       { id: 'doc_aadhaar', name: 'Aadhaar Card of Mother & Husband', nameHindi: 'माता एवं पति का आधार कार्ड', isMandatory: true, purpose: 'Identity and de-duplication verification', purposeHindi: 'पहचान व सत्यापन' },

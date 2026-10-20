@@ -12,13 +12,15 @@ import {
   RotateCcw 
 } from 'lucide-react';
 import { MASTER_DOCUMENTS } from '../../data/documentsData';
+import { safeExternalUrl } from '../../utils/safeUrl';
 
 export const DocumentCheckerView: React.FC = () => {
   const { readyDocumentIds, toggleDocumentReady, settings, t } = useApp();
 
   const [filterMode, setFilterMode] = useState<'all' | 'ready' | 'missing'>('all');
 
-  const readyCount = readyDocumentIds.length;
+  // Count only IDs that still exist, so stale saved data can't push this past 100%.
+  const readyCount = MASTER_DOCUMENTS.filter((d) => readyDocumentIds.includes(d.id)).length;
   const totalCount = MASTER_DOCUMENTS.length;
   const percentReady = Math.round((readyCount / totalCount) * 100);
 
@@ -57,9 +59,9 @@ export const DocumentCheckerView: React.FC = () => {
             </span>
           </div>
 
-          <div className="w-full h-2 bg-[var(--border-hairline)] rounded-full overflow-hidden">
+          <div className="w-full h-2.5 bg-[var(--bg-subtle)] rounded-full overflow-hidden">
             <div
-              className="h-full bg-emerald-600 transition-all duration-300 rounded-full"
+              className="h-full bg-gradient-to-r from-emerald-400 to-teal-500 transition-all duration-500 rounded-full"
               style={{ width: `${percentReady}%` }}
             />
           </div>
@@ -122,8 +124,8 @@ export const DocumentCheckerView: React.FC = () => {
               key={doc.id}
               className={`p-6 rounded-3xl transition-all space-y-4 ${
                 isReady
-                  ? 'border border-emerald-300 dark:border-emerald-700/80 bg-emerald-50/40 dark:bg-emerald-950/20 backdrop-blur-xl shadow-xs'
-                  : 'bobbin-surface-card'
+                  ? 'glass-card ring-2 ring-[var(--accent-green)]/40'
+                  : 'glass-card'
               }`}
             >
               {/* Row 1: Title & Toggle Button */}
@@ -146,7 +148,8 @@ export const DocumentCheckerView: React.FC = () => {
 
                 <button
                   onClick={() => toggleDocumentReady(doc.id)}
-                  className={`inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-semibold transition-colors shrink-0 ${
+                  aria-pressed={isReady}
+                  className={`inline-flex items-center gap-1.5 h-10 px-4 rounded-full text-[13px] font-semibold transition-colors shrink-0 ${
                     isReady
                       ? 'bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-200 hover:bg-emerald-200'
                       : 'border border-[var(--border-hairline)] bg-[var(--bg-subtle)] hover:bg-[var(--bg-canvas)] text-[var(--text-primary)]'
@@ -199,15 +202,17 @@ export const DocumentCheckerView: React.FC = () => {
                   <span>{settings.language === 'hi' ? doc.tipsHindi : doc.tips}</span>
                 </div>
 
-                <a
-                  href={doc.officialPortal}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="font-semibold text-[var(--accent-saffron)] hover:underline inline-flex items-center gap-1 shrink-0"
-                >
-                  <span>Official Portal</span>
-                  <ExternalLink className="w-3 h-3" />
-                </a>
+                {safeExternalUrl(doc.officialPortal) && (
+                  <a
+                    href={safeExternalUrl(doc.officialPortal)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="font-semibold text-[var(--accent-saffron)] hover:underline inline-flex items-center gap-1 shrink-0"
+                  >
+                    <span>{settings.language === 'hi' ? 'आधिकारिक पोर्टल' : 'Official portal'}</span>
+                    <ExternalLink className="w-3 h-3" />
+                  </a>
+                )}
               </div>
 
             </div>

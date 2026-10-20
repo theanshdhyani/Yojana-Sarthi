@@ -20,35 +20,44 @@ import { NearbyHelpView } from './components/views/NearbyHelpView';
 import { PrintSlipView } from './components/views/PrintSlipView';
 
 const MainContent: React.FC = () => {
-  const { currentView } = useApp();
+  const { currentView, settings } = useApp();
 
   return (
-    <main className="min-h-screen flex flex-col justify-between">
-      <AppHeader />
+    <>
+      <div className="ambient-field" aria-hidden="true" />
 
-      <div className="flex-1 pb-24 md:pb-0">
-        {currentView === 'home' && <HomeView />}
-        {currentView === 'questionnaire' && <QuestionnaireView />}
-        {currentView === 'results' && <ResultsView />}
-        {currentView === 'scheme_detail' && <SchemeDetailView />}
-        {currentView === 'all_schemes' && <AllSchemesView />}
-        {currentView === 'document_checker' && <DocumentCheckerView />}
-        {currentView === 'tracker' && <ApplicationTrackerView />}
-        {currentView === 'family_mode' && <FamilyModeView />}
-        {currentView === 'nearby_help' && <NearbyHelpView />}
-        {currentView === 'print_slip' && <PrintSlipView />}
+      <a
+        href="#main"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-[60] focus:px-4 focus:py-2 focus:rounded-xl glass-modal text-sm font-semibold"
+      >
+        {settings.language === 'hi' ? 'मुख्य सामग्री पर जाएं' : 'Skip to main content'}
+      </a>
+
+      <div className="min-h-screen flex flex-col justify-between">
+        <AppHeader />
+
+        <main id="main" key={currentView} className="flex-1 pb-28 md:pb-0 view-enter">
+          {currentView === 'home' && <HomeView />}
+          {currentView === 'questionnaire' && <QuestionnaireView />}
+          {currentView === 'results' && <ResultsView />}
+          {currentView === 'scheme_detail' && <SchemeDetailView />}
+          {currentView === 'all_schemes' && <AllSchemesView />}
+          {currentView === 'document_checker' && <DocumentCheckerView />}
+          {currentView === 'tracker' && <ApplicationTrackerView />}
+          {currentView === 'family_mode' && <FamilyModeView />}
+          {currentView === 'nearby_help' && <NearbyHelpView />}
+          {currentView === 'print_slip' && <PrintSlipView />}
+        </main>
+
+        <AppFooter />
+
+        <MobileGlassDock />
+
+        <SettingsModal />
+        <OnboardingModal />
+        <ToastContainer />
       </div>
-
-      <AppFooter />
-
-      {/* Floating Apple-Style Mobile Glass Navigation Dock */}
-      <MobileGlassDock />
-
-      {/* Global Modals & Notifications */}
-      <SettingsModal />
-      <OnboardingModal />
-      <ToastContainer />
-    </main>
+    </>
   );
 };
 

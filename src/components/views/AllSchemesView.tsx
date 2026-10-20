@@ -100,16 +100,18 @@ export const AllSchemesView: React.FC = () => {
       </div>
 
       {/* Sticky Frosted Glass Search & Filter Toolbar */}
-      <div className="glass-toolbar p-4 sm:p-5 rounded-2xl space-y-3.5 shadow-md sticky top-20 z-20">
+      <div className="glass-toolbar p-4 sm:p-5 rounded-[1.75rem] space-y-3.5 sticky top-24 z-20">
         {/* Search input */}
         <div className="relative">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-muted)]" />
           <input
-            type="text"
+            type="search"
+            maxLength={80}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder={t('searchPlaceholder')}
-            className="w-full pl-11 pr-10 py-3 rounded-xl border border-[var(--border-hairline)] bg-[var(--bg-surface)] text-sm text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:border-[var(--accent-saffron)] focus:outline-none shadow-2xs"
+            aria-label={t('searchPlaceholder')}
+            className="w-full pl-11 pr-10 h-12 rounded-full border border-transparent bg-[var(--bg-subtle)] text-[15px] text-[var(--text-primary)] placeholder-[var(--text-muted)]"
           />
           {searchQuery && (
             <button
@@ -128,10 +130,11 @@ export const AllSchemesView: React.FC = () => {
               <button
                 key={cat.id}
                 onClick={() => setSelectedCategory(cat.id)}
-                className={`whitespace-nowrap px-3.5 py-1.5 rounded-lg text-xs font-medium transition-colors border ${
+                aria-pressed={selectedCategory === cat.id}
+                className={`whitespace-nowrap px-4 py-2 rounded-full text-[13px] font-medium transition-colors ${
                   selectedCategory === cat.id
-                    ? 'border-[var(--accent-saffron)] bg-[var(--accent-saffron-light)] font-semibold text-[var(--text-primary)] shadow-2xs'
-                    : 'border-[var(--border-hairline)] bg-[var(--bg-surface)] text-[var(--text-secondary)] hover:bg-[var(--bg-subtle)]'
+                    ? 'bg-[var(--text-primary)] text-[var(--bg-canvas)] font-semibold'
+                    : 'bg-[var(--bg-subtle)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
                 }`}
               >
                 {cat.label}
@@ -145,10 +148,11 @@ export const AllSchemesView: React.FC = () => {
               <button
                 key={b.id}
                 onClick={() => setSelectedBenefitType(b.id)}
-                className={`whitespace-nowrap px-2.5 py-1 rounded-md transition-colors border ${
+                aria-pressed={selectedBenefitType === b.id}
+                className={`whitespace-nowrap px-3 py-1 rounded-full transition-colors ${
                   selectedBenefitType === b.id
-                    ? 'border-emerald-600 bg-emerald-50 dark:bg-emerald-950/80 text-emerald-900 dark:text-emerald-200 font-bold'
-                    : 'border-[var(--border-hairline)] bg-[var(--bg-surface)] text-[var(--text-muted)] hover:text-[var(--text-secondary)]'
+                    ? 'bg-[var(--accent-green-light)] text-[var(--accent-green-text)] font-semibold'
+                    : 'text-[var(--text-muted)] hover:text-[var(--text-secondary)]'
                 }`}
               >
                 {b.label}
@@ -180,10 +184,10 @@ export const AllSchemesView: React.FC = () => {
       {filteredSchemes.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
           {filteredSchemes.map((scheme) => (
-            <div
+            <button
               key={scheme.id}
               onClick={() => handleSchemeClick(scheme.id)}
-              className="bobbin-surface-card p-5 rounded-2xl cursor-pointer flex flex-col justify-between group"
+              className="bobbin-surface-card p-6 rounded-3xl text-left flex flex-col justify-between group"
             >
               <div className="space-y-3">
                 <div className="flex items-center justify-between text-xs text-[var(--text-secondary)]">
@@ -199,7 +203,7 @@ export const AllSchemesView: React.FC = () => {
                   {settings.language === 'hi' ? scheme.nameHindi : scheme.name}
                 </h3>
 
-                <div className="p-2.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-900/60 text-xs font-semibold text-emerald-900 dark:text-emerald-200">
+                <div className="px-3 py-2 rounded-xl bg-[var(--accent-green-light)] text-[13px] font-medium text-[var(--accent-green-text)]">
                   {settings.language === 'hi' ? scheme.benefitHeadlineHindi : scheme.benefitHeadline}
                 </div>
 
@@ -219,7 +223,7 @@ export const AllSchemesView: React.FC = () => {
                   {t('viewSchemeDetails')} →
                 </span>
               </div>
-            </div>
+            </button>
           ))}
         </div>
       ) : (

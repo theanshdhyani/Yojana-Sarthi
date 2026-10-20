@@ -3,14 +3,14 @@ import { useApp } from '../../context/AppContext';
 import { ShieldCheck, PhoneCall, AlertTriangle, ExternalLink } from 'lucide-react';
 
 export const AppFooter: React.FC = () => {
-  const { setCurrentView, settings, t } = useApp();
+  const { setCurrentView, openFindSchemes, settings, t } = useApp();
 
   return (
-    <footer className="mt-20 border-t border-[var(--border-hairline)] bg-[var(--bg-subtle)] text-[var(--text-secondary)] text-sm no-print">
+    <footer className="mt-24 glass-toolbar !border-x-0 !border-b-0 rounded-t-[2rem] text-[var(--text-secondary)] text-sm no-print">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
         
         {/* Anti-Scam Guidance Strip */}
-        <div className="mb-12 p-5 sm:p-6 rounded-2xl border border-[var(--warning-border)] bg-[var(--warning-bg)] flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shadow-2xs">
+        <div className="mb-12 p-5 sm:p-6 rounded-3xl border border-[var(--warning-border)] bg-[var(--warning-bg)] flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
           <div className="flex items-start gap-4">
             <div className="p-2 rounded-xl bg-amber-100/90 dark:bg-amber-950/60 text-amber-700 dark:text-amber-400 border border-amber-300/60 dark:border-amber-900/40 shrink-0">
               <AlertTriangle className="w-5 h-5" />
@@ -31,7 +31,7 @@ export const AppFooter: React.FC = () => {
           <div className="flex items-center gap-2 shrink-0">
             <a
               href="tel:1930"
-              className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-[var(--accent-saffron)] hover:bg-[var(--accent-saffron-hover)] text-white text-xs font-semibold transition-colors shadow-2xs"
+              className="inline-flex items-center gap-1.5 h-11 px-5 rounded-full bg-[var(--accent-saffron)] hover:bg-[var(--accent-saffron-hover)] text-white text-[13px] font-semibold"
             >
               <PhoneCall className="w-3.5 h-3.5" />
               <span>{settings.language === 'hi' ? 'साइबर हेल्पलाइन 1930' : 'Cyber Helpline: 1930'}</span>
@@ -70,7 +70,7 @@ export const AppFooter: React.FC = () => {
             </h4>
             <ul className="space-y-2 text-xs">
               <li>
-                <button onClick={() => setCurrentView('questionnaire')} className="text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors">
+                <button onClick={() => openFindSchemes()} className="text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors">
                   {t('navFindSchemes')}
                 </button>
               </li>
@@ -146,7 +146,11 @@ export const AppFooter: React.FC = () => {
                 : 'Yojana Sarthi does not store sensitive citizen data on external servers. All eligibility rules run locally in your browser.'}
             </p>
             <div className="mt-3 pt-3 border-t border-[var(--border-hairline)] text-xs text-[var(--text-muted)]">
-              <span>National Civic-Tech Initiative</span>
+              <span>
+                {settings.language === 'hi'
+                  ? 'एक स्वतंत्र सामुदायिक परियोजना — सरकारी वेबसाइट नहीं'
+                  : 'An independent community project — not a government website'}
+              </span>
               <span className="mx-1.5">·</span>
               <span>2026</span>
             </div>

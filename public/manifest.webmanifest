@@ -1,0 +1,15 @@
+{
+  "name": "Yojana Sarthi — योजना सारथी",
+  "short_name": "Yojana Sarthi",
+  "description": "Find the government welfare schemes your family may qualify for. Free, private, works offline.",
+  "lang": "en-IN",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#F4F1EC",
+  "theme_color": "#F4F1EC",
+  "icons": [
+    { "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
+    { "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "maskable" }
+  ]
+}

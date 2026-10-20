@@ -1,375 +1,345 @@
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
-import { 
-  CheckCircle2, 
-  AlertCircle, 
-  FileText, 
-  Printer, 
-  BookmarkPlus, 
-  ArrowRight, 
-  Sparkles, 
+import {
+  CheckCircle2,
+  AlertCircle,
+  HelpCircle,
+  Printer,
+  BookmarkPlus,
+  Sparkles,
   ChevronRight,
-  Filter,
   Check,
   RotateCcw,
   ShieldCheck,
-  Compass
+  Compass,
+  XCircle
 } from 'lucide-react';
 import { EvaluatedScheme, MatchStatus } from '../../types/scheme';
 
+type Tab = 'eligible' | MatchStatus;
+
 export const ResultsView: React.FC = () => {
-  const { 
-    evaluatedResults, 
-    setCurrentView, 
-    setSelectedSchemeId, 
-    addApplication, 
+  const {
+    evaluatedResults,
+    setCurrentView,
+    setSelectedSchemeId,
+    addApplication,
     applications,
     loadSampleData,
+    openFindSchemes,
     answers,
-    settings, 
-    t 
+    isDemoData,
+    settings,
+    t
   } = useApp();
+  const hi = settings.language === 'hi';
 
-  const [activeTab, setActiveTab] = useState<'all' | MatchStatus>('all');
+  const [activeTab, setActiveTab] = useState<Tab>('eligible');
 
   const { strongMatches, possibleMatches, reviewRequired } = evaluatedResults;
-  const totalCount = strongMatches.length + possibleMatches.length + reviewRequired.length;
+  const eligibleCount = strongMatches.length + possibleMatches.length;
   const hasAnswers = answers.age !== undefined || answers.occupation !== undefined;
 
-  const filteredSchemes: EvaluatedScheme[] = 
-    activeTab === 'all'
-      ? [...strongMatches, ...possibleMatches, ...reviewRequired]
-      : activeTab === 'strong_match'
-      ? strongMatches
-      : activeTab === 'possible_match'
-      ? possibleMatches
-      : reviewRequired;
+  const listFor: Record<Tab, EvaluatedScheme[]> = {
+    eligible: [...strongMatches, ...possibleMatches],
+    strong_match: strongMatches,
+    possible_match: possibleMatches,
+    review_required: reviewRequired
+  };
+  const filteredSchemes = listFor[activeTab];
 
   const handleSchemeClick = (schemeId: string) => {
     setSelectedSchemeId(schemeId);
     setCurrentView('scheme_detail');
   };
 
-  const handleSaveToTracker = (scheme: EvaluatedScheme) => {
-    const isAlreadySaved = applications.some((a) => a.schemeId === scheme.scheme.id);
-    if (isAlreadySaved) return;
-
+  const handleSaveToTracker = (item: EvaluatedScheme) => {
+    if (applications.some((a) => a.schemeId === item.scheme.id)) return;
+    const today = new Date().toISOString().split('T')[0];
     addApplication({
-      schemeId: scheme.scheme.id,
-      schemeName: scheme.scheme.name,
-      schemeNameHindi: scheme.scheme.nameHindi,
-      beneficiaryName: 'Self',
-      referenceNumber: `YS-${Math.floor(100000 + Math.random() * 900000)}`,
-      appliedDate: new Date().toISOString().split('T')[0],
+      schemeId: item.scheme.id,
+      schemeName: item.scheme.name,
+      schemeNameHindi: item.scheme.nameHindi,
+      beneficiaryName: hi ? 'स्वयं' : 'Self',
+      referenceNumber: '',
+      appliedDate: today,
       status: 'to_apply',
-      portalUrl: scheme.scheme.officialPortalUrl,
-      notes: `Matched with score ${scheme.matchScore}%. Next step: organize required documents.`,
-      timeline: [
-        {
-          date: new Date().toISOString().split('T')[0],
-          title: 'Scheme identified on Yojana Sarthi',
-          description: 'Added to citizen preparation tracker'
-        }
-      ]
+      portalUrl: item.scheme.officialPortalUrl,
+      notes: hi ? 'अगला कदम: आवश्यक दस्तावेज़ तैयार करें।' : 'Next step: get the required documents ready.',
+      timeline: [{ date: today, title: hi ? 'योजना सारथी पर पहचानी गई' : 'Identified on Yojana Sarthi', description: hi ? 'तैयारी ट्रैकर में जोड़ी गई' : 'Added to preparation tracker' }]
     });
   };
 
+  const statusMeta: Record<MatchStatus, { label: string; chip: string; icon: React.ReactNode }> = {
+    strong_match: {
+      label: hi ? 'पात्र' : 'Strong match',
+      chip: 'bg-[var(--accent-green-light)] text-[var(--accent-green-text)]',
+      icon: <CheckCircle2 className="w-3.5 h-3.5" />
+    },
+    possible_match: {
+      label: hi ? 'जांच आवश्यक' : 'Verify',
+      chip: 'bg-amber-500/15 text-amber-800 dark:text-amber-200',
+      icon: <HelpCircle className="w-3.5 h-3.5" />
+    },
+    review_required: {
+      label: hi ? 'संभवतः पात्र नहीं' : 'Likely not eligible',
+      chip: 'bg-[var(--bg-subtle)] text-[var(--text-secondary)]',
+      icon: <XCircle className="w-3.5 h-3.5" />
+    }
+  };
+
+  const tabs: { id: Tab; count: number; label: string; accent: string }[] = [
+    { id: 'eligible', count: eligibleCount, label: hi ? 'संभावित योजनाएं' : 'Likely for you', accent: 'text-[var(--text-primary)]' },
+    { id: 'strong_match', count: strongMatches.length, label: t('strongMatches'), accent: 'text-[var(--accent-green)]' },
+    { id: 'possible_match', count: possibleMatches.length, label: t('possibleMatches'), accent: 'text-amber-600 dark:text-amber-400' },
+    { id: 'review_required', count: reviewRequired.length, label: t('reviewRequired'), accent: 'text-[var(--text-muted)]' }
+  ];
+
   return (
-    <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6 sm:py-10 space-y-8">
-      
-      {/* Editorial Header */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-6 border-b border-[var(--border-hairline)]">
-        <div className="space-y-2">
-          <div className="inline-flex items-center gap-1.5 text-xs font-semibold text-[var(--accent-green-text)] bg-[var(--accent-green-light)] px-2.5 py-1 rounded-full border border-[var(--accent-green)]/30">
+    <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8 sm:py-12 space-y-8">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+        <div className="space-y-3">
+          <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-[var(--accent-green-text)] bg-[var(--accent-green-light)] px-3 py-1 rounded-full">
             <CheckCircle2 className="w-3.5 h-3.5" />
-            <span>{settings.language === 'hi' ? 'पात्रता विश्लेषण पूर्ण' : 'Preliminary Evaluation Ready'}</span>
-          </div>
-
-          <h1 className="text-2xl sm:text-4xl font-serif font-bold text-[var(--text-primary)]">
-            {t('resultsTitle')}
-          </h1>
-
-          <p className="text-sm text-[var(--text-secondary)] max-w-xl">
-            {settings.language === 'hi'
-              ? `आपके दिए गए विवरण के आधार पर आप ${totalCount} सरकारी योजनाओं के प्रारंभिक पात्र हो सकते हैं।`
-              : `Based on your profile, you preliminarily match ${totalCount} government welfare and financial programs.`}
+            {hi ? 'प्रारंभिक जांच पूरी' : 'Preliminary check complete'}
+          </span>
+          <h1 className="text-3xl sm:text-5xl font-bold text-[var(--text-primary)]">{t('resultsTitle')}</h1>
+          <p className="text-base text-[var(--text-secondary)] max-w-xl">
+            {hi
+              ? `आपके विवरण के आधार पर ${eligibleCount} योजनाएं आपके लिए हो सकती हैं।`
+              : `Based on your answers, ${eligibleCount} of ${eligibleCount + reviewRequired.length} schemes may be for you.`}
           </p>
         </div>
 
-        {/* Header Actions */}
-        <div className="flex items-center gap-2.5 shrink-0">
+        <div className="flex items-center gap-2 shrink-0">
           <button
             onClick={() => setCurrentView('print_slip')}
-            className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-semibold rounded-lg border border-[var(--border-hairline)] bg-[var(--bg-surface)] hover:bg-[var(--bg-subtle)] text-[var(--text-primary)] transition-colors shadow-2xs"
+            className="inline-flex items-center gap-1.5 h-10 px-4 text-[13px] font-semibold rounded-full glass-toolbar text-[var(--text-primary)]"
           >
-            <Printer className="w-3.5 h-3.5 text-[var(--accent-saffron)]" />
-            <span>{t('printSummarySlip')}</span>
+            <Printer className="w-4 h-4 text-[var(--accent-saffron)]" />
+            {t('printSummarySlip')}
           </button>
-
           <button
             onClick={() => setCurrentView('questionnaire')}
-            className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-semibold rounded-lg border border-[var(--border-hairline)] bg-[var(--bg-surface)] hover:bg-[var(--bg-subtle)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors shadow-2xs"
+            className="inline-flex items-center gap-1.5 h-10 px-4 text-[13px] font-semibold rounded-full glass-toolbar text-[var(--text-secondary)]"
           >
-            <RotateCcw className="w-3.5 h-3.5" />
-            <span>{t('retakeQuestions')}</span>
+            <RotateCcw className="w-4 h-4" />
+            {t('retakeQuestions')}
           </button>
         </div>
       </div>
 
-      {/* Official Advisory Disclaimer Notice */}
-      <div className="p-4 rounded-xl border border-[var(--border-hairline)] bg-[var(--bg-subtle)] text-xs text-[var(--text-secondary)] flex items-start gap-3">
+      {isDemoData && (
+        <div role="status" className="px-4 py-3 rounded-2xl bg-[var(--accent-navy-light)] text-[13px] text-[var(--accent-navy-text)] font-medium flex items-center gap-2">
+          <Sparkles className="w-4 h-4 shrink-0" />
+          {hi ? 'आप नमूना (डेमो) प्रोफ़ाइल देख रहे हैं।' : 'You are viewing a sample demo profile, not your own answers.'}
+          <button onClick={() => openFindSchemes()} className="ml-auto font-semibold underline shrink-0">
+            {hi ? 'अपनी जांच करें' : 'Check for me'}
+          </button>
+        </div>
+      )}
+
+      <div className="px-4 py-3 rounded-2xl glass-card text-[13px] text-[var(--text-secondary)] flex items-start gap-3">
         <ShieldCheck className="w-4 h-4 text-[var(--accent-saffron)] shrink-0 mt-0.5" />
         <p className="leading-relaxed">
-          <strong className="text-[var(--text-primary)]">
-            {settings.language === 'hi' ? 'महत्वपूर्ण सूचना: ' : 'Advisory Note: '}
-          </strong>
-          {settings.language === 'hi'
-            ? 'यह प्रणाली केवल प्रारंभिक पात्रता मिलान प्रस्तुत करती है। अंतिम स्वीकृति संबंधित सरकारी विभाग या बैंक द्वारा भौतिक एवं दस्तावेज़ सत्यापन के पश्चात ही प्रदान की जाती है।'
-            : 'These results represent a preliminary rule match based on your answers. Final approval requires verification of original documents and approval by the respective government authority or lending bank.'}
+          <strong className="text-[var(--text-primary)]">{hi ? 'महत्वपूर्ण: ' : 'Important: '}</strong>
+          {hi
+            ? 'यह केवल प्रारंभिक मिलान है। अंतिम स्वीकृति संबंधित विभाग द्वारा मूल दस्तावेज़ों के सत्यापन के बाद ही मिलती है।'
+            : 'This is a preliminary rule match. Final approval only comes from the government department after it verifies your original documents.'}
         </p>
       </div>
 
-      {/* Empty State when no answers filled */}
       {!hasAnswers && (
-        <div className="p-8 sm:p-12 text-center rounded-2xl border border-[var(--border-hairline)] bg-[var(--bg-surface)] space-y-4 max-w-lg mx-auto shadow-xs">
-          <div className="p-3 rounded-full bg-[var(--accent-saffron-light)] text-[var(--accent-saffron)] w-fit mx-auto">
-            <Compass className="w-6 h-6" />
-          </div>
-          <h3 className="font-serif font-bold text-lg text-[var(--text-primary)]">
-            {settings.language === 'hi' ? 'प्रश्नावली अभी भरी नहीं गई है' : 'No questionnaire answers submitted yet'}
-          </h3>
-          <p className="text-xs text-[var(--text-secondary)] leading-relaxed">
-            {settings.language === 'hi'
-              ? 'सटीक परिणाम देखने के लिए 2 मिनट की प्रश्नावली भरें या तुरंत परीक्षण हेतु नमूना प्रोफ़ाइल लोड करें।'
-              : 'Answer a few simple questions to unlock tailored schemes, or load sample demo data to see how the engine works.'}
+        <div className="p-10 sm:p-14 text-center rounded-[2rem] glass-card space-y-4 max-w-lg mx-auto">
+          <span className="w-14 h-14 rounded-2xl bg-gradient-to-br from-orange-400 to-rose-500 text-white flex items-center justify-center mx-auto shadow-md">
+            <Compass className="w-7 h-7" />
+          </span>
+          <h2 className="font-bold text-xl text-[var(--text-primary)]">
+            {hi ? 'प्रश्नावली अभी भरी नहीं गई है' : 'No answers yet'}
+          </h2>
+          <p className="text-sm text-[var(--text-secondary)] leading-relaxed">
+            {hi
+              ? 'सटीक परिणाम के लिए 2 मिनट की प्रश्नावली भरें, या नमूना प्रोफ़ाइल से देखें कि यह कैसे काम करता है।'
+              : 'Answer a few simple questions for tailored results, or load a sample profile to see how it works.'}
           </p>
           <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-2">
             <button
-              onClick={() => setCurrentView('questionnaire')}
-              className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-[var(--accent-saffron)] text-white text-xs font-semibold hover:bg-[var(--accent-saffron-hover)] transition-colors shadow-xs"
+              onClick={() => openFindSchemes()}
+              className="w-full sm:w-auto h-11 px-6 rounded-full bg-[var(--accent-saffron)] text-white text-sm font-semibold hover:bg-[var(--accent-saffron-hover)]"
             >
-              Start Questionnaire
+              {hi ? 'प्रश्नावली शुरू करें' : 'Start questionnaire'}
             </button>
             <button
               onClick={loadSampleData}
-              className="w-full sm:w-auto px-5 py-2.5 rounded-xl border border-[var(--border-hairline)] bg-[var(--bg-subtle)] text-[var(--text-primary)] text-xs font-semibold hover:bg-[var(--bg-canvas)] transition-colors"
+              className="w-full sm:w-auto h-11 px-6 rounded-full bg-[var(--bg-subtle)] text-[var(--text-primary)] text-sm font-semibold hover:bg-[var(--bg-surface)] transition-colors"
             >
-              Load Sample Demo Data
+              {hi ? 'नमूना प्रोफ़ाइल देखें' : 'Load sample profile'}
             </button>
           </div>
         </div>
       )}
 
-      {/* Overview Stat Cards / Filter Tabs with Apple Glassmorphism */}
       {hasAnswers && (
         <>
-          <div className="glass-toolbar p-2.5 sm:p-3.5 rounded-2xl sm:rounded-3xl shadow-xs">
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-3">
+          <div className="glass-toolbar p-1.5 rounded-[1.375rem] grid grid-cols-2 sm:grid-cols-4 gap-1.5" role="tablist">
+            {tabs.map((tab) => (
               <button
-                onClick={() => setActiveTab('all')}
-                className={`p-3.5 sm:p-4 rounded-xl sm:rounded-2xl border text-left transition-all ${
-                  activeTab === 'all'
-                    ? 'border-[var(--accent-saffron)] bg-[var(--accent-saffron-light)] font-bold text-[var(--text-primary)] shadow-2xs'
-                    : 'border-[var(--border-hairline)] bg-[var(--bg-surface)] hover:bg-[var(--bg-subtle)] text-[var(--text-secondary)]'
+                key={tab.id}
+                role="tab"
+                aria-selected={activeTab === tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`p-3.5 rounded-2xl text-left transition-all ${
+                  activeTab === tab.id
+                    ? 'bg-[var(--glass-dock-active-bg)] shadow-[var(--glass-dock-active-shadow)]'
+                    : 'hover:bg-[var(--bg-subtle)]'
                 }`}
               >
-                <span className="text-2xl font-serif font-bold tabular-nums text-[var(--text-primary)]">
-                  {totalCount}
-                </span>
-                <span className="block text-xs text-[var(--text-secondary)] mt-1">
-                  {settings.language === 'hi' ? 'कुल योजनाएं' : 'All Schemes'}
-                </span>
+                <span className={`block text-3xl font-bold tabular-nums ${tab.accent}`}>{tab.count}</span>
+                <span className="block text-xs font-medium text-[var(--text-secondary)] mt-0.5">{tab.label}</span>
               </button>
-
-              <button
-                onClick={() => setActiveTab('strong_match')}
-                className={`p-3.5 sm:p-4 rounded-xl sm:rounded-2xl border text-left transition-all ${
-                  activeTab === 'strong_match'
-                    ? 'border-[var(--accent-green)] bg-[var(--accent-green-light)] font-bold text-[var(--accent-green-text)] shadow-2xs'
-                    : 'border-[var(--border-hairline)] bg-[var(--bg-surface)] hover:bg-[var(--bg-subtle)] text-[var(--text-secondary)]'
-                }`}
-              >
-                <span className="text-2xl font-serif font-bold tabular-nums text-[var(--accent-green)]">
-                  {strongMatches.length}
-                </span>
-                <span className="block text-xs text-[var(--text-secondary)] mt-1">
-                  {t('strongMatches')}
-                </span>
-              </button>
-
-              <button
-                onClick={() => setActiveTab('possible_match')}
-                className={`p-3.5 sm:p-4 rounded-xl sm:rounded-2xl border text-left transition-all ${
-                  activeTab === 'possible_match'
-                    ? 'border-[var(--accent-saffron)] bg-[var(--accent-saffron-light)] font-bold text-[var(--accent-saffron-text)] shadow-2xs'
-                    : 'border-[var(--border-hairline)] bg-[var(--bg-surface)] hover:bg-[var(--bg-subtle)] text-[var(--text-secondary)]'
-                }`}
-              >
-                <span className="text-2xl font-serif font-bold tabular-nums text-[var(--accent-saffron)]">
-                  {possibleMatches.length}
-                </span>
-                <span className="block text-xs text-[var(--text-secondary)] mt-1">
-                  {t('possibleMatches')}
-                </span>
-              </button>
-
-              <button
-                onClick={() => setActiveTab('review_required')}
-                className={`p-3.5 sm:p-4 rounded-xl sm:rounded-2xl border text-left transition-all ${
-                  activeTab === 'review_required'
-                    ? 'border-[var(--accent-navy)] bg-[var(--accent-navy-light)] font-bold text-[var(--accent-navy-text)] shadow-2xs'
-                    : 'border-[var(--border-hairline)] bg-[var(--bg-surface)] hover:bg-[var(--bg-subtle)] text-[var(--text-secondary)]'
-                }`}
-              >
-                <span className="text-2xl font-serif font-bold tabular-nums text-[var(--accent-navy)]">
-                  {reviewRequired.length}
-                </span>
-                <span className="block text-xs text-[var(--text-secondary)] mt-1">
-                  {t('reviewRequired')}
-                </span>
-              </button>
-            </div>
+            ))}
           </div>
 
-          {/* Scheme Cards Recommendation List */}
+          {filteredSchemes.length === 0 && (
+            <p className="p-10 text-center text-sm text-[var(--text-secondary)] glass-card rounded-3xl">
+              {hi ? 'इस श्रेणी में कोई योजना नहीं है।' : 'No schemes in this group.'}
+            </p>
+          )}
+
           <div className="space-y-4">
             {filteredSchemes.map((item) => {
               const s = item.scheme;
               const isSaved = applications.some((a) => a.schemeId === s.id);
+              const meta = statusMeta[item.status];
+              const reasons = hi ? item.matchedReasonsHindi : item.matchedReasons;
+              const toVerify = hi ? item.toVerifyHindi : item.toVerify;
+              const unmet = hi ? item.unmetCriteriaHindi : item.unmetCriteria;
 
               return (
-                <div
-                  key={s.id}
-                  className="bobbin-surface-card p-6 rounded-3xl space-y-4 shadow-sm"
-                >
-                  {/* Row 1: Header & Status Badge */}
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                    <div className="space-y-0.5">
-                      <span className="text-[11px] font-bold uppercase tracking-wider text-[var(--accent-saffron)]">
-                        {settings.language === 'hi' ? s.categoryLabelHindi : s.categoryLabel}
+                <article key={s.id} className="glass-card p-5 sm:p-7 rounded-[1.75rem] space-y-5">
+                  <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
+                    <div className="space-y-1 min-w-0">
+                      <span className="text-xs font-semibold text-[var(--accent-saffron)]">
+                        {hi ? s.categoryLabelHindi : s.categoryLabel}
                       </span>
-                      <h3 
-                        onClick={() => handleSchemeClick(s.id)}
-                        className="text-lg sm:text-xl font-serif font-bold text-[var(--text-primary)] hover:text-[var(--accent-saffron)] cursor-pointer transition-colors"
-                      >
-                        {settings.language === 'hi' ? s.nameHindi : s.name}
-                      </h3>
+                      <h2 className="text-xl sm:text-2xl font-bold text-[var(--text-primary)] leading-snug">
+                        <button onClick={() => handleSchemeClick(s.id)} className="text-left hover:text-[var(--accent-saffron)] transition-colors">
+                          {hi ? s.nameHindi : s.name}
+                        </button>
+                      </h2>
+                      <p className="text-xs text-[var(--text-muted)]">{hi ? s.ministryHindi : s.ministry}</p>
                     </div>
-
-                    <div className="flex items-center gap-2">
-                      <span className={`px-2.5 py-1 rounded-md text-xs font-bold border ${
-                        item.status === 'strong_match'
-                          ? 'bg-[var(--accent-green-light)] text-[var(--accent-green-text)] border-[var(--accent-green)]/30'
-                          : item.status === 'possible_match'
-                          ? 'bg-[var(--accent-saffron-light)] text-[var(--accent-saffron-text)] border-[var(--accent-saffron)]/30'
-                          : 'bg-[var(--accent-navy-light)] text-[var(--accent-navy-text)] border-[var(--accent-navy)]/30'
-                      }`}>
-                        {item.status === 'strong_match' 
-                          ? settings.language === 'hi' ? 'पूर्ण पात्रता' : 'Strong Match'
-                          : item.status === 'possible_match'
-                          ? settings.language === 'hi' ? 'संभावित पात्रता' : 'Possible Match'
-                          : settings.language === 'hi' ? 'कागजात जरूरी' : 'Review Required'}
+                    <div className="flex items-center gap-2 shrink-0">
+                      <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold ${meta.chip}`}>
+                        {meta.icon}
+                        {meta.label}
                       </span>
-                      <span className="text-xs font-mono font-bold text-[var(--text-muted)]">
+                      <span className="text-xs font-mono font-semibold text-[var(--text-muted)] tabular-nums" title={hi ? 'मिलान स्कोर' : 'Match score'}>
                         {item.matchScore}%
                       </span>
                     </div>
                   </div>
 
-                  {/* Row 2: Headline Benefit */}
-                  <div className="p-3 rounded-xl bg-[var(--accent-green-light)] text-xs sm:text-sm font-semibold text-[var(--accent-green-text)] border border-[var(--accent-green)]/20 flex items-center gap-2">
-                    <Sparkles className="w-4 h-4 text-[var(--accent-green)] shrink-0" />
-                    <span>{settings.language === 'hi' ? s.benefitHeadlineHindi : s.benefitHeadline}</span>
-                  </div>
+                  <p className="px-4 py-3 rounded-2xl bg-[var(--accent-green-light)] text-sm font-semibold text-[var(--accent-green-text)] flex items-center gap-2">
+                    <Sparkles className="w-4 h-4 shrink-0" />
+                    {hi ? s.benefitHeadlineHindi : s.benefitHeadline}
+                  </p>
 
-                  {/* Row 3: Why It Matched & Summary */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs text-[var(--text-secondary)] pt-1">
-                    <div className="space-y-1.5 p-3 rounded-xl bg-[var(--bg-subtle)] border border-[var(--border-hairline)]">
-                      <span className="font-bold text-[var(--text-primary)] block">
-                        {t('whyYouMatched')}:
-                      </span>
-                      <ul className="space-y-1 list-disc list-inside">
-                        {(settings.language === 'hi' ? item.matchedReasonsHindi : item.matchedReasons).map((r, i) => (
-                          <li key={i}>{r}</li>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-[13px] text-[var(--text-secondary)]">
+                    <div className="p-4 rounded-2xl bg-[var(--bg-subtle)] space-y-2">
+                      <p className="font-semibold text-[var(--text-primary)]">
+                        {item.status === 'review_required' ? (hi ? 'जो शर्तें पूरी हैं' : 'What you already meet') : t('whyYouMatched')}
+                      </p>
+                      <ul className="space-y-1.5">
+                        {reasons.map((r) => (
+                          <li key={r} className="flex items-start gap-2">
+                            <Check className="w-3.5 h-3.5 text-[var(--accent-green)] shrink-0 mt-0.5" />
+                            <span>{r}</span>
+                          </li>
                         ))}
                       </ul>
                     </div>
 
-                    <div className="space-y-1.5 p-3 rounded-xl bg-[var(--bg-subtle)] border border-[var(--border-hairline)]">
-                      <span className="font-bold text-[var(--text-primary)] block">
-                        {t('requiredDocs')}:
-                      </span>
-                      <div className="flex flex-wrap gap-1.5 mt-1">
-                        {s.requiredDocuments.map((doc) => (
-                          <span
-                            key={doc.id}
-                            className="px-2 py-0.5 rounded bg-[var(--bg-surface)] text-[11px] font-medium text-[var(--text-secondary)] border border-[var(--border-hairline)]"
-                          >
-                            {settings.language === 'hi' ? doc.nameHindi : doc.name}
-                          </span>
-                        ))}
+                    {unmet.length > 0 || toVerify.length > 0 ? (
+                      <div className="p-4 rounded-2xl bg-[var(--bg-subtle)] space-y-2">
+                        <p className="font-semibold text-[var(--text-primary)]">
+                          {unmet.length > 0 ? (hi ? 'क्यों पात्र नहीं' : 'Why it may not apply') : hi ? 'कार्यालय में पुष्टि करें' : 'Confirm at the office'}
+                        </p>
+                        <ul className="space-y-1.5">
+                          {unmet.map((r) => (
+                            <li key={r} className="flex items-start gap-2">
+                              <XCircle className="w-3.5 h-3.5 text-[var(--accent-red)] shrink-0 mt-0.5" />
+                              <span>{r}</span>
+                            </li>
+                          ))}
+                          {toVerify.map((r) => (
+                            <li key={r} className="flex items-start gap-2">
+                              <AlertCircle className="w-3.5 h-3.5 text-amber-600 shrink-0 mt-0.5" />
+                              <span>{r}</span>
+                            </li>
+                          ))}
+                        </ul>
                       </div>
-                    </div>
+                    ) : (
+                      <div className="p-4 rounded-2xl bg-[var(--bg-subtle)] space-y-2">
+                        <p className="font-semibold text-[var(--text-primary)]">{t('requiredDocs')}</p>
+                        <div className="flex flex-wrap gap-1.5">
+                          {s.requiredDocuments.map((doc) => (
+                            <span key={doc.id} className="px-2.5 py-1 rounded-full bg-[var(--bg-surface)] text-xs font-medium text-[var(--text-secondary)]">
+                              {hi ? doc.nameHindi : doc.name}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   </div>
 
-                  {/* Row 4: Actions */}
-                  <div className="pt-3 border-t border-[var(--border-hairline)] flex flex-wrap items-center justify-between gap-3 text-xs">
-                    <div className="text-[var(--text-muted)]">
-                      {settings.language === 'hi' ? s.ministryHindi : s.ministry}
-                    </div>
-
-                    <div className="flex items-center gap-2.5">
+                  <div className="flex flex-wrap items-center justify-end gap-2">
+                    {item.status !== 'review_required' && (
                       <button
                         onClick={() => handleSaveToTracker(item)}
                         disabled={isSaved}
-                        className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-semibold transition-colors ${
-                          isSaved
-                            ? 'bg-[var(--bg-subtle)] text-[var(--text-muted)] border-[var(--border-hairline)] cursor-default'
-                            : 'border-[var(--border-hairline)] hover:bg-[var(--bg-subtle)] text-[var(--text-primary)]'
+                        className={`inline-flex items-center gap-1.5 h-10 px-4 rounded-full text-[13px] font-semibold transition-colors ${
+                          isSaved ? 'bg-[var(--bg-subtle)] text-[var(--text-muted)] cursor-default' : 'bg-[var(--bg-subtle)] hover:bg-[var(--bg-surface)] text-[var(--text-primary)]'
                         }`}
                       >
-                        {isSaved ? <Check className="w-3.5 h-3.5 text-[var(--accent-green)]" /> : <BookmarkPlus className="w-3.5 h-3.5" />}
-                        <span>{isSaved ? (settings.language === 'hi' ? 'सहेजा गया' : 'Saved') : t('saveToTracker')}</span>
+                        {isSaved ? <Check className="w-4 h-4 text-[var(--accent-green)]" /> : <BookmarkPlus className="w-4 h-4" />}
+                        {isSaved ? (hi ? 'सहेजा गया' : 'Saved') : t('saveToTracker')}
                       </button>
-
-                      <button
-                        onClick={() => handleSchemeClick(s.id)}
-                        className="inline-flex items-center gap-1 px-4 py-1.5 rounded-lg bg-[var(--accent-saffron)] hover:bg-[var(--accent-saffron-hover)] text-white font-semibold transition-colors shadow-xs"
-                      >
-                        <span>{t('viewSchemeDetails')}</span>
-                        <ChevronRight className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
+                    )}
+                    <button
+                      onClick={() => handleSchemeClick(s.id)}
+                      className="inline-flex items-center gap-1 h-10 px-5 rounded-full bg-[var(--accent-saffron)] hover:bg-[var(--accent-saffron-hover)] text-white text-[13px] font-semibold"
+                    >
+                      {t('viewSchemeDetails')}
+                      <ChevronRight className="w-4 h-4" />
+                    </button>
                   </div>
-
-                </div>
+                </article>
               );
             })}
           </div>
 
-          {/* Missing or Incomplete Prompt */}
-          <div className="p-6 rounded-2xl border border-[var(--border-hairline)] bg-[var(--bg-subtle)] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div className="p-6 rounded-[1.75rem] glass-card flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div>
-              <h4 className="font-bold text-sm text-[var(--text-primary)]">
-                {settings.language === 'hi' ? 'क्या आपके पास कुछ कागजात तैयार नहीं हैं?' : 'Need to verify your certificates and documents?'}
-              </h4>
-              <p className="text-xs text-[var(--text-secondary)] mt-0.5">
-                {settings.language === 'hi' 
-                  ? 'दस्तावेज़ चेकर का उपयोग करें ताकि आवेदन के समय किसी दफ्तर के चक्कर न लगाने पड़ें।' 
-                  : 'Use the Document Readiness Checker to organize missing papers before visiting the portal or CSC.'}
+              <h2 className="font-semibold text-[15px] text-[var(--text-primary)]">
+                {hi ? 'क्या आपके कागज़ात तैयार हैं?' : 'Are your documents ready?'}
+              </h2>
+              <p className="text-[13px] text-[var(--text-secondary)] mt-0.5">
+                {hi
+                  ? 'दस्तावेज़ चेकर से पता करें कि कौन से कागज़ बाकी हैं, ताकि दफ्तर के चक्कर न लगें।'
+                  : 'Use the Document Checker to sort out missing papers before visiting the portal or CSC.'}
               </p>
             </div>
-
             <button
               onClick={() => setCurrentView('document_checker')}
-              className="px-4 py-2 text-xs font-semibold rounded-lg bg-[var(--bg-surface)] border border-[var(--border-hairline)] hover:bg-[var(--bg-canvas)] text-[var(--text-primary)] transition-colors shrink-0 shadow-2xs"
+              className="h-10 px-5 text-[13px] font-semibold rounded-full bg-[var(--bg-subtle)] hover:bg-[var(--bg-surface)] text-[var(--text-primary)] transition-colors shrink-0"
             >
-              {settings.language === 'hi' ? 'दस्तावेज़ चेकर खोलें' : 'Open Document Checker'} →
+              {hi ? 'दस्तावेज़ चेकर खोलें' : 'Open Document Checker'} →
             </button>
           </div>
         </>
       )}
-
     </div>
   );
 };

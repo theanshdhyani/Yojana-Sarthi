@@ -3,7 +3,7 @@ export const SpeechService = {
     return typeof window !== 'undefined' && 'speechSynthesis' in window;
   },
 
-  speak(text: string, lang: 'en' | 'hi' = 'en', onEnd?: () => void): void {
+  speak(text: string, lang: 'en' | 'hi' = 'en', onEnd?: () => void, rate = 0.95): void {
     if (!this.isSupported()) return;
 
     this.stop();
@@ -18,7 +18,7 @@ export const SpeechService = {
 
     const utterance = new SpeechSynthesisUtterance(cleanText);
     utterance.lang = lang === 'hi' ? 'hi-IN' : 'en-IN';
-    utterance.rate = 0.95;
+    utterance.rate = rate;
     utterance.pitch = 1.0;
 
     // Try finding natural voice

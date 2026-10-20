@@ -1,7 +1,124 @@
 import { QuestionnaireAnswers } from '../types/questionnaire';
-import { TrackedApplication } from '../types/tracker';
+import { TrackedApplication, ApplicationStatus } from '../types/tracker';
 import { FamilyMember } from '../types/family';
 import { UserPreferences } from '../types/settings';
+import { safeExternalUrl } from '../utils/safeUrl';
+
+// ---------------------------------------------------------------------------
+// Validation: localStorage is user-controlled, so nothing read back from it is
+// trusted. Each reader rebuilds a clean object from known fields only; anything
+// malformed is dropped rather than crashing the app or reaching the DOM.
+// ---------------------------------------------------------------------------
+
+const MAX_TEXT = 500;
+
+const isObj = (v: unknown): v is Record<string, unknown> => typeof v === 'object' && v !== null && !Array.isArray(v);
+const str = (v: unknown, max = MAX_TEXT): string | undefined => (typeof v === 'string' ? v.slice(0, max) : undefined);
+const oneOf = <T extends string>(v: unknown, allowed: readonly T[]): T | undefined =>
+  typeof v === 'string' && (allowed as readonly string[]).includes(v) ? (v as T) : undefined;
+
+const GENDERS = ['male', 'female', 'transgender'] as const;
+const AREAS = ['rural', 'urban'] as const;
+const CATEGORIES = ['General', 'OBC', 'SC', 'ST', 'EWS'] as const;
+const OCCUPATIONS = [
+  'farmer', 'agricultural_labour', 'artisan_craftsperson', 'street_vendor', 'daily_wage_worker',
+  'small_business_owner', 'student', 'homemaker', 'salaried_private', 'government_employee', 'unemployed', 'retired'
+] as const;
+const INCOMES = ['below_1lakh', '1lakh_to_2.5lakh', '2.5lakh_to_5lakh', '5lakh_to_8lakh', 'above_8lakh'] as const;
+const LAND = ['none', 'marginal_less_than_1ha', 'small_1_to_2ha', 'medium_large_above_2ha'] as const;
+const RATION = ['none', 'apl', 'bpl', 'aay_antyodaya'] as const;
+const STATUSES: readonly ApplicationStatus[] = ['to_apply', 'under_review', 'approved', 'action_required', 'rejected'];
+const RELATIONSHIPS = ['self', 'spouse', 'father', 'mother', 'son', 'daughter', 'other'] as const;
+
+export function sanitizeAnswers(raw: unknown): QuestionnaireAnswers {
+  if (!isObj(raw)) return {};
+  const out: QuestionnaireAnswers = {};
+  if (typeof raw.age === 'number' && Number.isInteger(raw.age) && raw.age >= 1 && raw.age <= 120) out.age = raw.age;
+  out.gender = oneOf(raw.gender, GENDERS);
+  out.state = str(raw.state, 80);
+  out.residenceArea = oneOf(raw.residenceArea, AREAS);
+  out.socialCategory = oneOf(raw.socialCategory, CATEGORIES);
+  out.occupation = oneOf(raw.occupation, OCCUPATIONS);
+  out.annualIncomeBracket = oneOf(raw.annualIncomeBracket, INCOMES);
+  out.landholding = oneOf(raw.landholding, LAND);
+  out.hasRationCard = oneOf(raw.hasRationCard, RATION);
+  if (Array.isArray(raw.specialAttributes)) {
+    out.specialAttributes = raw.specialAttributes.filter((x): x is string => typeof x === 'string' && x.length <= 40).slice(0, 20);
+  }
+  (Object.keys(out) as (keyof QuestionnaireAnswers)[]).forEach((k) => out[k] === undefined && delete out[k]);
+  return out;
+}
+
+function sanitizeApplication(raw: unknown): TrackedApplication | null {
+  if (!isObj(raw)) return null;
+  const id = str(raw.id, 64);
+  const schemeId = str(raw.schemeId, 64);
+  const schemeName = str(raw.schemeName, 200);
+  const status = oneOf(raw.status, STATUSES);
+  if (!id || !schemeId || !schemeName || !status) return null;
+  const timeline = Array.isArray(raw.timeline)
+    ? raw.timeline
+        .filter(isObj)
+        .map((e) => ({ date: str(e.date, 20) ?? '', title: str(e.title, 200) ?? '', description: str(e.description) ?? '' }))
+        .slice(0, 100)
+    : [];
+  return {
+    id,
+    schemeId,
+    schemeName,
+    schemeNameHindi: str(raw.schemeNameHindi, 200) ?? schemeName,
+    beneficiaryName: str(raw.beneficiaryName, 100) ?? '',
+    referenceNumber: str(raw.referenceNumber, 64) ?? '',
+    appliedDate: str(raw.appliedDate, 20) ?? '',
+    status,
+    portalUrl: safeExternalUrl(raw.portalUrl),
+    notes: str(raw.notes),
+    timeline,
+    lastUpdated: str(raw.lastUpdated, 20) ?? ''
+  };
+}
+
+function sanitizeFamilyMember(raw: unknown): FamilyMember | null {
+  if (!isObj(raw)) return null;
+  const id = str(raw.id, 64);
+  const name = str(raw.name, 100);
+  const relationship = oneOf(raw.relationship, RELATIONSHIPS);
+  if (!id || !name || !relationship) return null;
+  return { id, name, relationship, profile: sanitizeAnswers(raw.profile), notes: str(raw.notes) };
+}
+
+const DEFAULT_SETTINGS: UserPreferences = {
+  language: 'en',
+  simpleLanguageMode: false,
+  fontSize: 'normal',
+  highContrast: false,
+  reducedMotion: false,
+  theme: 'light',
+  voiceSpeed: 1.0
+};
+
+function sanitizeSettings(raw: unknown): UserPreferences {
+  if (!isObj(raw)) return { ...DEFAULT_SETTINGS };
+  const speed = typeof raw.voiceSpeed === 'number' ? Math.min(1.2, Math.max(0.8, raw.voiceSpeed)) : DEFAULT_SETTINGS.voiceSpeed;
+  return {
+    language: oneOf(raw.language, ['en', 'hi'] as const) ?? DEFAULT_SETTINGS.language,
+    simpleLanguageMode: raw.simpleLanguageMode === true,
+    fontSize: oneOf(raw.fontSize, ['normal', 'large', 'extra-large'] as const) ?? DEFAULT_SETTINGS.fontSize,
+    highContrast: raw.highContrast === true,
+    reducedMotion: raw.reducedMotion === true,
+    theme: oneOf(raw.theme, ['light', 'dark'] as const) ?? DEFAULT_SETTINGS.theme,
+    voiceSpeed: speed
+  };
+}
+
+function readJson(key: string): unknown {
+  try {
+    const raw = localStorage.getItem(key);
+    return raw ? JSON.parse(raw) : undefined;
+  } catch {
+    return undefined;
+  }
+}
 
 const KEYS = {
   ANSWERS: 'yojana_sarthi_answers_v1',
@@ -127,12 +244,7 @@ export const SAMPLE_DEMO_DATA = {
 
 export const StorageService = {
   getAnswers(): QuestionnaireAnswers {
-    try {
-      const raw = localStorage.getItem(KEYS.ANSWERS);
-      return raw ? JSON.parse(raw) : {};
-    } catch {
-      return {};
-    }
+    return sanitizeAnswers(readJson(KEYS.ANSWERS));
   },
 
   saveAnswers(answers: QuestionnaireAnswers): void {
@@ -144,12 +256,8 @@ export const StorageService = {
   },
 
   getReadyDocuments(): string[] {
-    try {
-      const raw = localStorage.getItem(KEYS.READY_DOCS);
-      return raw ? JSON.parse(raw) : [];
-    } catch {
-      return [];
-    }
+    const raw = readJson(KEYS.READY_DOCS);
+    return Array.isArray(raw) ? raw.filter((x): x is string => typeof x === 'string' && x.length <= 64).slice(0, 100) : [];
   },
 
   saveReadyDocuments(docs: string[]): void {
@@ -161,12 +269,10 @@ export const StorageService = {
   },
 
   getApplications(): TrackedApplication[] {
-    try {
-      const raw = localStorage.getItem(KEYS.TRACKER);
-      return raw ? JSON.parse(raw) : [];
-    } catch {
-      return [];
-    }
+    const raw = readJson(KEYS.TRACKER);
+    return Array.isArray(raw)
+      ? raw.map(sanitizeApplication).filter((a): a is TrackedApplication => a !== null).slice(0, 200)
+      : [];
   },
 
   saveApplications(apps: TrackedApplication[]): void {
@@ -178,12 +284,10 @@ export const StorageService = {
   },
 
   getFamilyMembers(): FamilyMember[] {
-    try {
-      const raw = localStorage.getItem(KEYS.FAMILY);
-      return raw ? JSON.parse(raw) : [];
-    } catch {
-      return [];
-    }
+    const raw = readJson(KEYS.FAMILY);
+    return Array.isArray(raw)
+      ? raw.map(sanitizeFamilyMember).filter((m): m is FamilyMember => m !== null).slice(0, 30)
+      : [];
   },
 
   saveFamilyMembers(members: FamilyMember[]): void {
@@ -195,22 +299,11 @@ export const StorageService = {
   },
 
   getSettings(): UserPreferences {
-    try {
-      const raw = localStorage.getItem(KEYS.SETTINGS);
-      if (raw) return JSON.parse(raw);
-    } catch {
-      // fallback
-    }
+    return sanitizeSettings(readJson(KEYS.SETTINGS));
+  },
 
-    return {
-      language: 'en',
-      simpleLanguageMode: false,
-      fontSize: 'normal',
-      highContrast: false,
-      reducedMotion: false,
-      theme: 'light',
-      voiceSpeed: 1.0
-    };
+  defaultSettings(): UserPreferences {
+    return { ...DEFAULT_SETTINGS };
   },
 
   saveSettings(settings: UserPreferences): void {

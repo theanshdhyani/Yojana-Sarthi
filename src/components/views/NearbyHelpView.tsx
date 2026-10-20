@@ -16,10 +16,15 @@ import { HELP_CENTERS_DIRECTORY } from '../../data/helpCentersData';
 import { INDIAN_STATES_DISTRICTS } from '../../data/statesAndDistricts';
 import { CenterType } from '../../types/helpCenter';
 
-export const NearbyHelpView: React.FC = () => {
-  const { settings, addToast, t } = useApp();
+const CSC_LOCATOR_URL = 'https://locator.csccloud.in';
 
-  const [selectedState, setSelectedState] = useState<string>('Uttar Pradesh');
+export const NearbyHelpView: React.FC = () => {
+  const { settings, answers, addToast, t } = useApp();
+  const hi = settings.language === 'hi';
+
+  const initialState =
+    answers.state && INDIAN_STATES_DISTRICTS.some((s) => s.state === answers.state) ? answers.state : 'Uttar Pradesh';
+  const [selectedState, setSelectedState] = useState<string>(initialState);
   const [selectedDistrict, setSelectedDistrict] = useState<string>('all');
   const [selectedType, setSelectedType] = useState<string>('all');
   const [copiedId, setCopiedId] = useState<string | null>(null);
@@ -34,11 +39,15 @@ export const NearbyHelpView: React.FC = () => {
     return matchesState && matchesDistrict && matchesType;
   });
 
-  const handleCopyAddress = (id: string, text: string) => {
-    navigator.clipboard.writeText(text);
-    setCopiedId(id);
-    addToast(t('addressCopied'), 'success');
-    setTimeout(() => setCopiedId(null), 2500);
+  const handleCopyAddress = async (id: string, text: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopiedId(id);
+      addToast(t('addressCopied'), 'success');
+      setTimeout(() => setCopiedId(null), 2500);
+    } catch {
+      addToast(hi ? 'कॉपी नहीं हो सका' : 'Could not copy — please select the text manually', 'error');
+    }
   };
 
   return (
@@ -56,6 +65,31 @@ export const NearbyHelpView: React.FC = () => {
           <p className="text-xs sm:text-sm text-[var(--text-secondary)] mt-1">
             {t('nearbyHelpSubtitle')}
           </p>
+        </div>
+
+        {/* These listings are illustrative. Real contact details must come from the official locator. */}
+        <div
+          role="note"
+          className="p-4 sm:p-5 rounded-3xl border border-[var(--warning-border)] bg-[var(--warning-bg)] backdrop-blur-xl flex flex-col sm:flex-row sm:items-center justify-between gap-3"
+        >
+          <div className="flex items-start gap-3">
+            <ShieldCheck className="w-5 h-5 text-[var(--warning-icon)] shrink-0 mt-0.5" />
+            <p className="text-[13px] text-[var(--warning-desc)] leading-relaxed">
+              <strong className="text-[var(--warning-text)]">{hi ? 'नमूना सूची: ' : 'Sample listings: '}</strong>
+              {hi
+                ? 'नीचे दिए केंद्र केवल उदाहरण हैं और इनके फोन नंबर सत्यापित नहीं हैं। अपने नज़दीकी असली सीएससी के लिए आधिकारिक लोकेटर देखें।'
+                : 'The centres below are examples and their phone numbers are not verified. Use the official locator to find your real nearest CSC.'}
+            </p>
+          </div>
+          <a
+            href={CSC_LOCATOR_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center justify-center gap-1.5 h-10 px-4 rounded-full bg-[var(--accent-saffron)] hover:bg-[var(--accent-saffron-hover)] text-white text-[13px] font-semibold shrink-0"
+          >
+            {hi ? 'आधिकारिक सीएससी लोकेटर' : 'Official CSC locator'}
+            <ExternalLink className="w-3.5 h-3.5" />
+          </a>
         </div>
 
         {/* Filter Controls Bar with Apple Glassmorphism */}
@@ -143,13 +177,11 @@ export const NearbyHelpView: React.FC = () => {
                 </div>
 
                 <div className="flex items-center gap-2 shrink-0">
-                  <a
-                    href={`tel:${center.phone}`}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[var(--accent-saffron)] text-white text-xs font-semibold hover:bg-[var(--accent-saffron-hover)] transition-colors"
-                  >
+                  {/* No tap-to-call: sample numbers could ring a real, unrelated person. */}
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[var(--bg-subtle)] text-[var(--text-muted)] text-xs font-medium">
                     <Phone className="w-3.5 h-3.5" />
-                    <span>{t('callCenter')}</span>
-                  </a>
+                    <span>{hi ? 'नमूना' : 'Sample'}</span>
+                  </span>
 
                   <button
                     onClick={() => handleCopyAddress(center.id, `${center.name}, ${center.address}`)}
@@ -174,11 +206,6 @@ export const NearbyHelpView: React.FC = () => {
                   <Clock className="w-4 h-4 text-slate-400 shrink-0 mt-0.5" />
                   <div>
                     <p className="font-medium text-[var(--text-primary)]">{center.operatingHours}</p>
-                    {center.contactPerson && (
-                      <p className="text-[11px] text-[var(--text-muted)] mt-0.5">
-                        Officer / VLE: {center.contactPerson}
-                      </p>
-                    )}
                   </div>
                 </div>
               </div>
@@ -213,7 +240,7 @@ export const NearbyHelpView: React.FC = () => {
               : 'Try selecting a different district or check the central digital seva portal.'}
           </p>
           <a
-            href="https://locator.csccloud.in"
+            href={CSC_LOCATOR_URL}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-1.5 text-xs font-semibold text-[var(--accent-saffron)] underline"

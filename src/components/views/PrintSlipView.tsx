@@ -1,6 +1,6 @@
 import React from 'react';
 import { useApp } from '../../context/AppContext';
-import { Printer, ArrowLeft, ShieldCheck, CheckSquare, Square, Download } from 'lucide-react';
+import { Printer, ArrowLeft, ShieldCheck } from 'lucide-react';
 import { MASTER_DOCUMENTS } from '../../data/documentsData';
 
 export const PrintSlipView: React.FC = () => {
@@ -23,7 +23,6 @@ export const PrintSlipView: React.FC = () => {
     month: 'short',
     year: 'numeric'
   });
-  const slipId = `YS-SLIP-${Math.floor(100000 + Math.random() * 900000)}`;
 
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 py-6 sm:py-10 space-y-8">
@@ -41,7 +40,7 @@ export const PrintSlipView: React.FC = () => {
         <div className="flex items-center gap-3">
           <button
             onClick={handlePrint}
-            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[var(--accent-saffron)] hover:bg-[var(--accent-saffron-hover)] text-white text-xs font-semibold transition-colors shadow-sm"
+            className="inline-flex items-center gap-2 h-10 px-5 rounded-full bg-[var(--accent-saffron)] hover:bg-[var(--accent-saffron-hover)] text-white text-[13px] font-semibold"
           >
             <Printer className="w-4 h-4" />
             <span>{t('printNow')}</span>
@@ -50,7 +49,7 @@ export const PrintSlipView: React.FC = () => {
       </div>
 
       {/* PRINT SLIP CONTAINER - Designed specifically for crisp physical black & white paper output */}
-      <div className="bg-white text-black p-8 sm:p-12 rounded-xl border border-slate-300 shadow-sm space-y-6 text-sm font-sans">
+      <div className="bg-white text-black p-8 sm:p-12 rounded-3xl shadow-xl space-y-6 text-sm font-sans print:shadow-none print:rounded-none print:p-0">
         
         {/* Slip Header */}
         <div className="border-b-2 border-black pb-4 flex flex-col sm:flex-row sm:items-end justify-between gap-3">
@@ -72,9 +71,9 @@ export const PrintSlipView: React.FC = () => {
           </div>
 
           <div className="text-right text-xs space-y-0.5">
-            <div><strong>Slip ID:</strong> <span className="font-mono">{slipId}</span></div>
             <div><strong>Date:</strong> <span className="tabular-nums">{dateStr}</span></div>
-            <div><strong>Validation:</strong> Free Advisory (No Fee)</div>
+            <div><strong>Fee:</strong> Free advisory (no charge)</div>
+            <div className="font-semibold">Not a government document</div>
           </div>
         </div>
 
@@ -173,8 +172,12 @@ export const PrintSlipView: React.FC = () => {
 
         {/* Footer verification note */}
         <div className="text-[10px] text-slate-500 pt-3 border-t border-slate-300 flex justify-between items-center">
-          <span>Generated via Yojana Sarthi Digital Civic Platform · Private by Design</span>
-          <span>Sign / Stamp: _______________________</span>
+          <span>
+            Preliminary guidance from Yojana Sarthi. Eligibility is decided only by the issuing department.
+            <br />
+            योजना सारथी द्वारा प्रारंभिक मार्गदर्शन। पात्रता का अंतिम निर्णय संबंधित विभाग करता है।
+          </span>
+          <span>Helper / volunteer: _______________</span>
         </div>
 
       </div>

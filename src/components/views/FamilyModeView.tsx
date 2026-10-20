@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { 
   Users, 
@@ -13,7 +13,6 @@ import {
 } from 'lucide-react';
 import { FamilyMember } from '../../types/family';
 import { evaluateAllSchemes } from '../../services/eligibilityEngine';
-import { SCHEMES_DATABASE } from '../../data/schemesData';
 
 export const FamilyModeView: React.FC = () => {
   const { 
@@ -36,6 +35,13 @@ export const FamilyModeView: React.FC = () => {
   const [gender, setGender] = useState<'male' | 'female'>('female');
   const [occupation, setOccupation] = useState<any>('homemaker');
   const [notes, setNotes] = useState('');
+
+  useEffect(() => {
+    if (!isAddModalOpen) return;
+    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && setIsAddModalOpen(false);
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, [isAddModalOpen]);
 
   const handleAddMember = (e: React.FormEvent) => {
     e.preventDefault();
@@ -119,7 +125,7 @@ export const FamilyModeView: React.FC = () => {
       <div className="space-y-6">
         {familyMembers.map((member) => {
           const evalRes = evaluateAllSchemes(member.profile);
-          const topMatches = evalRes.strongMatches.slice(0, 2);
+          const topMatches = [...evalRes.strongMatches, ...evalRes.possibleMatches].slice(0, 4);
 
           return (
             <div
@@ -168,23 +174,41 @@ export const FamilyModeView: React.FC = () => {
                   {settings.language === 'hi' ? 'इस सदस्य के लिए मुख्य योजनाएं:' : 'Top Matched Entitlements for this Member:'}
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                  {topMatches.map((m) => (
-                    <div
-                      key={m.scheme.id}
-                      onClick={() => handleViewScheme(m.scheme.id)}
-                      className="p-3 rounded-xl border border-[var(--border-hairline)] bg-[var(--bg-subtle)] hover:border-[var(--accent-saffron)] cursor-pointer transition-colors space-y-1"
-                    >
-                      <div className="flex items-center justify-between text-xs font-semibold text-[var(--text-primary)]">
-                        <span>{settings.language === 'hi' ? m.scheme.nameHindi : m.scheme.name}</span>
-                        <ArrowRight className="w-3.5 h-3.5 text-[var(--accent-saffron)] shrink-0 ml-1" />
-                      </div>
-                      <p className="text-[11px] text-emerald-700 dark:text-emerald-400 font-medium">
-                        {settings.language === 'hi' ? m.scheme.benefitHeadlineHindi : m.scheme.benefitHeadline}
-                      </p>
-                    </div>
-                  ))}
-                </div>
+                {topMatches.length === 0 ? (
+                  <p className="text-xs text-[var(--text-secondary)] p-3 rounded-2xl bg-[var(--bg-subtle)]">
+                    {settings.language === 'hi'
+                      ? 'इस सदस्य के लिए अभी कोई योजना नहीं मिली। उम्र या व्यवसाय बदलने पर परिणाम बदल सकते हैं।'
+                      : 'No likely schemes for this member yet. Results change with age, occupation and household conditions.'}
+                  </p>
+                ) : (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    {topMatches.map((m) => (
+                      <button
+                        key={m.scheme.id}
+                        onClick={() => handleViewScheme(m.scheme.id)}
+                        className="p-3 rounded-2xl bg-[var(--bg-subtle)] hover:bg-[var(--bg-surface)] text-left transition-colors space-y-1"
+                      >
+                        <div className="flex items-center justify-between gap-2 text-xs font-semibold text-[var(--text-primary)]">
+                          <span>{settings.language === 'hi' ? m.scheme.nameHindi : m.scheme.name}</span>
+                          <span
+                            className={`text-[10px] px-2 py-0.5 rounded-full shrink-0 ${
+                              m.status === 'strong_match'
+                                ? 'bg-[var(--accent-green-light)] text-[var(--accent-green-text)]'
+                                : 'bg-amber-500/15 text-amber-800 dark:text-amber-200'
+                            }`}
+                          >
+                            {m.status === 'strong_match'
+                              ? settings.language === 'hi' ? 'पात्र' : 'Match'
+                              : settings.language === 'hi' ? 'जांचें' : 'Verify'}
+                          </span>
+                        </div>
+                        <p className="text-[11px] text-[var(--accent-green-text)] font-medium">
+                          {settings.language === 'hi' ? m.scheme.benefitHeadlineHindi : m.scheme.benefitHeadline}
+                        </p>
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
           );
@@ -193,9 +217,12 @@ export const FamilyModeView: React.FC = () => {
 
       {/* Add Member Modal */}
       {isAddModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 glass-scrim no-print">
-          <div className="w-full max-w-md glass-modal rounded-3xl p-6 sm:p-7 shadow-2xl space-y-5">
-            <h3 className="text-lg font-serif font-bold text-[var(--text-primary)]">
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 glass-scrim no-print"
+          onClick={(e) => e.target === e.currentTarget && setIsAddModalOpen(false)}
+        >
+          <div role="dialog" aria-modal="true" aria-labelledby="add-member-heading" className="w-full max-w-md glass-modal rounded-3xl p-6 sm:p-7 space-y-5">
+            <h3 id="add-member-heading" className="text-lg font-serif font-bold text-[var(--text-primary)]">
               {t('addFamilyMember')}
             </h3>
 
@@ -207,6 +234,7 @@ export const FamilyModeView: React.FC = () => {
                 <input
                   type="text"
                   required
+                  maxLength={100}
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="e.g. Sunita Devi (Spouse)"
@@ -242,7 +270,7 @@ export const FamilyModeView: React.FC = () => {
                     min="1"
                     max="105"
                     value={age}
-                    onChange={(e) => setAge(parseInt(e.target.value) || 1)}
+                    onChange={(e) => setAge(Math.min(105, Math.max(1, parseInt(e.target.value) || 1)))}
                     className="w-full p-2.5 rounded-lg border border-[var(--border-hairline)] bg-[var(--bg-subtle)]"
                   />
                 </div>
@@ -289,6 +317,7 @@ export const FamilyModeView: React.FC = () => {
                 </label>
                 <input
                   type="text"
+                  maxLength={200}
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
                   placeholder="e.g. Undergoing vocational training"

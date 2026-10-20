@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { 
   X, 
@@ -28,6 +28,13 @@ export const SettingsModal: React.FC = () => {
 
   const [confirmDelete, setConfirmDelete] = useState(false);
 
+  useEffect(() => {
+    if (!isSettingsOpen) return;
+    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && setIsSettingsOpen(false);
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, [isSettingsOpen, setIsSettingsOpen]);
+
   if (!isSettingsOpen) return null;
 
   const handleExport = () => {
@@ -37,8 +44,11 @@ export const SettingsModal: React.FC = () => {
     const a = document.createElement('a');
     a.href = url;
     a.download = `yojana-sarthi-backup-${new Date().toISOString().split('T')[0]}.json`;
+    document.body.appendChild(a);
     a.click();
-    URL.revokeObjectURL(url);
+    a.remove();
+    // Revoking synchronously can cancel the download in some browsers.
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
   };
 
   const handleClear = () => {
@@ -48,15 +58,18 @@ export const SettingsModal: React.FC = () => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 glass-scrim no-print">
-      <div 
-        className="w-full max-w-xl max-h-[90vh] overflow-y-auto glass-modal rounded-3xl shadow-2xl flex flex-col"
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 glass-scrim no-print"
+      onClick={(e) => e.target === e.currentTarget && setIsSettingsOpen(false)}
+    >
+      <div
+        className="w-full max-w-xl max-h-[90vh] overflow-y-auto glass-modal rounded-[2rem] flex flex-col"
         role="dialog"
         aria-modal="true"
         aria-labelledby="settings-heading"
       >
         {/* Header */}
-        <div className="p-5 border-b border-[var(--border-hairline)] flex items-center justify-between sticky top-0 bg-[var(--bg-surface)]/90 backdrop-blur-md z-10">
+        <div className="p-5 border-b border-[var(--border-hairline)] flex items-center justify-between sticky top-0 bg-[var(--glass-modal-bg)] backdrop-blur-xl z-10">
           <div>
             <h3 id="settings-heading" className="text-lg font-serif font-bold text-[var(--text-primary)]">
               {t('settings')}
@@ -67,7 +80,8 @@ export const SettingsModal: React.FC = () => {
           </div>
           <button
             onClick={() => setIsSettingsOpen(false)}
-            className="p-1.5 rounded-lg text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-subtle)] transition-colors"
+            aria-label={settings.language === 'hi' ? 'बंद करें' : 'Close'}
+            className="w-9 h-9 inline-flex items-center justify-center rounded-full bg-[var(--bg-subtle)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
@@ -218,6 +232,32 @@ export const SettingsModal: React.FC = () => {
             </div>
           </div>
 
+          {/* Reduce Motion */}
+          <div className="pt-6 flex items-center justify-between">
+            <div className="space-y-0.5">
+              <div className="text-sm font-semibold text-[var(--text-primary)]">
+                {settings.language === 'hi' ? 'कम एनिमेशन' : 'Reduce Motion'}
+              </div>
+              <p className="text-xs text-[var(--text-secondary)]">
+                {settings.language === 'hi' ? 'हिलती पृष्ठभूमि और एनिमेशन बंद करें।' : 'Turns off the drifting background and animations.'}
+              </p>
+            </div>
+            <button
+              role="switch"
+              aria-checked={settings.reducedMotion}
+              onClick={() => updateSettings({ reducedMotion: !settings.reducedMotion })}
+              className={`w-12 h-7 flex items-center rounded-full p-0.5 transition-colors ${
+                settings.reducedMotion ? 'bg-[var(--accent-green)]' : 'bg-[var(--bg-subtle)]'
+              }`}
+            >
+              <span
+                className={`bg-white w-6 h-6 rounded-full shadow-md transform transition-transform ${
+                  settings.reducedMotion ? 'translate-x-5' : 'translate-x-0'
+                }`}
+              />
+            </button>
+          </div>
+
           {/* Privacy Architecture Statement */}
           <div className="pt-6 space-y-2">
             <div className="flex items-center gap-2 text-sm font-semibold text-[var(--text-primary)]">
@@ -278,7 +318,7 @@ export const SettingsModal: React.FC = () => {
         </div>
 
         {/* Footer */}
-        <div className="p-4 border-t border-[var(--border-hairline)] bg-[var(--bg-subtle)] flex justify-end">
+        <div className="p-4 border-t border-[var(--border-hairline)] flex justify-end">
           <button
             onClick={() => setIsSettingsOpen(false)}
             className="px-5 py-2 text-xs font-semibold rounded-lg bg-[var(--accent-saffron)] hover:bg-[var(--accent-saffron-hover)] text-white transition-colors"

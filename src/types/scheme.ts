@@ -39,6 +39,12 @@ export interface SchemeEligibilityRules {
   requiresBPL?: boolean;
   specialFlags?: string[]; // 'disability', 'widow', 'girl_child', 'senior_citizen', 'street_vendor', 'artisan', 'rooftop_access', 'pregnant_lactating'
   statesSupported?: string[]; // empty means all India
+  excludedOccupations?: string[]; // e.g. serving government employees are excluded from PM-KISAN
+  // Benefit goes to a household member (daughter, widow, mother, elder) rather than the
+  // person filling the form, so age/gender limits describe that member, not the applicant.
+  beneficiaryIsHouseholdMember?: boolean;
+  // Everyone at or above this age qualifies regardless of other criteria (e.g. PM-JAY 70+).
+  universalFromAge?: number;
 }
 
 export interface Scheme {
@@ -95,5 +101,8 @@ export interface EvaluatedScheme {
   matchedReasonsHindi: string[];
   unmetCriteria: string[];
   unmetCriteriaHindi: string[];
+  // Criteria that could not be confirmed from the answers and need checking at the office.
+  toVerify: string[];
+  toVerifyHindi: string[];
   missingDocuments: string[];
 }

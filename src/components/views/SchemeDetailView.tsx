@@ -17,15 +17,15 @@ import {
   VolumeX,
   FileQuestion
 } from 'lucide-react';
-import { SCHEMES_DATABASE } from '../../data/schemesData';
+import { safeExternalUrl, safeTelHref } from '../../utils/safeUrl';
 
 export const SchemeDetailView: React.FC = () => {
-  const { 
-    selectedScheme, 
-    setCurrentView, 
-    setSelectedSchemeId, 
-    addApplication, 
-    applications, 
+  const {
+    selectedScheme,
+    setCurrentView,
+    addApplication,
+    applications,
+    answers,
     settings,
     readAloud,
     stopReading,
@@ -49,6 +49,10 @@ export const SchemeDetailView: React.FC = () => {
 
   const s = selectedScheme;
   const isSaved = applications.some((a) => a.schemeId === s.id);
+  const portalHref = safeExternalUrl(s.officialPortalUrl);
+  const helplineHref = safeTelHref(s.helplinePhone);
+  const hasAnswers = answers.age !== undefined || answers.occupation !== undefined;
+  const backView = hasAnswers ? 'results' : 'all_schemes';
 
   const handleSave = () => {
     if (isSaved) return;
@@ -57,7 +61,7 @@ export const SchemeDetailView: React.FC = () => {
       schemeName: s.name,
       schemeNameHindi: s.nameHindi,
       beneficiaryName: 'Self',
-      referenceNumber: `YS-${Math.floor(100000 + Math.random() * 900000)}`,
+      referenceNumber: '',
       appliedDate: new Date().toISOString().split('T')[0],
       status: 'to_apply',
       portalUrl: s.officialPortalUrl,
@@ -90,11 +94,15 @@ export const SchemeDetailView: React.FC = () => {
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <button
-            onClick={() => setCurrentView('results')}
-            className="inline-flex items-center gap-1.5 text-xs font-semibold text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors p-1"
+            onClick={() => setCurrentView(backView)}
+            className="inline-flex items-center gap-1.5 h-9 pl-2 pr-3.5 rounded-full glass-toolbar text-[13px] font-semibold text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
-            <span>{settings.language === 'hi' ? 'परिणामों पर वापस' : 'Back to Results'}</span>
+            <span>
+              {backView === 'results'
+                ? settings.language === 'hi' ? 'परिणामों पर वापस' : 'Back to results'
+                : settings.language === 'hi' ? 'सभी योजनाएं' : 'All schemes'}
+            </span>
           </button>
 
           <div className="flex items-center gap-2">
@@ -155,15 +163,17 @@ export const SchemeDetailView: React.FC = () => {
             <span>{isSaved ? (settings.language === 'hi' ? 'ट्रैकर में सहेजा गया' : 'Saved to Tracker') : t('saveToTracker')}</span>
           </button>
 
-          <a
-            href={s.officialPortalUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-xl bg-[var(--accent-saffron)] hover:bg-[var(--accent-saffron-hover)] text-white text-xs font-semibold transition-colors shadow-xs"
-          >
-            <span>{settings.language === 'hi' ? 'आधिकारिक पोर्टल पर जाएं' : 'View Official Portal'}</span>
-            <ExternalLink className="w-3.5 h-3.5" />
-          </a>
+          {portalHref && (
+            <a
+              href={portalHref}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-full bg-[var(--accent-saffron)] hover:bg-[var(--accent-saffron-hover)] text-white text-[13px] font-semibold"
+            >
+              <span>{settings.language === 'hi' ? 'आधिकारिक पोर्टल पर जाएं' : 'Official portal'}</span>
+              <ExternalLink className="w-3.5 h-3.5" />
+            </a>
+          )}
         </div>
       </div>
 
@@ -234,7 +244,7 @@ export const SchemeDetailView: React.FC = () => {
       </div>
 
       {/* Step by Step How to Apply */}
-      <div className="p-6 rounded-2xl border border-[var(--border-hairline)] bg-[var(--bg-surface)] space-y-5">
+      <div className="glass-card p-6 sm:p-7 rounded-3xl space-y-5">
         <h3 className="text-base font-serif font-bold text-[var(--text-primary)]">
           {t('applicationSteps')}
         </h3>
@@ -259,7 +269,7 @@ export const SchemeDetailView: React.FC = () => {
       </div>
 
       {/* Common Rejection Reasons & Safety Warnings */}
-      <div className="p-6 rounded-2xl border border-amber-200 dark:border-amber-900/60 bg-amber-50/50 dark:bg-amber-950/20 space-y-4">
+      <div className="p-6 rounded-3xl border border-[var(--warning-border)] bg-[var(--warning-bg)] backdrop-blur-xl space-y-4">
         <h3 className="text-base font-serif font-bold text-amber-900 dark:text-amber-200 flex items-center gap-2">
           <AlertTriangle className="w-5 h-5 text-amber-700" />
           <span>{t('rejectionReasons')}</span>
@@ -267,11 +277,11 @@ export const SchemeDetailView: React.FC = () => {
 
         <div className="space-y-3">
           {s.commonRejectionReasons.map((rej, i) => (
-            <div key={i} className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-amber-200/80 dark:border-amber-900/40 text-xs space-y-1.5 shadow-2xs">
-              <p className="font-bold text-slate-900 dark:text-slate-100">
+            <div key={i} className="p-4 rounded-2xl bg-[var(--warning-card-bg)] border border-[var(--warning-card-border)] text-[13px] space-y-1.5">
+              <p className="font-semibold text-[var(--text-primary)]">
                 {settings.language === 'hi' ? rej.titleHindi : rej.title}
               </p>
-              <p className="text-slate-700 dark:text-slate-300 leading-relaxed">
+              <p className="text-[var(--text-secondary)] leading-relaxed">
                 <span className="font-semibold text-emerald-800 dark:text-emerald-400">
                   {settings.language === 'hi' ? 'समाधान: ' : 'Remedy: '}
                 </span>
@@ -283,7 +293,7 @@ export const SchemeDetailView: React.FC = () => {
       </div>
 
       {/* Official Contact & Verification Strip */}
-      <div className="p-5 rounded-2xl border border-[var(--border-hairline)] bg-[var(--bg-surface)] grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
+      <div className="glass-card p-5 sm:p-6 rounded-3xl grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
         <div className="space-y-1">
           <span className="text-[11px] font-bold uppercase text-[var(--text-muted)]">
             {t('issuingAuthority')}
@@ -309,9 +319,13 @@ export const SchemeDetailView: React.FC = () => {
           </span>
           <p className="font-medium text-[var(--text-primary)] flex items-center gap-1">
             <PhoneCall className="w-3.5 h-3.5 text-emerald-700" />
-            <a href={`tel:${s.helplinePhone.split('/')[0].trim()}`} className="hover:underline font-mono">
-              {s.helplinePhone}
-            </a>
+            {helplineHref ? (
+              <a href={helplineHref} className="hover:underline font-mono">
+                {s.helplinePhone}
+              </a>
+            ) : (
+              <span className="font-mono">{s.helplinePhone}</span>
+            )}
           </p>
         </div>
       </div>

@@ -308,9 +308,15 @@ export const QuestionnaireView: React.FC = () => {
         </div>
 
         {/* Hairline Progress Bar */}
-        <div className="w-full h-2 bg-[var(--border-hairline)]/60 rounded-full overflow-hidden p-0.5">
+        <div
+          className="w-full h-2 bg-[var(--bg-subtle)] rounded-full overflow-hidden"
+          role="progressbar"
+          aria-valuemin={1}
+          aria-valuemax={totalSteps}
+          aria-valuenow={currentStepIndex + 1}
+        >
           <div
-            className="h-full bg-gradient-to-r from-amber-500 via-[var(--accent-saffron)] to-emerald-600 transition-all duration-300 rounded-full shadow-xs"
+            className="h-full bg-gradient-to-r from-orange-400 via-rose-500 to-violet-500 transition-all duration-500 rounded-full"
             style={{ width: `${((currentStepIndex + 1) / totalSteps) * 100}%` }}
           />
         </div>
@@ -351,12 +357,14 @@ export const QuestionnaireView: React.FC = () => {
               </label>
               <input
                 type="number"
+                inputMode="numeric"
                 min="1"
-                max="110"
+                max="115"
                 value={answers.age ?? ''}
                 onChange={(e) => {
                   setValidationError(null);
-                  setAnswers({ ...answers, age: parseInt(e.target.value) || undefined });
+                  const n = parseInt(e.target.value, 10);
+                  setAnswers({ ...answers, age: Number.isFinite(n) && n > 0 ? Math.min(n, 115) : undefined });
                 }}
                 placeholder="e.g. 38"
                 className="w-full text-2xl font-semibold px-4 py-3 rounded-xl border border-[var(--border-hairline)] bg-[var(--bg-subtle)] focus:border-[var(--accent-saffron)] focus:outline-none transition-colors"
@@ -557,6 +565,8 @@ export const QuestionnaireView: React.FC = () => {
               { id: 'small_business_owner', label: settings.language === 'hi' ? 'छोटा व्यापारी / दुकानदार / MSME' : 'Small Business / Shop Owner', icon: Briefcase },
               { id: 'student', label: settings.language === 'hi' ? 'विद्यार्थी / छात्र (अध्ययनरत)' : 'Student (Higher Studies)', icon: GraduationCap },
               { id: 'homemaker', label: settings.language === 'hi' ? 'गृहिणी (घरेलू महिला)' : 'Homemaker', icon: Home },
+              { id: 'salaried_private', label: settings.language === 'hi' ? 'निजी नौकरी (वेतनभोगी)' : 'Salaried (Private Job)', icon: Briefcase },
+              { id: 'government_employee', label: settings.language === 'hi' ? 'सरकारी कर्मचारी' : 'Government Employee', icon: Briefcase },
               { id: 'unemployed', label: settings.language === 'hi' ? 'बेरोजगार / काम की तलाश में' : 'Unemployed / Jobseeker', icon: User },
               { id: 'retired', label: settings.language === 'hi' ? 'सेवानिवृत्त / बुजुर्ग' : 'Retired / Senior', icon: Sun }
             ].map((item) => (
@@ -854,14 +864,14 @@ export const QuestionnaireView: React.FC = () => {
       <div className="glass-toolbar p-3 sm:p-4 rounded-2xl sm:rounded-3xl shadow-md sticky bottom-22 md:bottom-6 z-20 flex items-center justify-between gap-4">
         <button
           onClick={handleBack}
-          className="px-5 py-2.5 rounded-xl border border-[var(--border-hairline)] bg-[var(--bg-surface)] hover:bg-[var(--bg-subtle)] text-xs font-semibold text-[var(--text-secondary)] transition-colors"
+          className="h-11 px-5 rounded-full bg-[var(--bg-subtle)] hover:bg-[var(--bg-surface)] text-sm font-semibold text-[var(--text-secondary)] transition-colors"
         >
           {t('back')}
         </button>
 
         <button
           onClick={handleNext}
-          className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-[var(--accent-saffron)] hover:bg-[var(--accent-saffron-hover)] text-white text-xs font-semibold transition-colors shadow-sm"
+          className="inline-flex items-center gap-2 h-11 px-6 rounded-full bg-[var(--accent-saffron)] hover:bg-[var(--accent-saffron-hover)] text-white text-sm font-semibold"
         >
           <span>{currentStepIndex === totalSteps - 1 ? t('viewResults') : t('continue')}</span>
           <ArrowRight className="w-3.5 h-3.5" />

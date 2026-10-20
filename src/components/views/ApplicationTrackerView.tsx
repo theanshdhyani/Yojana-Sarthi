@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useApp } from '../../context/AppContext';
+import { safeExternalUrl } from '../../utils/safeUrl';
 import { 
   CheckCircle2, 
   Clock, 
@@ -34,6 +35,13 @@ export const ApplicationTrackerView: React.FC = () => {
   const [refNumber, setRefNumber] = useState('');
   const [notes, setNotes] = useState('');
 
+  useEffect(() => {
+    if (!isAddModalOpen) return;
+    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && setIsAddModalOpen(false);
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, [isAddModalOpen]);
+
   const statusCounts = {
     all: applications.length,
     to_apply: applications.filter((a) => a.status === 'to_apply').length,
@@ -55,8 +63,9 @@ export const ApplicationTrackerView: React.FC = () => {
       schemeId: scheme.id,
       schemeName: scheme.name,
       schemeNameHindi: scheme.nameHindi,
-      beneficiaryName: beneficiaryName || 'Self',
-      referenceNumber: refNumber || `YS-${Math.floor(100000 + Math.random() * 900000)}`,
+      beneficiaryName: beneficiaryName.trim() || 'Self',
+      // Never invent a reference number: a citizen could mistake it for an official acknowledgment.
+      referenceNumber: refNumber.trim(),
       appliedDate: new Date().toISOString().split('T')[0],
       status: 'to_apply',
       portalUrl: scheme.officialPortalUrl,
@@ -172,7 +181,14 @@ export const ApplicationTrackerView: React.FC = () => {
                     <div className="flex flex-wrap items-center gap-2 text-xs text-[var(--text-secondary)]">
                       <span>Beneficiary: <strong className="text-[var(--text-primary)]">{app.beneficiaryName}</strong></span>
                       <span>·</span>
-                      <span>Ref No: <span className="font-mono">{app.referenceNumber}</span></span>
+                      <span>
+                        Ref No:{' '}
+                        {app.referenceNumber ? (
+                          <span className="font-mono">{app.referenceNumber}</span>
+                        ) : (
+                          <span className="italic text-[var(--text-muted)]">{settings.language === 'hi' ? 'अभी नहीं मिला' : 'not yet received'}</span>
+                        )}
+                      </span>
                       <span>·</span>
                       <span>Date: <span className="tabular-nums">{app.appliedDate}</span></span>
                     </div>
@@ -222,9 +238,9 @@ export const ApplicationTrackerView: React.FC = () => {
                 {app.notes && (
                   <div className="p-3 rounded-xl bg-[var(--bg-subtle)] text-xs text-[var(--text-secondary)] flex items-start justify-between gap-2">
                     <p className="leading-relaxed">{app.notes}</p>
-                    {app.portalUrl && (
+                    {safeExternalUrl(app.portalUrl) && (
                       <a
-                        href={app.portalUrl}
+                        href={safeExternalUrl(app.portalUrl)}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="font-semibold text-[var(--accent-saffron)] hover:underline inline-flex items-center gap-1 shrink-0 ml-2"
@@ -275,9 +291,12 @@ export const ApplicationTrackerView: React.FC = () => {
 
       {/* Add Application Modal */}
       {isAddModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 glass-scrim no-print">
-          <div className="w-full max-w-lg glass-modal rounded-3xl p-6 sm:p-7 shadow-2xl space-y-5">
-            <h3 className="text-lg font-serif font-bold text-[var(--text-primary)]">
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 glass-scrim no-print"
+          onClick={(e) => e.target === e.currentTarget && setIsAddModalOpen(false)}
+        >
+          <div role="dialog" aria-modal="true" aria-labelledby="add-app-heading" className="w-full max-w-lg glass-modal rounded-3xl p-6 sm:p-7 space-y-5">
+            <h3 id="add-app-heading" className="text-lg font-serif font-bold text-[var(--text-primary)]">
               {t('newApplication')}
             </h3>
 
@@ -305,6 +324,7 @@ export const ApplicationTrackerView: React.FC = () => {
                 </label>
                 <input
                   type="text"
+                  maxLength={100}
                   value={beneficiaryName}
                   onChange={(e) => setBeneficiaryName(e.target.value)}
                   placeholder="e.g. Rameshwar Lal"
@@ -318,6 +338,7 @@ export const ApplicationTrackerView: React.FC = () => {
                 </label>
                 <input
                   type="text"
+                  maxLength={64}
                   value={refNumber}
                   onChange={(e) => setRefNumber(e.target.value)}
                   placeholder="e.g. UP/2026/099182"
@@ -331,6 +352,7 @@ export const ApplicationTrackerView: React.FC = () => {
                 </label>
                 <textarea
                   value={notes}
+                  maxLength={500}
                   onChange={(e) => setNotes(e.target.value)}
                   rows={2}
                   placeholder="e.g. Lekhpal verification scheduled for Friday."

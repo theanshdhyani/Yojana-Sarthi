@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, useMemo, ReactNode } from 'react';
 import { QuestionnaireAnswers } from '../types/questionnaire';
 import { Scheme, EvaluatedScheme } from '../types/scheme';
 import { TrackedApplication } from '../types/tracker';
@@ -153,6 +153,9 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       root.classList.remove('high-contrast');
     }
 
+    root.classList.toggle('reduce-motion', settings.reducedMotion);
+    root.lang = settings.language === 'hi' ? 'hi' : 'en';
+
     if (settings.fontSize === 'large') {
       root.style.fontSize = '18px';
     } else if (settings.fontSize === 'extra-large') {
@@ -160,22 +163,16 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     } else {
       root.style.fontSize = '16px';
     }
+
+    document
+      .querySelector('meta[name="theme-color"]')
+      ?.setAttribute('content', settings.theme === 'dark' ? '#0B0D12' : '#F4F1EC');
   }, [settings]);
 
   const updateSettings = (partial: Partial<UserPreferences>) => {
     const updated = { ...settings, ...partial };
     setSettingsState(updated);
     StorageService.saveSettings(updated);
-  };
-
-  const DEFAULT_PREFERENCES: UserPreferences = {
-    language: 'en',
-    simpleLanguageMode: false,
-    fontSize: 'normal',
-    highContrast: false,
-    reducedMotion: false,
-    theme: 'light',
-    voiceSpeed: 1.0
   };
 
   const setIsDemoData = (isDemo: boolean) => {
@@ -279,9 +276,12 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
 
   const readAloud = (text: string) => {
     setIsSpeaking(true);
-    SpeechService.speak(text, settings.language === 'hi' ? 'hi' : 'en', () => {
-      setIsSpeaking(false);
-    });
+    SpeechService.speak(
+      text,
+      settings.language === 'hi' ? 'hi' : 'en',
+      () => setIsSpeaking(false),
+      settings.voiceSpeed
+    );
   };
 
   const stopReading = () => {
@@ -299,7 +299,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     setReadyDocumentIds([]);
     setApplications([]);
     setFamilyMembers([]);
-    setSettingsState(DEFAULT_PREFERENCES);
+    setSettingsState(StorageService.defaultSettings());
     addToast(t('clearDataSuccess'), 'success');
   };
 
@@ -360,7 +360,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     return (dict as any)[key] || TRANSLATIONS.en[key] || String(key);
   };
 
-  const evaluatedResults = evaluateAllSchemes(answers, readyDocumentIds);
+  const evaluatedResults = useMemo(() => evaluateAllSchemes(answers, readyDocumentIds), [answers, readyDocumentIds]);
 
   const selectedScheme = selectedSchemeId
     ? SCHEMES_DATABASE.find((s) => s.id === selectedSchemeId) || null

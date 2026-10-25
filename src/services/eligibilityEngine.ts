@@ -1,6 +1,8 @@
 import { Scheme, EvaluatedScheme, MatchStatus } from '../types/scheme';
 import { QuestionnaireAnswers } from '../types/questionnaire';
 import { SCHEMES_DATABASE } from '../data/schemesData';
+import { en, MessageKey } from '../i18n/messages/en';
+import { Msg, msg, formatMsg } from '../i18n/format';
 
 /**
  * Rule-based eligibility engine.
@@ -15,6 +17,8 @@ import { SCHEMES_DATABASE } from '../data/schemesData';
  *   strong_match    → every rule is met
  *   possible_match  → nothing fails, but something must be checked at the office
  *   review_required → at least one rule definitely fails (likely not eligible)
+ *
+ * Reasons are returned as translatable messages (`Msg`), so the UI can show them in any language.
  */
 
 // Inclusive income range (₹/year) covered by each questionnaire bracket.
@@ -41,51 +45,55 @@ const FLAG_IMPLIES: Record<string, { gender?: 'female'; minAge?: number; maxAge?
   pregnant_lactating: { gender: 'female' }
 };
 
-const FLAG_LABELS: Record<string, { en: string; hi: string }> = {
-  disability: { en: 'person with disability', hi: 'दिव्यांग सदस्य' },
-  widow: { en: 'widowed woman', hi: 'विधवा महिला' },
-  girl_child_under_10: { en: 'daughter under 10 years', hi: '10 वर्ष से कम आयु की बेटी' },
-  pregnant_lactating: { en: 'pregnant or lactating mother', hi: 'गर्भवती/धात्री माता' },
-  senior_citizen: { en: 'senior citizen (60+)', hi: 'वरिष्ठ नागरिक (60+)' },
-  artisan: { en: 'traditional artisan', hi: 'पारंपरिक कारीगर' },
-  has_unshaded_rooftop: { en: 'unshaded rooftop', hi: 'धूप वाली छत' }
+const FLAG_KEYS: Record<string, MessageKey> = {
+  disability: 'fDisability',
+  widow: 'fWidow',
+  girl_child_under_10: 'fGirlChildUnder10',
+  pregnant_lactating: 'fPregnantLactating',
+  senior_citizen: 'fSeniorCitizen',
+  artisan: 'fArtisan',
+  artisan_craftsperson: 'fArtisan',
+  has_unshaded_rooftop: 'fHasUnshadedRooftop'
 };
 
-const OCCUPATION_LABELS_HI: Record<string, string> = {
-  farmer: 'किसान',
-  agricultural_labour: 'खेतिहर मजदूर',
-  artisan_craftsperson: 'कारीगर',
-  street_vendor: 'स्ट्रीट वेंडर',
-  daily_wage_worker: 'दिहाड़ी मजदूर',
-  small_business_owner: 'छोटा व्यापारी',
-  student: 'विद्यार्थी',
-  homemaker: 'गृहिणी',
-  salaried_private: 'निजी नौकरी',
-  government_employee: 'सरकारी कर्मचारी',
-  unemployed: 'बेरोजगार',
-  retired: 'सेवानिवृत्त'
+export const OCCUPATION_KEYS: Record<string, MessageKey> = {
+  farmer: 'oFarmer',
+  agricultural_labour: 'oAgriculturalLabour',
+  artisan_craftsperson: 'oArtisanCraftsperson',
+  street_vendor: 'oStreetVendor',
+  daily_wage_worker: 'oDailyWageWorker',
+  small_business_owner: 'oSmallBusinessOwner',
+  student: 'oStudent',
+  homemaker: 'oHomemaker',
+  salaried_private: 'oSalariedPrivate',
+  government_employee: 'oGovernmentEmployee',
+  unemployed: 'oUnemployed',
+  retired: 'oRetired'
 };
 
-const lakh = (n: number) => `₹${(n / 100000).toFixed(n % 100000 === 0 ? 0 : 1)} Lakh`;
-const lakhHi = (n: number) => `₹${(n / 100000).toFixed(n % 100000 === 0 ? 0 : 1)} लाख`;
-const occEn = (o: string) => o.replace(/_/g, ' ');
-const occHi = (o: string) => OCCUPATION_LABELS_HI[o] ?? occEn(o);
-const flagEn = (f: string) => FLAG_LABELS[f]?.en ?? f.replace(/_/g, ' ');
-const flagHi = (f: string) => FLAG_LABELS[f]?.hi ?? f.replace(/_/g, ' ');
-const ageRangeEn = (min?: number, max?: number) =>
-  min !== undefined && max !== undefined ? `${min}–${max} years` : min !== undefined ? `${min}+ years` : `up to ${max} years`;
-const ageRangeHi = (min?: number, max?: number) =>
-  min !== undefined && max !== undefined ? `${min}–${max} वर्ष` : min !== undefined ? `${min}+ वर्ष` : `${max} वर्ष तक`;
+const WHO_KEYS: Record<string, MessageKey> = { female: 'eWhoFemale', male: 'eWhoMale', transgender: 'eWhoTransgender' };
 
-const hasFlag = (answers: QuestionnaireAnswers, flag: string): boolean => {
+const occ = (o: string): Msg | string => (OCCUPATION_KEYS[o] ? msg(OCCUPATION_KEYS[o]) : o.replace(/_/g, ' '));
+const flag = (f: string): Msg | string => (FLAG_KEYS[f] ? msg(FLAG_KEYS[f]) : f.replace(/_/g, ' '));
+const lakh = (n: number) => msg('eLakh', { n: (n / 100000).toFixed(n % 100000 === 0 ? 0 : 1) });
+const ageRange = (min?: number, max?: number): Msg =>
+  min !== undefined && max !== undefined
+    ? msg('eAgeRange', { min, max })
+    : min !== undefined
+      ? msg('eAgeMin', { min })
+      : msg('eAgeMax', { max: max ?? 0 });
+
+const hasFlag = (answers: QuestionnaireAnswers, f: string): boolean => {
   const userFlags = answers.specialAttributes || [];
-  if (userFlags.includes(flag)) return true;
-  if (flag === 'artisan' || flag === 'artisan_craftsperson') {
+  if (userFlags.includes(f)) return true;
+  if (f === 'artisan' || f === 'artisan_craftsperson') {
     return userFlags.includes('artisan') || userFlags.includes('artisan_craftsperson') || answers.occupation === 'artisan_craftsperson';
   }
-  if (flag === 'senior_citizen') return answers.age !== undefined && answers.age >= 60;
+  if (f === 'senior_citizen') return answers.age !== undefined && answers.age >= 60;
   return false;
 };
+
+const english = (list: Msg[]) => list.map((m) => formatMsg(en, m));
 
 export function evaluateSchemeEligibility(
   scheme: Scheme,
@@ -93,52 +101,52 @@ export function evaluateSchemeEligibility(
   readyDocumentIds: string[] = []
 ): EvaluatedScheme {
   const rules = scheme.rules;
-  const matched: string[] = [];
-  const matchedHi: string[] = [];
-  const unmet: string[] = [];
-  const unmetHi: string[] = [];
-  const verify: string[] = [];
-  const verifyHi: string[] = [];
+  const matched: Msg[] = [];
+  const unmet: Msg[] = [];
+  const verify: Msg[] = [];
 
   let total = 0;
   let passed = 0;
 
-  const met = (en: string, hi: string) => {
+  const met = (m: Msg) => {
     total++;
     passed++;
-    matched.push(en);
-    matchedHi.push(hi);
+    matched.push(m);
   };
-  const fail = (en: string, hi: string) => {
+  const fail = (m: Msg) => {
     total++;
-    unmet.push(en);
-    unmetHi.push(hi);
+    unmet.push(m);
   };
-  const check = (en: string, hi: string, credit = 0.5) => {
+  const check = (m: Msg, credit = 0.5) => {
     total++;
     passed += credit;
-    verify.push(en);
-    verifyHi.push(hi);
+    verify.push(m);
   };
 
   const missingDocuments = scheme.requiredDocuments
     .filter((d) => d.isMandatory && !readyDocumentIds.includes(d.id))
     .map((d) => d.name);
 
-  // 0. Universal age-based coverage overrides every other rule (e.g. PM-JAY for all 70+).
-  if (rules.universalFromAge !== undefined && answers.age !== undefined && answers.age >= rules.universalFromAge) {
+  const result = (status: MatchStatus, matchScore: number): EvaluatedScheme => {
+    const shownMatched = matched.length > 0 ? matched : [msg('eOpenToAll')];
     return {
       scheme,
-      status: 'strong_match',
-      matchScore: 100,
-      matchedReasons: [`All citizens aged ${rules.universalFromAge}+ are covered regardless of income (you entered ${answers.age})`],
-      matchedReasonsHindi: [`${rules.universalFromAge}+ आयु के सभी नागरिक आय की परवाह किए बिना पात्र हैं (आपकी आयु ${answers.age})`],
-      unmetCriteria: [],
-      unmetCriteriaHindi: [],
-      toVerify: [],
-      toVerifyHindi: [],
+      status,
+      matchScore,
+      matched: shownMatched,
+      unmet,
+      verify,
+      matchedReasons: english(shownMatched),
+      unmetCriteria: english(unmet),
+      toVerify: english(verify),
       missingDocuments
     };
+  };
+
+  // 0. Universal age-based coverage overrides every other rule (e.g. PM-JAY for all 70+).
+  if (rules.universalFromAge !== undefined && answers.age !== undefined && answers.age >= rules.universalFromAge) {
+    matched.push(msg('eUniversalAge', { minAge: rules.universalFromAge, age: answers.age }));
+    return result('strong_match', 100);
   }
 
   // A benefit meant for a household member (daughter, widow, elder, mother) applies when the
@@ -148,173 +156,117 @@ export function evaluateSchemeEligibility(
       ? rules.specialFlags.find((f) => (answers.specialAttributes || []).includes(f))
       : undefined;
   const implied = memberFlag ? FLAG_IMPLIES[memberFlag] ?? {} : undefined;
+  const member = memberFlag ? flag(memberFlag) : '';
 
   // 1. Age
   if (rules.minAge !== undefined || rules.maxAge !== undefined) {
-    const range = ageRangeEn(rules.minAge, rules.maxAge);
-    const rangeHi = ageRangeHi(rules.minAge, rules.maxAge);
+    const range = ageRange(rules.minAge, rules.maxAge);
     if (implied) {
       const minOk = rules.minAge === undefined || (implied.minAge !== undefined && implied.minAge >= rules.minAge);
       const maxOk = rules.maxAge === undefined || (implied.maxAge !== undefined && implied.maxAge <= rules.maxAge);
-      if (minOk && maxOk) {
-        met(`The ${flagEn(memberFlag!)} in your household meets the age rule (${range})`, `आपके परिवार की ${flagHi(memberFlag!)} आयु शर्त (${rangeHi}) पूरी करती हैं`);
-      } else {
-        check(`The ${flagEn(memberFlag!)} must be aged ${range}`, `${flagHi(memberFlag!)} की आयु ${rangeHi} होनी चाहिए`);
-      }
+      if (minOk && maxOk) met(msg('eMemberAgeMet', { member, range }));
+      else check(msg('eMemberAgeCheck', { member, range }));
     } else if (answers.age === undefined) {
-      check(`Age not provided (scheme needs ${range})`, `आयु दर्ज नहीं (योजना हेतु ${rangeHi})`, 0);
+      check(msg('eAgeMissing', { range }), 0);
     } else if ((rules.minAge === undefined || answers.age >= rules.minAge) && (rules.maxAge === undefined || answers.age <= rules.maxAge)) {
-      met(`Age ${answers.age} is within the required range (${range})`, `आयु ${answers.age} वर्ष निर्धारित सीमा (${rangeHi}) में है`);
+      met(msg('eAgeMet', { age: answers.age, range }));
     } else {
-      fail(`Requires age ${range} (you entered ${answers.age})`, `आयु ${rangeHi} होनी चाहिए (आपने ${answers.age} दर्ज की)`);
+      fail(msg('eAgeFail', { range, age: answers.age }));
     }
   }
 
   // 2. Gender
   if (rules.gender && rules.gender !== 'all') {
-    const who = rules.gender === 'female' ? 'women' : rules.gender;
-    const whoHi = rules.gender === 'female' ? 'महिलाओं' : rules.gender === 'male' ? 'पुरुषों' : 'ट्रांसजेंडर व्यक्तियों';
-    if (implied && implied.gender === rules.gender) {
-      met(`Benefit goes to the ${flagEn(memberFlag!)} in your household`, `लाभ आपके परिवार की ${flagHi(memberFlag!)} को मिलेगा`);
-    } else if (implied) {
-      check(`Beneficiary must be from: ${who}`, `लाभार्थी ${whoHi} में से होना चाहिए`);
-    } else if (answers.gender === undefined) {
-      check(`Gender not provided (scheme is for ${who})`, `लिंग दर्ज नहीं (योजना ${whoHi} हेतु)`, 0);
-    } else if (answers.gender === rules.gender) {
-      met(`Scheme is specifically for ${who}`, `योजना विशेष रूप से ${whoHi} के लिए है`);
-    } else {
-      fail(`Scheme is only for ${who}`, `यह योजना केवल ${whoHi} के लिए है`);
-    }
+    const who = msg(WHO_KEYS[rules.gender]);
+    if (implied && implied.gender === rules.gender) met(msg('eMemberGenderMet', { member }));
+    else if (implied) check(msg('eMemberGenderCheck', { who }));
+    else if (answers.gender === undefined) check(msg('eGenderMissing', { who }), 0);
+    else if (answers.gender === rules.gender) met(msg('eGenderMet', { who }));
+    else fail(msg('eGenderFail', { who }));
   }
 
   // 3. Occupation (required list)
   if (rules.occupations && rules.occupations.length > 0) {
-    const list = rules.occupations.map(occEn).join(', ');
-    const listHi = rules.occupations.map(occHi).join(', ');
-    if (!answers.occupation) {
-      check(`Occupation not provided (scheme is for: ${list})`, `व्यवसाय दर्ज नहीं (योजना: ${listHi})`, 0);
-    } else if (rules.occupations.includes(answers.occupation)) {
-      met(`Your occupation (${occEn(answers.occupation)}) is covered`, `आपका व्यवसाय (${occHi(answers.occupation)}) योजना में शामिल है`);
-    } else {
-      fail(`Scheme is for: ${list}`, `यह योजना इनके लिए है: ${listHi}`);
-    }
+    const list = rules.occupations.map(occ);
+    if (!answers.occupation) check(msg('eOccMissing', { list: asList(list) }), 0);
+    else if (rules.occupations.includes(answers.occupation)) met(msg('eOccMet', { occ: occ(answers.occupation) }));
+    else fail(msg('eOccFail', { list: asList(list) }));
   }
 
   // 4. Occupation (exclusions)
   if (rules.excludedOccupations && answers.occupation && rules.excludedOccupations.includes(answers.occupation)) {
-    fail(`${occEn(answers.occupation)} households are excluded from this scheme`, `${occHi(answers.occupation)} परिवार इस योजना से बाहर हैं`);
+    fail(msg('eOccExcluded', { occ: occ(answers.occupation) }));
   }
 
   // 5. Income — compare the whole bracket, not one point inside it.
   if (rules.maxAnnualIncome !== undefined) {
-    const limit = rules.maxAnnualIncome;
+    const limit = lakh(rules.maxAnnualIncome);
     if (!answers.annualIncomeBracket) {
-      check(`Income not provided (limit ${lakh(limit)}/yr)`, `आय दर्ज नहीं (सीमा ${lakhHi(limit)}/वर्ष)`, 0);
+      check(msg('eIncomeMissing', { limit }), 0);
     } else {
       const [min, max] = INCOME_RANGES[answers.annualIncomeBracket];
-      if (max <= limit) {
-        met(`Household income is within the ${lakh(limit)}/yr limit`, `पारिवारिक आय ${lakhHi(limit)}/वर्ष की सीमा के भीतर है`);
-      } else if (min >= limit) {
-        fail(`Household income is above the ${lakh(limit)}/yr limit`, `पारिवारिक आय ${lakhHi(limit)}/वर्ष की सीमा से अधिक है`);
-      } else {
-        check(
-          `Eligible only if household income is ${lakh(limit)}/yr or less — your bracket spans this limit`,
-          `केवल तभी पात्र जब पारिवारिक आय ${lakhHi(limit)}/वर्ष या कम हो — आपका आय वर्ग इस सीमा के आर-पार है`
-        );
-      }
+      if (max <= rules.maxAnnualIncome) met(msg('eIncomeMet', { limit }));
+      else if (min >= rules.maxAnnualIncome) fail(msg('eIncomeFail', { limit }));
+      else check(msg('eIncomeCheck', { limit }));
     }
   }
 
   // 6. Landholding
   if (rules.requiresLandholding) {
-    if (!answers.landholding) {
-      check('Landholding not provided', 'भूमि विवरण दर्ज नहीं', 0);
-    } else if (answers.landholding === 'none') {
-      fail('Requires cultivable land in the applicant’s or family’s name', 'आवेदक या परिवार के नाम कृषि भूमि होना आवश्यक है');
-    } else if (rules.maxLandholdingHectares !== undefined && LANDHOLDING_MAX_HECTARES[answers.landholding] > rules.maxLandholdingHectares) {
-      fail(`Landholding exceeds the ${rules.maxLandholdingHectares} ha ceiling`, `भूमि ${rules.maxLandholdingHectares} हेक्टेयर की सीमा से अधिक है`);
-    } else {
-      met('Family holds cultivable agricultural land', 'परिवार के पास कृषि योग्य भूमि है');
-    }
+    if (!answers.landholding) check(msg('eLandMissing'), 0);
+    else if (answers.landholding === 'none') fail(msg('eLandNone'));
+    else if (rules.maxLandholdingHectares !== undefined && LANDHOLDING_MAX_HECTARES[answers.landholding] > rules.maxLandholdingHectares)
+      fail(msg('eLandCeiling', { ha: rules.maxLandholdingHectares }));
+    else met(msg('eLandMet'));
   }
 
   // 7. Social category
   if (rules.categories && rules.categories.length > 0) {
     const list = rules.categories.join(', ');
-    if (!answers.socialCategory) {
-      check(`Category not provided (scheme is for ${list})`, `वर्ग दर्ज नहीं (योजना ${list} हेतु)`, 0);
-    } else if (rules.categories.includes(answers.socialCategory)) {
-      met(`Category ${answers.socialCategory} is eligible`, `${answers.socialCategory} वर्ग पात्र है`);
-    } else {
-      fail(`Only for categories: ${list}`, `केवल ${list} वर्ग के लिए`);
-    }
+    if (!answers.socialCategory) check(msg('eCatMissing', { list }), 0);
+    else if (rules.categories.includes(answers.socialCategory)) met(msg('eCatMet', { cat: answers.socialCategory }));
+    else fail(msg('eCatFail', { list }));
   }
 
   // 8. Rural / urban
   if (rules.residence && rules.residence !== 'both') {
-    const areaEn = rules.residence === 'rural' ? 'rural (village)' : 'urban (town/city)';
-    const areaHi = rules.residence === 'rural' ? 'ग्रामीण' : 'शहरी';
-    if (!answers.residenceArea) {
-      check(`Area not provided (scheme is for ${areaEn} areas)`, `क्षेत्र दर्ज नहीं (योजना ${areaHi} क्षेत्रों हेतु)`, 0);
-    } else if (answers.residenceArea === rules.residence) {
-      met(`You live in a ${areaEn} area`, `आप ${areaHi} क्षेत्र में रहते हैं`);
-    } else {
-      fail(`Only for ${areaEn} areas`, `केवल ${areaHi} क्षेत्रों के लिए`);
-    }
+    const area = msg(rules.residence === 'rural' ? 'eAreaRural' : 'eAreaUrban');
+    if (!answers.residenceArea) check(msg('eAreaMissing', { area }), 0);
+    else if (answers.residenceArea === rules.residence) met(msg('eAreaMet', { area }));
+    else fail(msg('eAreaFail', { area }));
   }
 
   // 9. BPL / priority household
   if (rules.requiresBPL) {
     const card = answers.hasRationCard;
     const lowIncome = answers.annualIncomeBracket === 'below_1lakh' || answers.annualIncomeBracket === '1lakh_to_2.5lakh';
-    if (card === 'bpl' || card === 'aay_antyodaya') {
-      met('BPL / Antyodaya ration card confirms priority status', 'बीपीएल / अंत्योदय राशन कार्ड से प्राथमिकता पुष्ट');
-    } else if (lowIncome || card === undefined) {
-      check(
-        'Needs BPL / priority-household status — confirm your name in the official beneficiary list',
-        'बीपीएल / प्राथमिकता परिवार होना आवश्यक — आधिकारिक लाभार्थी सूची में नाम की पुष्टि करें'
-      );
-    } else {
-      fail('Restricted to BPL / Antyodaya households', 'केवल बीपीएल / अंत्योदय परिवारों के लिए');
-    }
+    if (card === 'bpl' || card === 'aay_antyodaya') met(msg('eBplMet'));
+    else if (lowIncome || card === undefined) check(msg('eBplCheck'));
+    else fail(msg('eBplFail'));
   }
 
   // 10. Special conditions
-  for (const flag of rules.specialFlags || []) {
-    if (hasFlag(answers, flag)) {
-      met(`Condition met: ${flagEn(flag)}`, `शर्त पूरी: ${flagHi(flag)}`);
-    } else {
-      fail(`Requires: ${flagEn(flag)}`, `आवश्यक: ${flagHi(flag)}`);
-    }
+  for (const f of rules.specialFlags || []) {
+    if (hasFlag(answers, f)) met(msg('eFlagMet', { flag: flag(f) }));
+    else fail(msg('eFlagFail', { flag: flag(f) }));
   }
 
   // 11. State-specific schemes
   if (rules.statesSupported && rules.statesSupported.length > 0) {
     const list = rules.statesSupported.join(', ');
-    if (!answers.state) {
-      check(`State not provided (scheme runs in ${list})`, `राज्य दर्ज नहीं (योजना: ${list})`, 0);
-    } else if (rules.statesSupported.some((s) => s.toLowerCase() === answers.state!.toLowerCase())) {
-      met(`Available in ${answers.state}`, `${answers.state} में उपलब्ध`);
-    } else {
-      fail(`Only available in: ${list}`, `केवल इन राज्यों में: ${list}`);
-    }
+    if (!answers.state) check(msg('eStateMissing', { list }), 0);
+    else if (rules.statesSupported.some((s) => s.toLowerCase() === answers.state!.toLowerCase())) met(msg('eStateMet', { state: answers.state }));
+    else fail(msg('eStateFail', { list }));
   }
 
   const matchScore = total > 0 ? Math.round((passed / total) * 100) : 100;
   const status: MatchStatus = unmet.length > 0 ? 'review_required' : verify.length > 0 ? 'possible_match' : 'strong_match';
+  return result(status, matchScore);
+}
 
-  return {
-    scheme,
-    status,
-    matchScore,
-    matchedReasons: matched.length > 0 ? matched : ['Open to all citizens — no specific criteria'],
-    matchedReasonsHindi: matchedHi.length > 0 ? matchedHi : ['सभी नागरिकों के लिए खुली — कोई विशेष शर्त नहीं'],
-    unmetCriteria: unmet,
-    unmetCriteriaHindi: unmetHi,
-    toVerify: verify,
-    toVerifyHindi: verifyHi,
-    missingDocuments
-  };
+/** A list of labels joined with the language's separator. */
+function asList(items: (Msg | string)[]): Msg[] | string {
+  return items.every((i) => typeof i !== 'string') ? (items as Msg[]) : items.map((i) => (typeof i === 'string' ? i : formatMsg(en, i))).join(', ');
 }
 
 export interface EvaluationSummary {

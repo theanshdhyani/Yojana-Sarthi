@@ -4,6 +4,7 @@ import { AppHeader } from './components/common/AppHeader';
 import { AppFooter } from './components/common/AppFooter';
 import { MobileGlassDock } from './components/common/MobileGlassDock';
 import { ToastContainer } from './components/common/ToastContainer';
+import { LanguageSheet, TranslationNotice } from './components/common/LanguagePicker';
 import { SettingsModal } from './components/views/SettingsModal';
 import { OnboardingModal } from './components/views/OnboardingModal';
 
@@ -20,7 +21,7 @@ import { NearbyHelpView } from './components/views/NearbyHelpView';
 import { PrintSlipView } from './components/views/PrintSlipView';
 
 const MainContent: React.FC = () => {
-  const { currentView, settings } = useApp();
+  const { currentView, settings, t } = useApp();
 
   return (
     <>
@@ -30,11 +31,12 @@ const MainContent: React.FC = () => {
         href="#main"
         className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-[60] focus:px-4 focus:py-2 focus:rounded-xl glass-modal text-sm font-semibold"
       >
-        {settings.language === 'hi' ? 'मुख्य सामग्री पर जाएं' : 'Skip to main content'}
+        {t('skipToMainContent')}
       </a>
 
       <div className="min-h-screen flex flex-col justify-between">
         <AppHeader />
+        <TranslationNotice />
 
         <main id="main" key={currentView} className="flex-1 pb-28 md:pb-0 view-enter">
           {currentView === 'home' && <HomeView />}
@@ -54,6 +56,7 @@ const MainContent: React.FC = () => {
         <MobileGlassDock />
 
         <SettingsModal />
+        <LanguageSheet />
         <OnboardingModal />
         <ToastContainer />
       </div>

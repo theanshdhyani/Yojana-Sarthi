@@ -29,10 +29,10 @@ export const ResultsView: React.FC = () => {
     openFindSchemes,
     answers,
     isDemoData,
-    settings,
-    t
+    t,
+    tm,
+    L
   } = useApp();
-  const hi = settings.language === 'hi';
 
   const [activeTab, setActiveTab] = useState<Tab>('eligible');
 
@@ -60,36 +60,36 @@ export const ResultsView: React.FC = () => {
       schemeId: item.scheme.id,
       schemeName: item.scheme.name,
       schemeNameHindi: item.scheme.nameHindi,
-      beneficiaryName: hi ? 'स्वयं' : 'Self',
+      beneficiaryName: t('self'),
       referenceNumber: '',
       appliedDate: today,
       status: 'to_apply',
       portalUrl: item.scheme.officialPortalUrl,
-      notes: hi ? 'अगला कदम: आवश्यक दस्तावेज़ तैयार करें।' : 'Next step: get the required documents ready.',
-      timeline: [{ date: today, title: hi ? 'योजना सारथी पर पहचानी गई' : 'Identified on Yojana Sarthi', description: hi ? 'तैयारी ट्रैकर में जोड़ी गई' : 'Added to preparation tracker' }]
+      notes: t('nextStepGetTheRequired'),
+      timeline: [{ date: today, title: t('identifiedOnYojanaSarthi'), description: t('addedToPreparationTracker') }]
     });
   };
 
   const statusMeta: Record<MatchStatus, { label: string; chip: string; icon: React.ReactNode }> = {
     strong_match: {
-      label: hi ? 'पात्र' : 'Strong match',
+      label: t('strongMatch'),
       chip: 'bg-[var(--accent-green-light)] text-[var(--accent-green-text)]',
       icon: <CheckCircle2 className="w-3.5 h-3.5" />
     },
     possible_match: {
-      label: hi ? 'जांच आवश्यक' : 'Verify',
+      label: t('verify2'),
       chip: 'bg-amber-500/15 text-amber-800 dark:text-amber-200',
       icon: <HelpCircle className="w-3.5 h-3.5" />
     },
     review_required: {
-      label: hi ? 'संभवतः पात्र नहीं' : 'Likely not eligible',
+      label: t('likelyNotEligible'),
       chip: 'bg-[var(--bg-subtle)] text-[var(--text-secondary)]',
       icon: <XCircle className="w-3.5 h-3.5" />
     }
   };
 
   const tabs: { id: Tab; count: number; label: string; accent: string }[] = [
-    { id: 'eligible', count: eligibleCount, label: hi ? 'संभावित योजनाएं' : 'Likely for you', accent: 'text-[var(--text-primary)]' },
+    { id: 'eligible', count: eligibleCount, label: t('likelyForYou'), accent: 'text-[var(--text-primary)]' },
     { id: 'strong_match', count: strongMatches.length, label: t('strongMatches'), accent: 'text-[var(--accent-green)]' },
     { id: 'possible_match', count: possibleMatches.length, label: t('possibleMatches'), accent: 'text-amber-600 dark:text-amber-400' },
     { id: 'review_required', count: reviewRequired.length, label: t('reviewRequired'), accent: 'text-[var(--text-muted)]' }
@@ -101,13 +101,11 @@ export const ResultsView: React.FC = () => {
         <div className="space-y-3">
           <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-[var(--accent-green-text)] bg-[var(--accent-green-light)] px-3 py-1 rounded-full">
             <CheckCircle2 className="w-3.5 h-3.5" />
-            {hi ? 'प्रारंभिक जांच पूरी' : 'Preliminary check complete'}
+            {t('preliminaryCheckComplete')}
           </span>
           <h1 className="text-3xl sm:text-5xl font-bold text-[var(--text-primary)]">{t('resultsTitle')}</h1>
           <p className="text-base text-[var(--text-secondary)] max-w-xl">
-            {hi
-              ? `आपके विवरण के आधार पर ${eligibleCount} योजनाएं आपके लिए हो सकती हैं।`
-              : `Based on your answers, ${eligibleCount} of ${eligibleCount + reviewRequired.length} schemes may be for you.`}
+            {t('basedOnYourAnswersOf', { eligibleCount, p1: eligibleCount + reviewRequired.length })}
           </p>
         </div>
 
@@ -132,9 +130,9 @@ export const ResultsView: React.FC = () => {
       {isDemoData && (
         <div role="status" className="px-4 py-3 rounded-2xl bg-[var(--accent-navy-light)] text-[13px] text-[var(--accent-navy-text)] font-medium flex items-center gap-2">
           <Sparkles className="w-4 h-4 shrink-0" />
-          {hi ? 'आप नमूना (डेमो) प्रोफ़ाइल देख रहे हैं।' : 'You are viewing a sample demo profile, not your own answers.'}
+          {t('youAreViewingASample')}
           <button onClick={() => openFindSchemes()} className="ml-auto font-semibold underline shrink-0">
-            {hi ? 'अपनी जांच करें' : 'Check for me'}
+            {t('checkForMe')}
           </button>
         </div>
       )}
@@ -142,10 +140,8 @@ export const ResultsView: React.FC = () => {
       <div className="px-4 py-3 rounded-2xl glass-card text-[13px] text-[var(--text-secondary)] flex items-start gap-3">
         <ShieldCheck className="w-4 h-4 text-[var(--accent-saffron)] shrink-0 mt-0.5" />
         <p className="leading-relaxed">
-          <strong className="text-[var(--text-primary)]">{hi ? 'महत्वपूर्ण: ' : 'Important: '}</strong>
-          {hi
-            ? 'यह केवल प्रारंभिक मिलान है। अंतिम स्वीकृति संबंधित विभाग द्वारा मूल दस्तावेज़ों के सत्यापन के बाद ही मिलती है।'
-            : 'This is a preliminary rule match. Final approval only comes from the government department after it verifies your original documents.'}
+          <strong className="text-[var(--text-primary)]">{t('important')}</strong>
+          {t('thisIsAPreliminaryRule')}
         </p>
       </div>
 
@@ -155,25 +151,23 @@ export const ResultsView: React.FC = () => {
             <Compass className="w-7 h-7" />
           </span>
           <h2 className="font-bold text-xl text-[var(--text-primary)]">
-            {hi ? 'प्रश्नावली अभी भरी नहीं गई है' : 'No answers yet'}
+            {t('noAnswersYet')}
           </h2>
           <p className="text-sm text-[var(--text-secondary)] leading-relaxed">
-            {hi
-              ? 'सटीक परिणाम के लिए 2 मिनट की प्रश्नावली भरें, या नमूना प्रोफ़ाइल से देखें कि यह कैसे काम करता है।'
-              : 'Answer a few simple questions for tailored results, or load a sample profile to see how it works.'}
+            {t('answerAFewSimpleQuestions2')}
           </p>
           <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-2">
             <button
               onClick={() => openFindSchemes()}
               className="w-full sm:w-auto h-11 px-6 rounded-full bg-[var(--accent-saffron)] text-white text-sm font-semibold hover:bg-[var(--accent-saffron-hover)]"
             >
-              {hi ? 'प्रश्नावली शुरू करें' : 'Start questionnaire'}
+              {t('startQuestionnaire')}
             </button>
             <button
               onClick={loadSampleData}
               className="w-full sm:w-auto h-11 px-6 rounded-full bg-[var(--bg-subtle)] text-[var(--text-primary)] text-sm font-semibold hover:bg-[var(--bg-surface)] transition-colors"
             >
-              {hi ? 'नमूना प्रोफ़ाइल देखें' : 'Load sample profile'}
+              {t('loadSampleProfile')}
             </button>
           </div>
         </div>
@@ -202,7 +196,7 @@ export const ResultsView: React.FC = () => {
 
           {filteredSchemes.length === 0 && (
             <p className="p-10 text-center text-sm text-[var(--text-secondary)] glass-card rounded-3xl">
-              {hi ? 'इस श्रेणी में कोई योजना नहीं है।' : 'No schemes in this group.'}
+              {t('noSchemesInThisGroup')}
             </p>
           )}
 
@@ -211,30 +205,30 @@ export const ResultsView: React.FC = () => {
               const s = item.scheme;
               const isSaved = applications.some((a) => a.schemeId === s.id);
               const meta = statusMeta[item.status];
-              const reasons = hi ? item.matchedReasonsHindi : item.matchedReasons;
-              const toVerify = hi ? item.toVerifyHindi : item.toVerify;
-              const unmet = hi ? item.unmetCriteriaHindi : item.unmetCriteria;
+              const reasons = item.matched.map(tm);
+              const toVerify = item.verify.map(tm);
+              const unmet = item.unmet.map(tm);
 
               return (
                 <article key={s.id} className="glass-card p-5 sm:p-7 rounded-[1.75rem] space-y-5">
                   <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
                     <div className="space-y-1 min-w-0">
                       <span className="text-xs font-semibold text-[var(--accent-saffron)]">
-                        {hi ? s.categoryLabelHindi : s.categoryLabel}
+                        {L.category(s.category)}
                       </span>
                       <h2 className="text-xl sm:text-2xl font-bold text-[var(--text-primary)] leading-snug">
                         <button onClick={() => handleSchemeClick(s.id)} className="text-left hover:text-[var(--accent-saffron)] transition-colors">
-                          {hi ? s.nameHindi : s.name}
+                          {L.schemeName(s)}
                         </button>
                       </h2>
-                      <p className="text-xs text-[var(--text-muted)]">{hi ? s.ministryHindi : s.ministry}</p>
+                      <p className="text-xs text-[var(--text-muted)]">{L.long(s.ministry, s.ministryHindi)}</p>
                     </div>
                     <div className="flex items-center gap-2 shrink-0">
                       <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold ${meta.chip}`}>
                         {meta.icon}
                         {meta.label}
                       </span>
-                      <span className="text-xs font-mono font-semibold text-[var(--text-muted)] tabular-nums" title={hi ? 'मिलान स्कोर' : 'Match score'}>
+                      <span className="text-xs font-mono font-semibold text-[var(--text-muted)] tabular-nums" title={t('matchScore')}>
                         {item.matchScore}%
                       </span>
                     </div>
@@ -242,13 +236,13 @@ export const ResultsView: React.FC = () => {
 
                   <p className="px-4 py-3 rounded-2xl bg-[var(--accent-green-light)] text-sm font-semibold text-[var(--accent-green-text)] flex items-center gap-2">
                     <Sparkles className="w-4 h-4 shrink-0" />
-                    {hi ? s.benefitHeadlineHindi : s.benefitHeadline}
+                    {L.schemeBenefit(s)}
                   </p>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-[13px] text-[var(--text-secondary)]">
                     <div className="p-4 rounded-2xl bg-[var(--bg-subtle)] space-y-2">
                       <p className="font-semibold text-[var(--text-primary)]">
-                        {item.status === 'review_required' ? (hi ? 'जो शर्तें पूरी हैं' : 'What you already meet') : t('whyYouMatched')}
+                        {item.status === 'review_required' ? (t('whatYouAlreadyMeet')) : t('whyYouMatched')}
                       </p>
                       <ul className="space-y-1.5">
                         {reasons.map((r) => (
@@ -263,7 +257,7 @@ export const ResultsView: React.FC = () => {
                     {unmet.length > 0 || toVerify.length > 0 ? (
                       <div className="p-4 rounded-2xl bg-[var(--bg-subtle)] space-y-2">
                         <p className="font-semibold text-[var(--text-primary)]">
-                          {unmet.length > 0 ? (hi ? 'क्यों पात्र नहीं' : 'Why it may not apply') : hi ? 'कार्यालय में पुष्टि करें' : 'Confirm at the office'}
+                          {unmet.length > 0 ? (t('whyItMayNotApply')) : t('confirmAtTheOffice')}
                         </p>
                         <ul className="space-y-1.5">
                           {unmet.map((r) => (
@@ -286,7 +280,7 @@ export const ResultsView: React.FC = () => {
                         <div className="flex flex-wrap gap-1.5">
                           {s.requiredDocuments.map((doc) => (
                             <span key={doc.id} className="px-2.5 py-1 rounded-full bg-[var(--bg-surface)] text-xs font-medium text-[var(--text-secondary)]">
-                              {hi ? doc.nameHindi : doc.name}
+                              {L.docName(doc.id, doc.name, doc.nameHindi)}
                             </span>
                           ))}
                         </div>
@@ -304,7 +298,7 @@ export const ResultsView: React.FC = () => {
                         }`}
                       >
                         {isSaved ? <Check className="w-4 h-4 text-[var(--accent-green)]" /> : <BookmarkPlus className="w-4 h-4" />}
-                        {isSaved ? (hi ? 'सहेजा गया' : 'Saved') : t('saveToTracker')}
+                        {isSaved ? (t('saved')) : t('saveToTracker')}
                       </button>
                     )}
                     <button
@@ -323,19 +317,17 @@ export const ResultsView: React.FC = () => {
           <div className="p-6 rounded-[1.75rem] glass-card flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div>
               <h2 className="font-semibold text-[15px] text-[var(--text-primary)]">
-                {hi ? 'क्या आपके कागज़ात तैयार हैं?' : 'Are your documents ready?'}
+                {t('areYourDocumentsReady')}
               </h2>
               <p className="text-[13px] text-[var(--text-secondary)] mt-0.5">
-                {hi
-                  ? 'दस्तावेज़ चेकर से पता करें कि कौन से कागज़ बाकी हैं, ताकि दफ्तर के चक्कर न लगें।'
-                  : 'Use the Document Checker to sort out missing papers before visiting the portal or CSC.'}
+                {t('useTheDocumentCheckerTo')}
               </p>
             </div>
             <button
               onClick={() => setCurrentView('document_checker')}
               className="h-10 px-5 text-[13px] font-semibold rounded-full bg-[var(--bg-subtle)] hover:bg-[var(--bg-surface)] text-[var(--text-primary)] transition-colors shrink-0"
             >
-              {hi ? 'दस्तावेज़ चेकर खोलें' : 'Open Document Checker'} →
+              {t('openDocumentChecker')} →
             </button>
           </div>
         </>

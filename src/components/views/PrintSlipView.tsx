@@ -34,7 +34,7 @@ export const PrintSlipView: React.FC = () => {
           className="inline-flex items-center gap-1.5 text-xs font-semibold text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
         >
           <ArrowLeft className="w-4 h-4" />
-          <span>{settings.language === 'hi' ? 'परिणामों पर वापस' : 'Back to Results'}</span>
+          <span>{t('backToResults')}</span>
         </button>
 
         <div className="flex items-center gap-3">

@@ -17,14 +17,10 @@ export const AppFooter: React.FC = () => {
             </div>
             <div className="space-y-1">
               <p className="font-bold text-[var(--warning-text)] text-sm sm:text-base">
-                {settings.language === 'hi' 
-                  ? 'सरकारी योजनाओं के लिए किसी भी बिचौलिये या एजेंट को पैसे न दें।' 
-                  : 'Never pay unofficial agents or middlemen for government welfare benefits.'}
+                {t('neverPayUnofficialAgentsOr')}
               </p>
               <p className="text-xs sm:text-sm text-[var(--warning-desc)] leading-relaxed">
-                {settings.language === 'hi'
-                  ? 'सभी आधिकारिक योजना पोर्टल .gov.in या .nic.in पर समाप्त होते हैं। साइबर धोखाधड़ी होने पर तुरंत 1930 डायल करें।'
-                  : 'Official government portals always end with .gov.in or .nic.in. Report extortion or cyber frauds immediately at 1930.'}
+                {t('officialGovernmentPortalsAlwaysEnd')}
               </p>
             </div>
           </div>
@@ -34,7 +30,7 @@ export const AppFooter: React.FC = () => {
               className="inline-flex items-center gap-1.5 h-11 px-5 rounded-full bg-[var(--accent-saffron)] hover:bg-[var(--accent-saffron-hover)] text-white text-[13px] font-semibold"
             >
               <PhoneCall className="w-3.5 h-3.5" />
-              <span>{settings.language === 'hi' ? 'साइबर हेल्पलाइन 1930' : 'Cyber Helpline: 1930'}</span>
+              <span>{t('cyberHelpline1930')}</span>
             </a>
           </div>
         </div>
@@ -53,9 +49,7 @@ export const AppFooter: React.FC = () => {
               </span>
             </div>
             <p className="text-xs leading-relaxed text-[var(--text-secondary)]">
-              {settings.language === 'hi'
-                ? 'भारतीय नागरिकों के लिए एक स्वतंत्र, पारदर्शी और गरिमापूर्ण डिजिटल लोक सेवा मार्गदर्शक।'
-                : 'A calm, independent civic guide helping citizens understand, prepare and access welfare entitlements.'}
+              {t('aCalmIndependentCivicGuide')}
             </p>
             <div className="flex items-center gap-2 text-xs text-[var(--accent-green-text)] font-semibold">
               <ShieldCheck className="w-4 h-4 text-[var(--accent-green)]" />
@@ -66,7 +60,7 @@ export const AppFooter: React.FC = () => {
           {/* Navigation */}
           <div>
             <h4 className="text-xs font-bold uppercase tracking-wider text-[var(--text-primary)] mb-3">
-              {settings.language === 'hi' ? 'मुख्य साधन' : 'Tools & Services'}
+              {t('toolsServices')}
             </h4>
             <ul className="space-y-2 text-xs">
               <li>
@@ -105,7 +99,7 @@ export const AppFooter: React.FC = () => {
           {/* Official Resources */}
           <div>
             <h4 className="text-xs font-bold uppercase tracking-wider text-[var(--text-primary)] mb-3">
-              {settings.language === 'hi' ? 'राष्ट्रीय पोर्टल' : 'Official Portals'}
+              {t('officialPortals')}
             </h4>
             <ul className="space-y-2 text-xs">
               <li>
@@ -138,18 +132,14 @@ export const AppFooter: React.FC = () => {
           {/* Privacy & Legal notice */}
           <div>
             <h4 className="text-xs font-bold uppercase tracking-wider text-[var(--text-primary)] mb-3">
-              {settings.language === 'hi' ? 'नागरिक सुरक्षा' : 'Citizen Safety'}
+              {t('citizenSafety')}
             </h4>
             <p className="text-xs leading-relaxed text-[var(--text-secondary)]">
-              {settings.language === 'hi'
-                ? 'योजना सारथी किसी भी प्रकार का व्यक्तिगत डेटा अपने सर्वर पर स्टोर नहीं करता। सभी गणनाएं सीधे आपके वेब ब्राउज़र में स्थानीय रूप से निष्पादित होती हैं।'
-                : 'Yojana Sarthi does not store sensitive citizen data on external servers. All eligibility rules run locally in your browser.'}
+              {t('yojanaSarthiDoesNotStore')}
             </p>
             <div className="mt-3 pt-3 border-t border-[var(--border-hairline)] text-xs text-[var(--text-muted)]">
               <span>
-                {settings.language === 'hi'
-                  ? 'एक स्वतंत्र सामुदायिक परियोजना — सरकारी वेबसाइट नहीं'
-                  : 'An independent community project — not a government website'}
+                {t('anIndependentCommunityProjectNot')}
               </span>
               <span className="mx-1.5">·</span>
               <span>2026</span>

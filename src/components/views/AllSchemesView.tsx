@@ -20,7 +20,7 @@ import { SCHEMES_DATABASE } from '../../data/schemesData';
 import { SchemeCategory, BenefitType } from '../../types/scheme';
 
 export const AllSchemesView: React.FC = () => {
-  const { setCurrentView, setSelectedSchemeId, settings, t } = useApp();
+  const { setCurrentView, setSelectedSchemeId, settings, t, L } = useApp();
 
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
@@ -28,25 +28,25 @@ export const AllSchemesView: React.FC = () => {
 
   const categories = [
     { id: 'all', label: t('filterAllCategories') },
-    { id: 'agriculture', label: settings.language === 'hi' ? 'कृषि एवं किसान' : 'Agriculture & Farming' },
-    { id: 'health', label: settings.language === 'hi' ? 'स्वास्थ्य एवं चिकित्सा' : 'Health & Medical' },
-    { id: 'housing', label: settings.language === 'hi' ? 'आवास एवं मकान' : 'Housing & Shelter' },
-    { id: 'women_children', label: settings.language === 'hi' ? 'महिला एवं बाल कल्याण' : 'Women & Children' },
-    { id: 'education', label: settings.language === 'hi' ? 'शिक्षा एवं छात्रवृत्ति' : 'Education & Learning' },
-    { id: 'livelihood_business', label: settings.language === 'hi' ? 'रोजगार एवं व्यवसाय' : 'Livelihood & MSME' },
-    { id: 'social_security', label: settings.language === 'hi' ? 'सामाजिक सुरक्षा एवं पेंशन' : 'Social Security' },
-    { id: 'clean_energy', label: settings.language === 'hi' ? 'सोलर एवं स्वच्छ ऊर्जा' : 'Clean Energy' }
+    { id: 'agriculture', label: t('agricultureFarming') },
+    { id: 'health', label: t('healthMedical') },
+    { id: 'housing', label: t('housingShelter') },
+    { id: 'women_children', label: t('womenChildren') },
+    { id: 'education', label: t('educationLearning') },
+    { id: 'livelihood_business', label: t('livelihoodMsme') },
+    { id: 'social_security', label: t('socialSecurity') },
+    { id: 'clean_energy', label: t('cleanEnergy') }
   ];
 
   const benefitTypes = [
-    { id: 'all', label: 'All Benefit Types' },
-    { id: 'cash_transfer', label: 'Direct Cash Transfer' },
-    { id: 'subsidized_loan', label: 'Subsidized / Mudra Loan' },
-    { id: 'health_cover', label: 'Cashless Health Cover' },
-    { id: 'asset_subsidy', label: 'Asset / Solar Subsidy' },
-    { id: 'pension', label: 'Monthly Pension' },
-    { id: 'scholarship', label: 'Education Scholarship' },
-    { id: 'employment_guarantee', label: 'Employment Guarantee' }
+    { id: 'all', label: t('btAll') },
+    { id: 'cash_transfer', label: t('btCashTransfer') },
+    { id: 'subsidized_loan', label: t('btSubsidizedLoan') },
+    { id: 'health_cover', label: t('btHealthCover') },
+    { id: 'asset_subsidy', label: t('btAssetSubsidy') },
+    { id: 'pension', label: t('btPension') },
+    { id: 'scholarship', label: t('btScholarship') },
+    { id: 'employment_guarantee', label: t('btEmploymentGuarantee') }
   ];
 
   const filteredSchemes = SCHEMES_DATABASE.filter((scheme) => {
@@ -89,7 +89,7 @@ export const AllSchemesView: React.FC = () => {
       {/* Title */}
       <div>
         <span className="text-xs font-bold uppercase tracking-wider text-amber-700 dark:text-amber-400">
-          {settings.language === 'hi' ? 'राष्ट्रीय डायरेक्टरी' : 'National Welfare Directory'}
+          {t('nationalWelfareDirectory')}
         </span>
         <h1 className="text-2xl sm:text-4xl font-serif font-bold text-[var(--text-primary)]">
           {t('allSchemesTitle')}
@@ -165,9 +165,9 @@ export const AllSchemesView: React.FC = () => {
       {/* Counter & Active filters */}
       <div className="flex items-center justify-between text-xs text-[var(--text-secondary)] border-b border-[var(--border-hairline)] pb-3">
         <div>
-          <span>{settings.language === 'hi' ? 'दिखाए गए परिणाम: ' : 'Showing: '}</span>
+          <span>{t('showing')}</span>
           <span className="font-bold text-[var(--text-primary)] tabular-nums">{filteredSchemes.length}</span>
-          <span> / {SCHEMES_DATABASE.length} {settings.language === 'hi' ? 'योजनाएं' : 'schemes'}</span>
+          <span> / {SCHEMES_DATABASE.length} {t('schemes')}</span>
         </div>
 
         {(searchQuery || selectedCategory !== 'all' || selectedBenefitType !== 'all') && (
@@ -175,7 +175,7 @@ export const AllSchemesView: React.FC = () => {
             onClick={handleResetFilters}
             className="text-xs font-semibold text-[var(--accent-saffron)] hover:underline"
           >
-            {settings.language === 'hi' ? 'सभी फिल्टर हटाएं' : 'Reset all filters'}
+            {t('resetAllFilters')}
           </button>
         )}
       </div>
@@ -192,7 +192,7 @@ export const AllSchemesView: React.FC = () => {
               <div className="space-y-3">
                 <div className="flex items-center justify-between text-xs text-[var(--text-secondary)]">
                   <span className="font-semibold text-amber-700 dark:text-amber-400">
-                    {settings.language === 'hi' ? scheme.categoryLabelHindi : scheme.categoryLabel}
+                    {L.category(scheme.category)}
                   </span>
                   <span className="font-mono text-[11px] text-[var(--text-muted)]">
                     {scheme.shortCode}
@@ -200,24 +200,24 @@ export const AllSchemesView: React.FC = () => {
                 </div>
 
                 <h3 className="font-serif font-bold text-base text-[var(--text-primary)] group-hover:text-[var(--accent-saffron)] transition-colors leading-snug">
-                  {settings.language === 'hi' ? scheme.nameHindi : scheme.name}
+                  {L.schemeName(scheme)}
                 </h3>
 
                 <div className="px-3 py-2 rounded-xl bg-[var(--accent-green-light)] text-[13px] font-medium text-[var(--accent-green-text)]">
-                  {settings.language === 'hi' ? scheme.benefitHeadlineHindi : scheme.benefitHeadline}
+                  {L.schemeBenefit(scheme)}
                 </div>
 
                 <p className="text-xs text-[var(--text-secondary)] line-clamp-2 leading-relaxed">
                   {settings.simpleLanguageMode
-                    ? settings.language === 'hi' ? scheme.simpleLanguageSummaryHindi : scheme.simpleLanguageSummary
-                    : settings.language === 'hi' ? scheme.summaryHindi : scheme.summary}
+                    ? L.schemeSimple(scheme)
+                    : L.schemeSummary(scheme)}
                 </p>
               </div>
 
               <div className="pt-4 mt-4 border-t border-[var(--border-hairline)] flex items-center justify-between text-xs">
                 <span className="text-[var(--text-muted)] flex items-center gap-1">
                   <Clock className="w-3.5 h-3.5" />
-                  <span>~{scheme.processingTimeDays} {settings.language === 'hi' ? 'दिन' : 'days'}</span>
+                  <span>~{scheme.processingTimeDays} {t('days')}</span>
                 </span>
                 <span className="font-semibold text-[var(--accent-saffron)] group-hover:underline">
                   {t('viewSchemeDetails')} →
@@ -230,18 +230,16 @@ export const AllSchemesView: React.FC = () => {
         /* Empty State */
         <div className="p-12 text-center rounded-2xl border border-[var(--border-hairline)] bg-[var(--bg-surface)] space-y-4 max-w-md mx-auto">
           <p className="text-sm font-semibold text-[var(--text-primary)]">
-            {settings.language === 'hi' ? 'कोई योजना नहीं मिली' : 'No schemes match your query'}
+            {t('noSchemesMatchYourQuery')}
           </p>
           <p className="text-xs text-[var(--text-secondary)]">
-            {settings.language === 'hi'
-              ? 'कृपया दूसरा कीवर्ड खोजें या फिल्टर हटाएं।'
-              : 'Try clearing your search terms or selecting another category.'}
+            {t('tryClearingYourSearchTerms')}
           </p>
           <button
             onClick={handleResetFilters}
             className="px-4 py-2 text-xs font-semibold rounded-lg bg-[var(--accent-saffron)] text-white"
           >
-            {settings.language === 'hi' ? 'सभी योजनाएं देखें' : 'View all schemes'}
+            {t('viewAllSchemes')}
           </button>
         </div>
       )}

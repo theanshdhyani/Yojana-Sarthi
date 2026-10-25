@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useApp, AppView } from '../../context/AppContext';
+import { languageInfo } from '../../i18n';
 import { Menu, X, SlidersHorizontal, Languages, ArrowRight, WifiOff, VolumeX } from 'lucide-react';
 
 export const AppHeader: React.FC = () => {
@@ -7,7 +8,7 @@ export const AppHeader: React.FC = () => {
     currentView,
     setCurrentView,
     settings,
-    updateSettings,
+    setIsLanguageSheetOpen,
     setIsSettingsOpen,
     isSpeaking,
     stopReading,
@@ -49,9 +50,6 @@ export const AppHeader: React.FC = () => {
     setMobileMenuOpen(false);
   };
 
-  const toggleLanguage = () => {
-    updateSettings({ language: settings.language === 'en' ? 'hi' : 'en' });
-  };
 
   const iconButton =
     'h-10 min-w-10 px-2.5 inline-flex items-center justify-center gap-1.5 rounded-full bg-[var(--bg-subtle)] hover:bg-[var(--bg-surface)] text-[var(--text-primary)] text-xs font-semibold transition-colors';
@@ -105,9 +103,15 @@ export const AppHeader: React.FC = () => {
             </button>
           )}
 
-          <button onClick={toggleLanguage} title={t('languageToggle')} className={iconButton}>
+          <button
+            onClick={() => setIsLanguageSheetOpen(true)}
+            title={t('chooseLanguage')}
+            aria-label={t('chooseLanguage')}
+            aria-haspopup="dialog"
+            className={iconButton}
+          >
             <Languages className="w-4 h-4 text-[var(--accent-saffron)]" />
-            <span>{settings.language === 'en' ? 'हिन्दी' : 'EN'}</span>
+            <span className="max-w-[5.5rem] truncate">{languageInfo(settings.language).native}</span>
           </button>
 
           <button onClick={() => setIsSettingsOpen(true)} title={t('settings')} aria-label={t('settings')} className={iconButton}>
@@ -125,7 +129,7 @@ export const AppHeader: React.FC = () => {
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             className={`lg:hidden ${iconButton}`}
-            aria-label={settings.language === 'hi' ? 'मेनू' : 'Menu'}
+            aria-label={t('menu')}
             aria-expanded={mobileMenuOpen}
           >
             {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}

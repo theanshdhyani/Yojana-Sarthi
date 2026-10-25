@@ -15,6 +15,7 @@ import {
   AlertCircle
 } from 'lucide-react';
 import { StorageService } from '../../services/storageService';
+import { LanguageGrid } from '../common/LanguagePicker';
 
 export const SettingsModal: React.FC = () => {
   const { 
@@ -75,12 +76,12 @@ export const SettingsModal: React.FC = () => {
               {t('settings')}
             </h3>
             <p className="text-xs text-[var(--text-secondary)]">
-              {settings.language === 'hi' ? 'भाषा, पहुंच क्षमता एवं गोपनीयता नियंत्रण' : 'Language, accessibility and privacy controls'}
+              {t('languageAccessibilityAndPrivacyControls')}
             </p>
           </div>
           <button
             onClick={() => setIsSettingsOpen(false)}
-            aria-label={settings.language === 'hi' ? 'बंद करें' : 'Close'}
+            aria-label={t('close')}
             className="w-9 h-9 inline-flex items-center justify-center rounded-full bg-[var(--bg-subtle)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
           >
             <X className="w-5 h-5" />
@@ -96,25 +97,7 @@ export const SettingsModal: React.FC = () => {
               <Languages className="w-4 h-4 text-[var(--accent-saffron)]" />
               <span>{t('languageToggle')}</span>
             </div>
-            <div className="grid grid-cols-2 gap-2 text-xs">
-              {[
-                { code: 'en', label: 'English', sub: 'Default' },
-                { code: 'hi', label: 'हिन्दी (Hindi)', sub: 'पूर्ण समर्थित' }
-              ].map((lang) => (
-                <button
-                  key={lang.code}
-                  onClick={() => updateSettings({ language: lang.code as any })}
-                  className={`p-3 rounded-xl border text-left flex flex-col justify-between transition-colors ${
-                    settings.language === lang.code
-                      ? 'border-[var(--accent-saffron)] bg-[var(--accent-saffron-light)] text-[var(--text-primary)] font-semibold'
-                      : 'border-[var(--border-hairline)] hover:bg-[var(--bg-subtle)] text-[var(--text-secondary)]'
-                  }`}
-                >
-                  <span className="text-sm font-medium">{lang.label}</span>
-                  <span className="text-[10px] text-[var(--text-muted)] mt-1">{lang.sub}</span>
-                </button>
-              ))}
-            </div>
+            <LanguageGrid columns={3} />
           </div>
 
           {/* Simple Language Mode ("सरल भाषा मोड") */}
@@ -126,9 +109,7 @@ export const SettingsModal: React.FC = () => {
                   <span>{t('simpleLanguageToggle')}</span>
                 </div>
                 <p className="text-xs text-[var(--text-secondary)]">
-                  {settings.language === 'hi' 
-                    ? 'कठिन सरकारी शब्दों को बोलचाल की आम भाषा में समझें।' 
-                    : 'Replaces bureaucratic clauses with plain, conversational language.'}
+                  {t('replacesBureaucraticClausesWithPlain')}
                 </p>
               </div>
               <button
@@ -156,9 +137,9 @@ export const SettingsModal: React.FC = () => {
             </div>
             <div className="grid grid-cols-3 gap-2 text-xs">
               {[
-                { id: 'normal', label: 'Standard (16px)' },
-                { id: 'large', label: 'Large (18px)' },
-                { id: 'extra-large', label: 'Extra Large (20px)' }
+                { id: 'normal', label: t('fontStandard') },
+                { id: 'large', label: t('fontLarge') },
+                { id: 'extra-large', label: t('fontExtraLarge') }
               ].map((size) => (
                 <button
                   key={size.id}
@@ -184,9 +165,7 @@ export const SettingsModal: React.FC = () => {
                   <span>{t('highContrastMode')}</span>
                 </div>
                 <p className="text-xs text-[var(--text-secondary)]">
-                  {settings.language === 'hi' 
-                    ? 'अक्षरों और बॉर्डर्स के कंट्रास्ट को अत्यधिक स्पष्ट करें।' 
-                    : 'Enhances borders and text contrast for low-vision readability.'}
+                  {t('enhancesBordersAndTextContrast')}
                 </p>
               </div>
               <button
@@ -209,10 +188,10 @@ export const SettingsModal: React.FC = () => {
               <div className="space-y-0.5">
                 <div className="flex items-center gap-2 text-sm font-semibold text-[var(--text-primary)]">
                   {settings.theme === 'dark' ? <Moon className="w-4 h-4 text-indigo-400" /> : <Sun className="w-4 h-4 text-amber-500" />}
-                  <span>{settings.language === 'hi' ? 'डार्क थीम' : 'Dark Theme'}</span>
+                  <span>{t('darkTheme')}</span>
                 </div>
                 <p className="text-xs text-[var(--text-secondary)]">
-                  {settings.language === 'hi' ? 'कम रोशनी में आंखों पर आराम।' : 'Deep dark aesthetic for nighttime reading.'}
+                  {t('deepDarkAestheticForNighttime')}
                 </p>
               </div>
               <button
@@ -236,10 +215,10 @@ export const SettingsModal: React.FC = () => {
           <div className="pt-6 flex items-center justify-between">
             <div className="space-y-0.5">
               <div className="text-sm font-semibold text-[var(--text-primary)]">
-                {settings.language === 'hi' ? 'कम एनिमेशन' : 'Reduce Motion'}
+                {t('reduceMotion')}
               </div>
               <p className="text-xs text-[var(--text-secondary)]">
-                {settings.language === 'hi' ? 'हिलती पृष्ठभूमि और एनिमेशन बंद करें।' : 'Turns off the drifting background and animations.'}
+                {t('turnsOffTheDriftingBackground')}
               </p>
             </div>
             <button
@@ -262,12 +241,10 @@ export const SettingsModal: React.FC = () => {
           <div className="pt-6 space-y-2">
             <div className="flex items-center gap-2 text-sm font-semibold text-[var(--text-primary)]">
               <ShieldCheck className="w-4 h-4 text-emerald-600" />
-              <span>{settings.language === 'hi' ? 'स्थानीय गोपनीयता सुरक्षा' : 'Local-First Privacy Architecture'}</span>
+              <span>{t('localFirstPrivacyArchitecture')}</span>
             </div>
             <p className="text-xs leading-relaxed text-[var(--text-secondary)]">
-              {settings.language === 'hi'
-                ? 'आपके सवाल-जवाब, आवेदन और कागजात आपके ब्राउज़र के भीतर सुरक्षित रहते हैं। कोई भी व्यक्तिगत डेटा न तो बेचा जाता है और न ही बाहरी कंपनियों को भेजा जाता है।'
-                : 'All questionnaire responses and application records are kept exclusively on this device using local browser storage. No trackers, ads, or profile harvesting.'}
+              {t('allQuestionnaireResponsesAndApplication')}
             </p>
           </div>
 
@@ -296,13 +273,13 @@ export const SettingsModal: React.FC = () => {
                     onClick={handleClear}
                     className="flex-1 px-3 py-2 text-xs font-bold rounded-lg bg-red-600 hover:bg-red-700 text-white transition-colors"
                   >
-                    Confirm Delete
+                    {t('confirmDelete')}
                   </button>
                   <button
                     onClick={() => setConfirmDelete(false)}
                     className="px-3 py-2 text-xs font-semibold rounded-lg border border-[var(--border-hairline)] text-[var(--text-secondary)] hover:bg-[var(--bg-subtle)]"
                   >
-                    Cancel
+                    {t('cancel')}
                   </button>
                 </div>
               )}
@@ -323,7 +300,7 @@ export const SettingsModal: React.FC = () => {
             onClick={() => setIsSettingsOpen(false)}
             className="px-5 py-2 text-xs font-semibold rounded-lg bg-[var(--accent-saffron)] hover:bg-[var(--accent-saffron-hover)] text-white transition-colors"
           >
-            {settings.language === 'hi' ? 'पूर्ण हुआ' : 'Done'}
+            {t('done')}
           </button>
         </div>
       </div>

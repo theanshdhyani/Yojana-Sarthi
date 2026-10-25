@@ -15,7 +15,7 @@ import { MASTER_DOCUMENTS } from '../../data/documentsData';
 import { safeExternalUrl } from '../../utils/safeUrl';
 
 export const DocumentCheckerView: React.FC = () => {
-  const { readyDocumentIds, toggleDocumentReady, settings, t } = useApp();
+  const { readyDocumentIds, toggleDocumentReady, settings, t, L } = useApp();
 
   const [filterMode, setFilterMode] = useState<'all' | 'ready' | 'missing'>('all');
 
@@ -38,7 +38,7 @@ export const DocumentCheckerView: React.FC = () => {
       <div className="space-y-4">
         <div>
           <span className="text-xs font-bold uppercase tracking-wider text-emerald-700 dark:text-emerald-400">
-            {settings.language === 'hi' ? 'दस्तावेज़ तैयारी' : 'Readiness Checklist'}
+            {t('readinessChecklist')}
           </span>
           <h1 className="text-2xl sm:text-4xl font-serif font-bold text-[var(--text-primary)]">
             {t('documentsReadyHeadline')}
@@ -52,7 +52,7 @@ export const DocumentCheckerView: React.FC = () => {
         <div className="p-5 sm:p-6 rounded-3xl glass-card space-y-3.5 shadow-md">
           <div className="flex items-center justify-between">
             <span className="text-sm font-semibold text-[var(--text-primary)]">
-              {readyCount} / {totalCount} {settings.language === 'hi' ? 'दस्तावेज़ तैयार हैं' : 'Documents Ready'}
+              {readyCount} / {totalCount} {t('documentsReady')}
             </span>
             <span className="text-sm font-bold font-mono tabular-nums text-emerald-700 dark:text-emerald-400">
               {percentReady}%
@@ -68,12 +68,8 @@ export const DocumentCheckerView: React.FC = () => {
 
           <p className="text-xs text-[var(--text-secondary)]">
             {percentReady >= 70
-              ? settings.language === 'hi'
-                ? 'बहुत बढ़िया! आपके अधिकांश प्राथमिक दस्तावेज तैयार हैं। आप सीधे सरकारी पोर्टल या सीएससी पर आवेदन कर सकते हैं।'
-                : 'Excellent preparation! You possess the essential core identity and banking documents needed for 80%+ of welfare schemes.'
-              : settings.language === 'hi'
-              ? 'जो दस्तावेज बाकी हैं, उन पर क्लिक करके देखें कि वे किस दफ्तर से बनेंगे और कितनी फीस लगेगी।'
-              : 'Click on missing documents below to see which local office issues them, fees, and avoid common rejection traps.'}
+              ? t('excellentPreparationYouPossessThe')
+              : t('clickOnMissingDocumentsBelow')}
           </p>
         </div>
       </div>
@@ -88,7 +84,7 @@ export const DocumentCheckerView: React.FC = () => {
               : 'bg-[var(--bg-subtle)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
           }`}
         >
-          {settings.language === 'hi' ? `सभी (${totalCount})` : `All (${totalCount})`}
+          {t('all2', { totalCount })}
         </button>
 
         <button
@@ -99,7 +95,7 @@ export const DocumentCheckerView: React.FC = () => {
               : 'bg-[var(--bg-subtle)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
           }`}
         >
-          {settings.language === 'hi' ? `तैयार (${readyCount})` : `Ready (${readyCount})`}
+          {t('ready', { readyCount })}
         </button>
 
         <button
@@ -110,7 +106,7 @@ export const DocumentCheckerView: React.FC = () => {
               : 'bg-[var(--bg-subtle)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
           }`}
         >
-          {settings.language === 'hi' ? `कार्रवाई आवश्यक (${totalCount - readyCount})` : `Action Required (${totalCount - readyCount})`}
+          {t('actionRequired2', { p0: totalCount - readyCount })}
         </button>
       </div>
 
@@ -133,16 +129,16 @@ export const DocumentCheckerView: React.FC = () => {
                 <div className="space-y-0.5">
                   <div className="flex items-center gap-2">
                     <h3 className="font-serif font-bold text-base sm:text-lg text-[var(--text-primary)]">
-                      {settings.language === 'hi' ? doc.nameHindi : doc.name}
+                      {L.docName(doc.id, doc.name, doc.nameHindi)}
                     </h3>
                     {isReady && (
                       <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-50 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 border border-emerald-300">
-                        Ready
+                        {t('readyBadge')}
                       </span>
                     )}
                   </div>
                   <p className="text-xs text-[var(--text-secondary)]">
-                    {settings.language === 'hi' ? doc.shortDescHindi : doc.shortDesc}
+                    {L.docShortDesc(doc.id, doc.shortDesc, doc.shortDescHindi)}
                   </p>
                 </div>
 
@@ -156,7 +152,7 @@ export const DocumentCheckerView: React.FC = () => {
                   }`}
                 >
                   <Check className={`w-3.5 h-3.5 ${isReady ? 'text-emerald-700' : 'text-[var(--text-muted)]'}`} />
-                  <span>{isReady ? (settings.language === 'hi' ? 'तैयार है' : 'Marked Ready') : t('markAsReady')}</span>
+                  <span>{isReady ? (t('markedReady')) : t('markAsReady')}</span>
                 </button>
               </div>
 
@@ -168,7 +164,7 @@ export const DocumentCheckerView: React.FC = () => {
                     <span>{t('issuingAuthority')}</span>
                   </span>
                   <p className="font-medium text-[var(--text-primary)]">
-                    {settings.language === 'hi' ? doc.issuingAuthorityHindi : doc.issuingAuthority}
+                    {L.long(doc.issuingAuthority, doc.issuingAuthorityHindi)}
                   </p>
                 </div>
 
@@ -178,7 +174,7 @@ export const DocumentCheckerView: React.FC = () => {
                     <span>{t('fee')}</span>
                   </span>
                   <p className="font-medium text-[var(--text-primary)]">
-                    {settings.language === 'hi' ? doc.costHindi : doc.cost}
+                    {L.long(doc.cost, doc.costHindi)}
                   </p>
                 </div>
 
@@ -188,7 +184,7 @@ export const DocumentCheckerView: React.FC = () => {
                     <span>{t('processingTime')}</span>
                   </span>
                   <p className="font-medium text-[var(--text-primary)]">
-                    {settings.language === 'hi' ? doc.estimatedTimeHindi : doc.estimatedTime}
+                    {L.long(doc.estimatedTime, doc.estimatedTimeHindi)}
                   </p>
                 </div>
               </div>
@@ -197,9 +193,9 @@ export const DocumentCheckerView: React.FC = () => {
               <div className="p-3.5 rounded-xl bg-[var(--bg-subtle)] text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                 <div className="text-slate-700 dark:text-slate-300">
                   <span className="font-semibold text-amber-800 dark:text-amber-400">
-                    {settings.language === 'hi' ? 'महत्वपूर्ण सलाह: ' : 'Citizen Tip: '}
+                    {t('citizenTip')}
                   </span>
-                  <span>{settings.language === 'hi' ? doc.tipsHindi : doc.tips}</span>
+                  <span>{L.long(doc.tips, doc.tipsHindi)}</span>
                 </div>
 
                 {safeExternalUrl(doc.officialPortal) && (
@@ -209,7 +205,7 @@ export const DocumentCheckerView: React.FC = () => {
                     rel="noopener noreferrer"
                     className="font-semibold text-[var(--accent-saffron)] hover:underline inline-flex items-center gap-1 shrink-0"
                   >
-                    <span>{settings.language === 'hi' ? 'आधिकारिक पोर्टल' : 'Official portal'}</span>
+                    <span>{t('officialPortal')}</span>
                     <ExternalLink className="w-3 h-3" />
                   </a>
                 )}

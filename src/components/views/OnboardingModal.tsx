@@ -1,17 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { useApp } from '../../context/AppContext';
-import { 
-  Sparkles, 
-  FileCheck2, 
-  ShieldCheck, 
-  Compass, 
-  ArrowRight, 
-  Check, 
-  X 
-} from 'lucide-react';
+import { Sparkles, FileCheck2, ShieldCheck, Compass, ArrowRight, Languages } from 'lucide-react';
+import { LanguageGrid } from '../common/LanguagePicker';
 
 export const OnboardingModal: React.FC = () => {
-  const { isOnboardingOpen, setIsOnboardingOpen, startNewAssessment, settings } = useApp();
+  const { isOnboardingOpen, setIsOnboardingOpen, startNewAssessment, t } = useApp();
   const [currentStep, setCurrentStep] = useState(0);
 
   useEffect(() => {
@@ -23,36 +16,35 @@ export const OnboardingModal: React.FC = () => {
 
   if (!isOnboardingOpen) return null;
 
+  // Step 0 asks for a language first, so everything after it is already readable.
   const slides = [
     {
+      icon: <Languages className="w-8 h-8 text-[var(--accent-saffron)]" />,
+      title: t('chooseLanguage'),
+      subtitle: t('chooseLanguageHint'),
+      languagePicker: true
+    },
+    {
       icon: <Compass className="w-8 h-8 text-[var(--accent-saffron)]" />,
-      title: settings.language === 'hi' ? 'अपनी पात्रता पहचानें' : 'Discover Your Entitlements',
-      subtitle: settings.language === 'hi' 
-        ? 'कुछ सीधे सवालों के जवाब देकर जानें कि केंद्र और राज्य की कौन-सी योजनाएं आपके व आपके परिवार के लिए हैं।'
-        : 'Answer a few simple questions to instantly find central and state welfare programs tailored to your family and livelihood.'
+      title: t('discoverYourEntitlements'),
+      subtitle: t('answerAFewSimpleQuestions')
     },
     {
       icon: <Sparkles className="w-8 h-8 text-amber-600" />,
-      title: settings.language === 'hi' ? 'सरल भाषा में समझें' : 'Understand Benefits in Plain Words',
-      subtitle: settings.language === 'hi'
-        ? 'कठिन सरकारी कानूनी भाषा से मुक्ति। योजना का वास्तविक लाभ, किस्तें और नियम सीधी बोलचाल में समझें।'
-        : 'No bureaucratic jargon. Get plain-language explanations of exact cash transfers, subsidies, and rules.'
+      title: t('understandBenefitsInPlainWords'),
+      subtitle: t('noBureaucraticJargonGetPlain')
     },
     {
       icon: <FileCheck2 className="w-8 h-8 text-emerald-600" />,
-      title: settings.language === 'hi' ? 'कागजात पहले से तैयार करें' : 'Prepare Documents with Confidence',
-      subtitle: settings.language === 'hi'
-        ? 'पता करें कि आवेदन में कौन से प्रमाण पत्र लगेंगे, वे कहां से बनेंगे और आवेदन निरस्त होने से कैसे बचें।'
-        : 'Learn exactly which documents are mandatory, their issuing offices, expected fees, and common rejection pitfalls.'
+      title: t('prepareDocumentsWithConfidence'),
+      subtitle: t('learnExactlyWhichDocumentsAre')
     },
     {
       icon: <ShieldCheck className="w-8 h-8 text-blue-600" />,
-      title: settings.language === 'hi' ? 'पूर्णतः निजी व सुरक्षित' : 'Private by Design, Always Free',
-      subtitle: settings.language === 'hi'
-        ? 'न आधार नंबर, न मोबाइल नंबर, न कोई ओटीपी। आपकी सभी जानकारियां केवल आपके फोन पर ही रहती हैं।'
-        : 'No Aadhaar number, no phone number, no login required. Your information never leaves your personal device.'
+      title: t('privateByDesignAlwaysFree'),
+      subtitle: t('noAadhaarNumberNoPhone')
     }
-  ];
+  ] as { icon: React.ReactNode; title: string; subtitle: string; languagePicker?: boolean }[];
 
   const handleNext = () => {
     if (currentStep < slides.length - 1) {
@@ -72,7 +64,7 @@ export const OnboardingModal: React.FC = () => {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 glass-scrim no-print">
       <div 
-        className="w-full max-w-md glass-modal rounded-[2rem] p-6 sm:p-8 flex flex-col justify-between min-h-[420px]"
+        className="w-full max-w-md max-h-[92vh] overflow-y-auto glass-modal rounded-[2rem] p-6 sm:p-8 flex flex-col justify-between min-h-[420px]"
         role="dialog"
         aria-modal="true"
         aria-labelledby="onboarding-heading"
@@ -95,12 +87,12 @@ export const OnboardingModal: React.FC = () => {
             onClick={handleSkip}
             className="text-xs font-semibold text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors"
           >
-            {settings.language === 'hi' ? 'छोड़ें (Skip)' : 'Skip'}
+            {t('skip')}
           </button>
         </div>
 
         {/* Center Content */}
-        <div className="py-8 text-center space-y-4 flex flex-col items-center">
+        <div className="py-6 text-center space-y-4 flex flex-col items-center">
           <div className="w-20 h-20 rounded-[1.375rem] glass-card inline-flex items-center justify-center mb-2">
             {activeSlide.icon}
           </div>
@@ -110,6 +102,11 @@ export const OnboardingModal: React.FC = () => {
           <p className="text-xs sm:text-sm text-[var(--text-secondary)] leading-relaxed max-w-sm">
             {activeSlide.subtitle}
           </p>
+          {activeSlide.languagePicker && (
+            <div className="w-full pt-2 text-left">
+              <LanguageGrid />
+            </div>
+          )}
         </div>
 
         {/* Bottom CTA */}
@@ -119,7 +116,7 @@ export const OnboardingModal: React.FC = () => {
               onClick={() => setCurrentStep(currentStep - 1)}
               className="px-4 py-2 text-xs font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
             >
-              {settings.language === 'hi' ? 'पीछे' : 'Back'}
+              {t('back')}
             </button>
           ) : <div />}
 
@@ -129,8 +126,8 @@ export const OnboardingModal: React.FC = () => {
           >
             <span>
               {currentStep === slides.length - 1
-                ? settings.language === 'hi' ? 'शुरू करें' : 'Get Started'
-                : settings.language === 'hi' ? 'अगला' : 'Continue'}
+                ? t('getStarted')
+                : t('continue')}
             </span>
             <ArrowRight className="w-3.5 h-3.5" />
           </button>

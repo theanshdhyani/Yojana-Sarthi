@@ -42,8 +42,7 @@ export const QuestionnaireView: React.FC = () => {
     hasSavedAnswers,
     questionnaireStepIndex: currentStepIndex,
     setQuestionnaireStepIndex: setCurrentStepIndex,
-    t 
-  } = useApp();
+    t, L } = useApp();
 
   const [validationError, setValidationError] = useState<string | null>(null);
 
@@ -54,9 +53,7 @@ export const QuestionnaireView: React.FC = () => {
       case 0:
         if (!answers.age || isNaN(answers.age) || answers.age < 1 || answers.age > 115) {
           setValidationError(
-            settings.language === 'hi'
-              ? 'कृपया आगे बढ़ने के लिए 1 से 115 के बीच एक मान्य आयु दर्ज करें।'
-              : 'Please enter a valid age between 1 and 115 years to continue.'
+            t('pleaseEnterAValidAge')
           );
           return false;
         }
@@ -64,9 +61,7 @@ export const QuestionnaireView: React.FC = () => {
       case 1:
         if (!answers.gender) {
           setValidationError(
-            settings.language === 'hi'
-              ? 'कृपया आगे बढ़ने के लिए अपना लिंग चुनें।'
-              : 'Please select a gender option to continue.'
+            t('pleaseSelectAGenderOption')
           );
           return false;
         }
@@ -74,9 +69,7 @@ export const QuestionnaireView: React.FC = () => {
       case 2:
         if (!answers.state || answers.state.trim() === '') {
           setValidationError(
-            settings.language === 'hi'
-              ? 'कृपया आगे बढ़ने के लिए अपना राज्य या केंद्र शासित प्रदेश चुनें।'
-              : 'Please select your State or Union Territory to continue.'
+            t('pleaseSelectYourStateOr')
           );
           return false;
         }
@@ -84,9 +77,7 @@ export const QuestionnaireView: React.FC = () => {
       case 3:
         if (!answers.residenceArea) {
           setValidationError(
-            settings.language === 'hi'
-              ? 'कृपया चुनें कि आप गांव (ग्रामीण) में रहते हैं या शहर (शहरी) में।'
-              : 'Please select whether you reside in a rural or urban area.'
+            t('pleaseSelectWhetherYouReside')
           );
           return false;
         }
@@ -94,9 +85,7 @@ export const QuestionnaireView: React.FC = () => {
       case 4:
         if (!answers.occupation) {
           setValidationError(
-            settings.language === 'hi'
-              ? 'कृपया अपनी प्राथमिक आजीविका या व्यवसाय चुनें।'
-              : 'Please select your primary occupation or livelihood.'
+            t('pleaseSelectYourPrimaryOccupation')
           );
           return false;
         }
@@ -104,9 +93,7 @@ export const QuestionnaireView: React.FC = () => {
       case 5:
         if (!answers.annualIncomeBracket) {
           setValidationError(
-            settings.language === 'hi'
-              ? 'कृपया अपने परिवार की वार्षिक आय का दायरा चुनें।'
-              : 'Please select your annual household income bracket.'
+            t('pleaseSelectYourAnnualHousehold')
           );
           return false;
         }
@@ -114,9 +101,7 @@ export const QuestionnaireView: React.FC = () => {
       case 6:
         if (!answers.landholding) {
           setValidationError(
-            settings.language === 'hi'
-              ? 'कृपया अपनी कृषि भूमि स्वामित्व की स्थिति चुनें।'
-              : 'Please select your agricultural landholding profile.'
+            t('pleaseSelectYourAgriculturalLandholding')
           );
           return false;
         }
@@ -124,9 +109,7 @@ export const QuestionnaireView: React.FC = () => {
       case 7:
         if (!answers.socialCategory) {
           setValidationError(
-            settings.language === 'hi'
-              ? 'कृपया अपना सामाजिक वर्ग (Category) चुनें।'
-              : 'Please select your social category to check affirmative benefits.'
+            t('pleaseSelectYourSocialCategory')
           );
           return false;
         }
@@ -134,9 +117,7 @@ export const QuestionnaireView: React.FC = () => {
       case 8:
         if (!answers.hasRationCard) {
           setValidationError(
-            settings.language === 'hi'
-              ? 'कृपया अपने राशन कार्ड की श्रेणी चुनें।'
-              : 'Please select your ration card category.'
+            t('pleaseSelectYourRationCard')
           );
           return false;
         }
@@ -202,10 +183,10 @@ export const QuestionnaireView: React.FC = () => {
               </div>
               <div>
                 <h3 id="resume-assessment-heading" className="text-lg font-serif font-bold text-[var(--text-primary)]">
-                  {settings.language === 'hi' ? 'सहेजा गया मूल्यांकन मिला' : 'Saved Assessment Found'}
+                  {t('savedAssessmentFound')}
                 </h3>
                 <p className="text-xs text-[var(--text-secondary)]">
-                  {settings.language === 'hi' ? 'आपके पास पहले से भरे गए उत्तर उपलब्ध हैं' : 'You have an assessment with answered questions'}
+                  {t('youHaveAnAssessmentWith')}
                 </p>
               </div>
             </div>
@@ -213,15 +194,15 @@ export const QuestionnaireView: React.FC = () => {
             {/* Summary of saved fields */}
             <div className="p-3.5 rounded-2xl bg-[var(--bg-subtle)] border border-[var(--border-hairline)] text-xs space-y-1.5 text-[var(--text-secondary)]">
               <div className="font-semibold text-[var(--text-primary)] flex items-center justify-between">
-                <span>{settings.language === 'hi' ? 'दर्ज विवरण:' : 'Recorded Data:'}</span>
+                <span>{t('recordedData')}</span>
                 <span className="text-[10px] text-amber-600 dark:text-amber-400 font-mono">
-                  {Object.values(answers).filter(v => v !== undefined && v !== '' && (!Array.isArray(v) || v.length > 0)).length} {settings.language === 'hi' ? 'उत्तर' : 'fields'}
+                  {Object.values(answers).filter(v => v !== undefined && v !== '' && (!Array.isArray(v) || v.length > 0)).length} {t('fields')}
                 </span>
               </div>
               <div className="flex flex-wrap gap-1.5 pt-1">
                 {answers.age && (
                   <span className="px-2 py-0.5 rounded-md bg-[var(--bg-surface)] border border-[var(--border-hairline)] text-[11px]">
-                    Age: {answers.age}
+                    {t('ageLabel')}: {answers.age}
                   </span>
                 )}
                 {answers.gender && (
@@ -243,9 +224,7 @@ export const QuestionnaireView: React.FC = () => {
             </div>
 
             <p className="text-xs text-[var(--text-secondary)] leading-relaxed">
-              {settings.language === 'hi'
-                ? 'क्या आप एक नया मूल्यांकन खाली फॉर्म से शुरू करना चाहते हैं, या अपने पिछले उत्तरों को जारी रखना चाहते हैं?'
-                : 'Would you like to start a brand-new assessment with blank answers, or resume your saved progress?'}
+              {t('wouldYouLikeToStart')}
             </p>
 
             {/* Actions: Start New Assessment is the clear primary action */}
@@ -257,7 +236,7 @@ export const QuestionnaireView: React.FC = () => {
                 }}
                 className="w-full py-3 px-4 rounded-xl bg-[var(--accent-saffron)] hover:bg-[var(--accent-saffron-hover)] text-white font-semibold text-xs transition-all shadow-md active:scale-[0.98] flex items-center justify-center gap-2"
               >
-                <span>{settings.language === 'hi' ? 'नया मूल्यांकन शुरू करें (खाली फॉर्म)' : 'Start New Assessment'}</span>
+                <span>{t('startNewAssessment')}</span>
                 <ArrowRight className="w-3.5 h-3.5" />
               </button>
 
@@ -268,7 +247,7 @@ export const QuestionnaireView: React.FC = () => {
                 }}
                 className="w-full py-2.5 px-4 rounded-xl border border-[var(--border-hairline)] bg-[var(--bg-surface)] hover:bg-[var(--bg-subtle)] text-[var(--text-primary)] font-semibold text-xs transition-all shadow-2xs active:scale-[0.98]"
               >
-                {settings.language === 'hi' ? 'पिछला मूल्यांकन जारी रखें' : 'Continue Previous Assessment'}
+                {t('continuePreviousAssessment')}
               </button>
             </div>
           </div>
@@ -292,17 +271,15 @@ export const QuestionnaireView: React.FC = () => {
                 type="button"
                 onClick={handleResetToBlank}
                 className="inline-flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-xl border border-rose-300/70 dark:border-rose-900/60 bg-rose-50/60 dark:bg-rose-950/30 text-rose-700 dark:text-rose-300 hover:bg-rose-100/70 transition-all font-medium"
-                title={settings.language === 'hi' ? 'सभी उत्तर साफ करें और नया मूल्यांकन शुरू करें' : 'Clear all answers and start fresh'}
+                title={t('clearAllAnswersAndStart')}
               >
                 <RotateCcw className="w-3 h-3" />
-                <span>{settings.language === 'hi' ? 'पुनरारंभ (साफ करें)' : 'Start Blank / Reset'}</span>
+                <span>{t('startBlankReset')}</span>
               </button>
             )}
 
             <span className="text-xs font-mono font-semibold text-[var(--accent-saffron)] px-3 py-1 rounded-full bg-[var(--accent-saffron-light)]/60 border border-[var(--accent-saffron)]/30 tracking-wider">
-              {settings.language === 'hi' 
-                ? `प्रश्न ${String(currentStepIndex + 1).padStart(2, '0')} / ${String(totalSteps).padStart(2, '0')}`
-                : `Question ${String(currentStepIndex + 1).padStart(2, '0')} of ${String(totalSteps).padStart(2, '0')}`}
+              {t('questionOf', { p0: String(currentStepIndex + 1).padStart(2, '0'), p1: String(totalSteps).padStart(2, '0') })}
             </span>
           </div>
         </div>
@@ -328,10 +305,10 @@ export const QuestionnaireView: React.FC = () => {
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <span className="text-xs font-bold uppercase tracking-wider text-amber-700 dark:text-amber-400">
-                {settings.language === 'hi' ? 'आयु विवरण' : 'Age Criteria'}
+                {t('ageCriteria')}
               </span>
               <button
-                onClick={() => handleReadCurrent(settings.language === 'hi' ? 'आपकी आयु कितनी है? यह पेंशन, छात्रवृत्ति और युवा योजनाओं की जांच हेतु आवश्यक है।' : 'What is your current age? This helps filter age-specific schemes like pensions, scholarships, and youth programs.')}
+                onClick={() => handleReadCurrent(t('whatIsYourCurrentAge'))}
                 className="p-1.5 rounded-lg border border-[var(--border-hairline)] text-xs text-[var(--text-secondary)] hover:text-[var(--text-primary)] flex items-center gap-1"
               >
                 {isSpeaking ? <VolumeX className="w-3.5 h-3.5 text-amber-700" /> : <Volume2 className="w-3.5 h-3.5" />}
@@ -340,20 +317,18 @@ export const QuestionnaireView: React.FC = () => {
             </div>
 
             <h2 className="text-2xl sm:text-3xl font-serif font-bold text-[var(--text-primary)]">
-              {settings.language === 'hi' ? 'आपकी वर्तमान आयु (वर्ष) कितनी है?' : 'What is your current age?'}
+              {t('whatIsYourCurrentAge2')}
             </h2>
 
             <p className="text-xs sm:text-sm text-[var(--text-secondary)]">
-              {settings.language === 'hi'
-                ? 'विभिन्न योजनाएं (जैसे वृद्धावस्था पेंशन 60+, छात्रवृत्ति 15-25, बाल योजनाएं <10) आयु सीमा पर निर्भर करती हैं।'
-                : 'Central schemes have specific age brackets for pensions (60+), youth programs (18-40), and child benefits (<10).'}
+              {t('centralSchemesHaveSpecificAge')}
             </p>
           </div>
 
           <div className="p-6 rounded-3xl glass-card border border-[var(--glass-panel-border)] space-y-6 shadow-sm">
             <div>
               <label className="block text-xs font-semibold text-[var(--text-primary)] mb-2">
-                {settings.language === 'hi' ? 'आयु दर्ज करें (संख्या में)' : 'Enter Age (Years)'}
+                {t('enterAgeYears')}
               </label>
               <input
                 type="number"
@@ -373,7 +348,7 @@ export const QuestionnaireView: React.FC = () => {
 
             <div className="space-y-2">
               <span className="text-xs font-medium text-[var(--text-muted)]">
-                {settings.language === 'hi' ? 'अक्सर उपयोग किए जाने वाले विकल्प:' : 'Quick Select:'}
+                {t('quickSelect')}
               </span>
               <div className="flex flex-wrap gap-2">
                 {[19, 28, 42, 62, 71].map((val) => (
@@ -390,7 +365,7 @@ export const QuestionnaireView: React.FC = () => {
                         : 'border-[var(--border-hairline)] hover:bg-[var(--bg-subtle)] text-[var(--text-secondary)]'
                     }`}
                   >
-                    {val} {settings.language === 'hi' ? 'वर्ष' : 'yrs'}
+                    {val} {t('yrs')}
                   </button>
                 ))}
               </div>
@@ -404,23 +379,21 @@ export const QuestionnaireView: React.FC = () => {
         <div className="space-y-6">
           <div className="space-y-2">
             <span className="text-xs font-bold uppercase tracking-wider text-amber-700 dark:text-amber-400">
-              {settings.language === 'hi' ? 'लिंग विवरण' : 'Gender Profile'}
+              {t('genderProfile')}
             </span>
             <h2 className="text-2xl sm:text-3xl font-serif font-bold text-[var(--text-primary)]">
-              {settings.language === 'hi' ? 'आपका लिंग क्या है?' : 'What is your gender?'}
+              {t('whatIsYourGender')}
             </h2>
             <p className="text-xs sm:text-sm text-[var(--text-secondary)]">
-              {settings.language === 'hi'
-                ? 'उज्ज्वला, मातृ वंदना, सुकन्या जैसी योजनाएं विशेष रूप से महिलाओं व बालिकाओं के लिए हैं।'
-                : 'Special priority welfare programs (like PM Ujjwala and PMMVY) are designed specifically for women.'}
+              {t('specialPriorityWelfareProgramsLike')}
             </p>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             {[
-              { id: 'female', label: settings.language === 'hi' ? 'महिला (Female)' : 'Female', desc: 'Women specific schemes & subsidies' },
-              { id: 'male', label: settings.language === 'hi' ? 'पुरुष (Male)' : 'Male', desc: 'General & family welfare schemes' },
-              { id: 'transgender', label: settings.language === 'hi' ? 'ट्रांसजेंडर (Transgender)' : 'Transgender', desc: 'SMILE & social inclusion schemes' }
+              { id: 'female', label: t('female'), desc: t('gdFemale') },
+              { id: 'male', label: t('male'), desc: t('gdMale') },
+              { id: 'transgender', label: t('transgender'), desc: t('gdTransgender') }
             ].map((item) => (
               <button
                 key={item.id}
@@ -453,21 +426,19 @@ export const QuestionnaireView: React.FC = () => {
         <div className="space-y-6">
           <div className="space-y-2">
             <span className="text-xs font-bold uppercase tracking-wider text-amber-700 dark:text-amber-400">
-              {settings.language === 'hi' ? 'स्थान विवरण' : 'Geographic Location'}
+              {t('geographicLocation')}
             </span>
             <h2 className="text-2xl sm:text-3xl font-serif font-bold text-[var(--text-primary)]">
-              {settings.language === 'hi' ? 'आप किस राज्य / केंद्र शासित प्रदेश में रहते हैं?' : 'Which State or Union Territory do you reside in?'}
+              {t('whichStateOrUnionTerritory')}
             </h2>
             <p className="text-xs sm:text-sm text-[var(--text-secondary)]">
-              {settings.language === 'hi'
-                ? 'यह राज्य-विशिष्ट पोर्टल लिंक और निकटतम सहायता केंद्र दिखाने में मदद करता है।'
-                : 'Identifies state-specific welfare top-ups, revenue portals, and nearest assistance centers.'}
+              {t('identifiesStateSpecificWelfareTop')}
             </p>
           </div>
 
           <div className="p-6 rounded-3xl glass-card border border-[var(--glass-panel-border)] space-y-4 shadow-sm">
             <label className="block text-xs font-semibold text-[var(--text-primary)]">
-              {settings.language === 'hi' ? 'राज्य का चयन करें' : 'Select State'}
+              {t('selectState')}
             </label>
             <select
               value={answers.state || ''}
@@ -478,11 +449,11 @@ export const QuestionnaireView: React.FC = () => {
               className="w-full text-base px-4 py-3 rounded-xl border border-[var(--border-hairline)] bg-[var(--bg-subtle)] text-[var(--text-primary)] focus:border-[var(--accent-saffron)] focus:outline-none transition-colors"
             >
               <option value="" disabled>
-                {settings.language === 'hi' ? '-- अपना राज्य / केंद्र शासित प्रदेश चुनें --' : '-- Select your State / UT --'}
+                {t('selectYourStateUt')}
               </option>
               {INDIAN_STATES_DISTRICTS.map((s) => (
                 <option key={s.state} value={s.state}>
-                  {s.state} ({s.stateHindi})
+                  {L.state(s.state, s.stateHindi)}
                 </option>
               ))}
             </select>
@@ -495,22 +466,20 @@ export const QuestionnaireView: React.FC = () => {
         <div className="space-y-6">
           <div className="space-y-2">
             <span className="text-xs font-bold uppercase tracking-wider text-amber-700 dark:text-amber-400">
-              {settings.language === 'hi' ? 'निवास क्षेत्र' : 'Area of Residence'}
+              {t('areaOfResidence')}
             </span>
             <h2 className="text-2xl sm:text-3xl font-serif font-bold text-[var(--text-primary)]">
-              {settings.language === 'hi' ? 'आप गांव में रहते हैं या शहर / कस्बे में?' : 'Do you live in a rural village or an urban town/city?'}
+              {t('doYouLiveInA')}
             </h2>
             <p className="text-xs sm:text-sm text-[var(--text-secondary)]">
-              {settings.language === 'hi'
-                ? 'मनरेगा और पीएम आवास-ग्रामीण गांवों के लिए हैं, जबकि पीएम स्वनिधि शहरों के लिए है।'
-                : 'Schemes like MGNREGA and PMAY-Gramin target rural areas, while PM SVANidhi focuses on urban vendors.'}
+              {t('schemesLikeMgnregaAndPmay')}
             </p>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {[
-              { id: 'rural', label: settings.language === 'hi' ? 'ग्रामीण (गांव / ग्राम पंचायत)' : 'Rural (Village / Panchayat)', desc: 'Eligible for MGNREGA, PMAY-G, agriculture inputs' },
-              { id: 'urban', label: settings.language === 'hi' ? 'शहरी (कस्बा / नगर निगम / पालिका)' : 'Urban (City / Municipality)', desc: 'Eligible for PM SVANidhi, PMAY-Urban 2.0, urban MSME' }
+              { id: 'rural', label: t('ruralVillagePanchayat'), desc: t('adRural') },
+              { id: 'urban', label: t('urbanCityMunicipality'), desc: t('adUrban') }
             ].map((item) => (
               <button
                 key={item.id}
@@ -543,32 +512,30 @@ export const QuestionnaireView: React.FC = () => {
         <div className="space-y-6">
           <div className="space-y-2">
             <span className="text-xs font-bold uppercase tracking-wider text-amber-700 dark:text-amber-400">
-              {settings.language === 'hi' ? 'व्यवसाय व आजीविका' : 'Primary Occupation'}
+              {t('primaryOccupation')}
             </span>
             <h2 className="text-2xl sm:text-3xl font-serif font-bold text-[var(--text-primary)]">
-              {settings.language === 'hi' ? 'आपका मुख्य काम या आजीविका क्या है?' : 'What is your primary livelihood or occupation?'}
+              {t('whatIsYourPrimaryLivelihood')}
             </h2>
             <p className="text-xs sm:text-sm text-[var(--text-secondary)]">
-              {settings.language === 'hi'
-                ? 'सरकारी योजनाएं सीधे आपके काम से जुड़ी होती हैं (जैसे किसान, कारीगर, छात्र, दुकानदार)।'
-                : 'Matches occupation-targeted programs like PM-KISAN, PM Vishwakarma, MUDRA loans, and scholarships.'}
+              {t('matchesOccupationTargetedProgramsLike')}
             </p>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-[460px] overflow-y-auto pr-1">
             {[
-              { id: 'farmer', label: settings.language === 'hi' ? 'किसान (भूमि स्वामी)' : 'Farmer (Cultivator)', icon: Wheat },
-              { id: 'agricultural_labour', label: settings.language === 'hi' ? 'खेतिहर मजदूर / ग्रामीण श्रमिक' : 'Agricultural Labourer', icon: HeartHandshake },
-              { id: 'artisan_craftsperson', label: settings.language === 'hi' ? 'पारंपरिक कारीगर / विश्वकर्मा शिल्पकार' : 'Traditional Artisan / Craftsman', icon: Hammer },
-              { id: 'street_vendor', label: settings.language === 'hi' ? 'स्ट्रीट वेंडर / रेहड़ी-पटरी विक्रेता' : 'Street Vendor / Hawkers', icon: Store },
-              { id: 'daily_wage_worker', label: settings.language === 'hi' ? 'दैनिक वेतनभोगी / दिहाड़ी मजदूर' : 'Daily Wage Worker', icon: User },
-              { id: 'small_business_owner', label: settings.language === 'hi' ? 'छोटा व्यापारी / दुकानदार / MSME' : 'Small Business / Shop Owner', icon: Briefcase },
-              { id: 'student', label: settings.language === 'hi' ? 'विद्यार्थी / छात्र (अध्ययनरत)' : 'Student (Higher Studies)', icon: GraduationCap },
-              { id: 'homemaker', label: settings.language === 'hi' ? 'गृहिणी (घरेलू महिला)' : 'Homemaker', icon: Home },
-              { id: 'salaried_private', label: settings.language === 'hi' ? 'निजी नौकरी (वेतनभोगी)' : 'Salaried (Private Job)', icon: Briefcase },
-              { id: 'government_employee', label: settings.language === 'hi' ? 'सरकारी कर्मचारी' : 'Government Employee', icon: Briefcase },
-              { id: 'unemployed', label: settings.language === 'hi' ? 'बेरोजगार / काम की तलाश में' : 'Unemployed / Jobseeker', icon: User },
-              { id: 'retired', label: settings.language === 'hi' ? 'सेवानिवृत्त / बुजुर्ग' : 'Retired / Senior', icon: Sun }
+              { id: 'farmer', label: t('farmerCultivator'), icon: Wheat },
+              { id: 'agricultural_labour', label: t('agriculturalLabourer'), icon: HeartHandshake },
+              { id: 'artisan_craftsperson', label: t('traditionalArtisanCraftsman'), icon: Hammer },
+              { id: 'street_vendor', label: t('streetVendorHawkers'), icon: Store },
+              { id: 'daily_wage_worker', label: t('dailyWageWorker'), icon: User },
+              { id: 'small_business_owner', label: t('smallBusinessShopOwner'), icon: Briefcase },
+              { id: 'student', label: t('studentHigherStudies'), icon: GraduationCap },
+              { id: 'homemaker', label: t('homemaker'), icon: Home },
+              { id: 'salaried_private', label: t('salariedPrivateJob'), icon: Briefcase },
+              { id: 'government_employee', label: t('governmentEmployee'), icon: Briefcase },
+              { id: 'unemployed', label: t('unemployedJobseeker'), icon: User },
+              { id: 'retired', label: t('retiredSenior'), icon: Sun }
             ].map((item) => (
               <button
                 key={item.id}
@@ -601,25 +568,23 @@ export const QuestionnaireView: React.FC = () => {
         <div className="space-y-6">
           <div className="space-y-2">
             <span className="text-xs font-bold uppercase tracking-wider text-amber-700 dark:text-amber-400">
-              {settings.language === 'hi' ? 'पारिवारिक आय' : 'Household Annual Income'}
+              {t('householdAnnualIncome')}
             </span>
             <h2 className="text-2xl sm:text-3xl font-serif font-bold text-[var(--text-primary)]">
-              {settings.language === 'hi' ? 'आपके पूरे परिवार की कुल वार्षिक आय किस दायरे में है?' : 'What is your total annual household income?'}
+              {t('whatIsYourTotalAnnual')}
             </h2>
             <p className="text-xs sm:text-sm text-[var(--text-secondary)]">
-              {settings.language === 'hi'
-                ? 'कल्याणकारी योजनाओं में आय सीमा होती है (जैसे ₹1 लाख, ₹2.5 लाख या ₹8 लाख तक)।'
-                : 'Most social schemes enforce maximum income thresholds (e.g. up to ₹1L, ₹2.5L, or ₹8L per year).'}
+              {t('mostSocialSchemesEnforceMaximum')}
             </p>
           </div>
 
           <div className="space-y-3">
             {[
-              { id: 'below_1lakh', label: settings.language === 'hi' ? '₹1,00,000 से कम (गरीबी रेखा / बीपीएल स्तर)' : 'Less than ₹1,00,000 / year (BPL / Antyodaya bracket)' },
-              { id: '1lakh_to_2.5lakh', label: settings.language === 'hi' ? '₹1,00,000 से ₹2,50,000 प्रति वर्ष (EWS / निम्न आय)' : '₹1,00,000 to ₹2,50,000 / year (EWS & Low Income)' },
-              { id: '2.5lakh_to_5lakh', label: settings.language === 'hi' ? '₹2,50,000 से ₹5,00,000 प्रति वर्ष (मध्यम आय LIG)' : '₹2,50,000 to ₹5,00,000 / year (LIG category)' },
-              { id: '5lakh_to_8lakh', label: settings.language === 'hi' ? '₹5,00,000 से ₹8,00,000 प्रति वर्ष (सामान्य सीमा)' : '₹5,00,000 to ₹8,00,000 / year (MIG category)' },
-              { id: 'above_8lakh', label: settings.language === 'hi' ? '₹8,00,000 से अधिक' : 'Above ₹8,00,000 / year' }
+              { id: 'below_1lakh', label: t('lessThan100000') },
+              { id: '1lakh_to_2.5lakh', label: t('n100000To2') },
+              { id: '2.5lakh_to_5lakh', label: t('n250000To5') },
+              { id: '5lakh_to_8lakh', label: t('n500000To8') },
+              { id: 'above_8lakh', label: t('above800000Year') }
             ].map((item) => (
               <button
                 key={item.id}
@@ -649,24 +614,22 @@ export const QuestionnaireView: React.FC = () => {
         <div className="space-y-6">
           <div className="space-y-2">
             <span className="text-xs font-bold uppercase tracking-wider text-amber-700 dark:text-amber-400">
-              {settings.language === 'hi' ? 'कृषि भूमि स्वामित्व' : 'Agricultural Landholding'}
+              {t('agriculturalLandholding')}
             </span>
             <h2 className="text-2xl sm:text-3xl font-serif font-bold text-[var(--text-primary)]">
-              {settings.language === 'hi' ? 'आपके या परिवार के नाम पर कितनी खेती की जमीन है?' : 'How much cultivable agricultural land does your family hold?'}
+              {t('howMuchCultivableAgriculturalLand')}
             </h2>
             <p className="text-xs sm:text-sm text-[var(--text-secondary)]">
-              {settings.language === 'hi'
-                ? 'पीएम-किसान और किसान क्रेडिट कार्ड (KCC) हेतु भूमि अभिलेख होना आवश्यक है।'
-                : 'Directly determines eligibility for PM-KISAN, crop insurance, and Kisan Credit Card.'}
+              {t('directlyDeterminesEligibilityForPm')}
             </p>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {[
-              { id: 'none', label: settings.language === 'hi' ? 'कोई कृषि भूमि नहीं (भूमिहीन)' : 'No Agricultural Land (Landless)', desc: 'Eligible for wage work, PM Vishwakarma, SVANidhi' },
-              { id: 'marginal_less_than_1ha', label: settings.language === 'hi' ? 'सीमांत किसान (< 1 हेक्टेयर / 2.5 एकड़)' : 'Marginal Farmer (< 1 Hectare / 2.5 Acres)', desc: 'High priority for PM-KISAN & input subsidies' },
-              { id: 'small_1_to_2ha', label: settings.language === 'hi' ? 'लघु किसान (1 से 2 हेक्टेयर)' : 'Small Farmer (1 to 2 Hectares)', desc: 'Eligible for PM-KISAN, solar pump schemes' },
-              { id: 'medium_large_above_2ha', label: settings.language === 'hi' ? 'मध्यम / बड़े किसान (> 2 हेक्टेयर)' : 'Medium / Large Farmer (> 2 Hectares)', desc: 'Qualifies for farm mechanization & solar grants' }
+              { id: 'none', label: t('noAgriculturalLandLandless'), desc: t('ldNone') },
+              { id: 'marginal_less_than_1ha', label: t('marginalFarmer1Hectare2'), desc: t('ldMarginal') },
+              { id: 'small_1_to_2ha', label: t('smallFarmer1To2'), desc: t('ldSmall') },
+              { id: 'medium_large_above_2ha', label: t('mediumLargeFarmer2Hectares'), desc: t('ldLarge') }
             ].map((item) => (
               <button
                 key={item.id}
@@ -699,25 +662,23 @@ export const QuestionnaireView: React.FC = () => {
         <div className="space-y-6">
           <div className="space-y-2">
             <span className="text-xs font-bold uppercase tracking-wider text-amber-700 dark:text-amber-400">
-              {settings.language === 'hi' ? 'सामाजिक वर्ग / श्रेणी' : 'Social Category'}
+              {t('socialCategory')}
             </span>
             <h2 className="text-2xl sm:text-3xl font-serif font-bold text-[var(--text-primary)]">
-              {settings.language === 'hi' ? 'आप किस सामाजिक वर्ग / श्रेणी से संबंधित हैं?' : 'Which social category do you belong to?'}
+              {t('whichSocialCategoryDoYou')}
             </h2>
             <p className="text-xs sm:text-sm text-[var(--text-secondary)]">
-              {settings.language === 'hi'
-                ? 'आरक्षित वर्गों (SC, ST, OBC) और EWS हेतु विशेष छात्रवृत्ति और अनुदान योजनाएं होती हैं।'
-                : 'Identifies dedicated affirmative welfare schemes, reservations, and fee exemptions.'}
+              {t('identifiesDedicatedAffirmativeWelfareSchemes')}
             </p>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {[
-              { id: 'General', label: 'General (सामान्य वर्ग)' },
-              { id: 'OBC', label: 'OBC (अन्य पिछड़ा वर्ग)' },
-              { id: 'SC', label: 'SC (अनुसूचित जाति)' },
-              { id: 'ST', label: 'ST (अनुसूचित जनजाति)' },
-              { id: 'EWS', label: 'EWS (आर्थिक रूप से कमजोर सामान्य)' }
+              { id: 'General', label: t('catGeneral') },
+              { id: 'OBC', label: t('catObc') },
+              { id: 'SC', label: t('catSc') },
+              { id: 'ST', label: t('catSt') },
+              { id: 'EWS', label: t('catEws') }
             ].map((item) => (
               <button
                 key={item.id}
@@ -747,24 +708,22 @@ export const QuestionnaireView: React.FC = () => {
         <div className="space-y-6">
           <div className="space-y-2">
             <span className="text-xs font-bold uppercase tracking-wider text-amber-700 dark:text-amber-400">
-              {settings.language === 'hi' ? 'राशन कार्ड स्थिति' : 'Ration Card Category'}
+              {t('rationCardCategory')}
             </span>
             <h2 className="text-2xl sm:text-3xl font-serif font-bold text-[var(--text-primary)]">
-              {settings.language === 'hi' ? 'आपके परिवार के पास कौन सा राशन कार्ड है?' : 'What type of ration card does your household hold?'}
+              {t('whatTypeOfRationCard')}
             </h2>
             <p className="text-xs sm:text-sm text-[var(--text-secondary)]">
-              {settings.language === 'hi'
-                ? 'आयुष्मान भारत और उज्ज्वला में बीपीएल अथवा अंत्योदय कार्ड प्राथमिक पहचान है।'
-                : 'BPL and Antyodaya (AAY) cards are recognized proof for Ayushman Bharat and Ujjwala.'}
+              {t('bplAndAntyodayaAayCards')}
             </p>
           </div>
 
           <div className="space-y-3">
             {[
-              { id: 'aay_antyodaya', label: settings.language === 'hi' ? 'अंत्योदय अन्न योजना (AAY / पीला कार्ड - अत्यंत निर्धन)' : 'Antyodaya Anna Yojana (AAY - Heavily Subsidised)' },
-              { id: 'bpl', label: settings.language === 'hi' ? 'बीपीएल / प्राथमिकता राशन कार्ड (BPL / PHH)' : 'Below Poverty Line (BPL / Priority Household PHH)' },
-              { id: 'apl', label: settings.language === 'hi' ? 'सामान्य राशन कार्ड (APL / Non-PHH / सफेद कार्ड)' : 'Above Poverty Line (APL / Non-PHH)' },
-              { id: 'none', label: settings.language === 'hi' ? 'कोई राशन कार्ड नहीं है' : 'No Ration Card' }
+              { id: 'aay_antyodaya', label: t('antyodayaAnnaYojanaAayHeavily') },
+              { id: 'bpl', label: t('belowPovertyLineBplPriority') },
+              { id: 'apl', label: t('abovePovertyLineAplNon') },
+              { id: 'none', label: t('noRationCard') }
             ].map((item) => (
               <button
                 key={item.id}
@@ -794,26 +753,24 @@ export const QuestionnaireView: React.FC = () => {
         <div className="space-y-6">
           <div className="space-y-2">
             <span className="text-xs font-bold uppercase tracking-wider text-amber-700 dark:text-amber-400">
-              {settings.language === 'hi' ? 'विशेष पारिवारिक परिस्थितियां' : 'Special Household Conditions'}
+              {t('specialHouseholdConditions')}
             </span>
             <h2 className="text-2xl sm:text-3xl font-serif font-bold text-[var(--text-primary)]">
-              {settings.language === 'hi' ? 'क्या आपके परिवार में इनमें से कोई विशेष स्थिति है?' : 'Do any of these special conditions apply to your household?'}
+              {t('doAnyOfTheseSpecial')}
             </h2>
             <p className="text-xs sm:text-sm text-[var(--text-secondary)]">
-              {settings.language === 'hi'
-                ? 'लागू होने वाले सभी विकल्पों को चुनें (या कोई न हो तो सीधे आगे बढ़ें)।'
-                : 'Select all that apply. These unlock targeted benefits like Sukanya Samriddhi, Surya Ghar, or Pensions.'}
+              {t('selectAllThatApplyThese')}
             </p>
           </div>
 
           <div className="space-y-3">
             {[
-              { id: 'girl_child_under_10', label: settings.language === 'hi' ? '10 वर्ष से कम आयु की बेटी (सुकन्या समृद्धि योजना)' : 'Daughter aged under 10 years (SSY savings)' },
-              { id: 'pregnant_lactating', label: settings.language === 'hi' ? 'गर्भवती अथवा स्तनपान कराने वाली माता (PMMVY नकद लाभ)' : 'Pregnant or lactating mother (PMMVY ₹5,000)' },
-              { id: 'disability', label: settings.language === 'hi' ? 'दिव्यांग सदस्य (दिव्यांग पेंशन व सहायक उपकरण)' : 'Person with benchmark disability (Disability Pension)' },
-              { id: 'widow', label: settings.language === 'hi' ? 'विधवा महिला (विधवा पेंशन योजना)' : 'Widowed woman in household (Widow Pension)' },
-              { id: 'senior_citizen', label: settings.language === 'hi' ? '60 वर्ष से अधिक आयु के बुजुर्ग (वृद्धावस्था पेंशन व स्वास्थ्य)' : 'Senior citizen aged 60+ (Old age pension)' },
-              { id: 'has_unshaded_rooftop', label: settings.language === 'hi' ? 'घर की छत पर धूप आती है (पीएम सूर्य घर ₹78k सोलर सब्सिडी)' : 'Unshaded rooftop access (PM Surya Ghar Solar Subsidy)' }
+              { id: 'girl_child_under_10', label: t('daughterAgedUnder10Years') },
+              { id: 'pregnant_lactating', label: t('pregnantOrLactatingMotherPmmvy') },
+              { id: 'disability', label: t('personWithBenchmarkDisabilityDisability') },
+              { id: 'widow', label: t('widowedWomanInHouseholdWidow') },
+              { id: 'senior_citizen', label: t('seniorCitizenAged60Old') },
+              { id: 'has_unshaded_rooftop', label: t('unshadedRooftopAccessPmSurya') }
             ].map((item) => {
               const currentList = answers.specialAttributes || [];
               const isChecked = currentList.includes(item.id);

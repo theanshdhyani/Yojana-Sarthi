@@ -20,13 +20,14 @@ import {
 import { SCHEMES_DATABASE } from '../../data/schemesData';
 import { evaluateAllSchemes } from '../../services/eligibilityEngine';
 import { QuestionnaireAnswers } from '../../types/questionnaire';
+import { MessageKey } from '../../i18n';
 
 type PersonaKey = 'farmer' | 'student' | 'woman' | 'senior' | 'artisan';
 
 interface Persona {
   name: string;
-  role: { en: string; hi: string };
-  place: { en: string; hi: string };
+  role: MessageKey;
+  place: MessageKey;
   answers: QuestionnaireAnswers;
 }
 
@@ -34,8 +35,8 @@ interface Persona {
 const PERSONAS: Record<PersonaKey, Persona> = {
   farmer: {
     name: 'Rameshwar Sharma',
-    role: { en: 'Small farmer, 42', hi: 'लघु किसान, 42 वर्ष' },
-    place: { en: 'Uttar Pradesh · Rural', hi: 'उत्तर प्रदेश · ग्रामीण' },
+    role: 'personaFarmerRole',
+    place: 'personaFarmerPlace',
     answers: {
       age: 42, gender: 'male', state: 'Uttar Pradesh', residenceArea: 'rural', socialCategory: 'OBC',
       occupation: 'farmer', annualIncomeBracket: '1lakh_to_2.5lakh', landholding: 'small_1_to_2ha', hasRationCard: 'bpl',
@@ -44,8 +45,8 @@ const PERSONAS: Record<PersonaKey, Persona> = {
   },
   student: {
     name: 'Anjali Kumari',
-    role: { en: 'College student, 19', hi: 'कॉलेज छात्रा, 19 वर्ष' },
-    place: { en: 'Bihar · Rural', hi: 'बिहार · ग्रामीण' },
+    role: 'personaStudentRole',
+    place: 'personaStudentPlace',
     answers: {
       age: 19, gender: 'female', state: 'Bihar', residenceArea: 'rural', socialCategory: 'OBC',
       occupation: 'student', annualIncomeBracket: '1lakh_to_2.5lakh', landholding: 'none', hasRationCard: 'bpl'
@@ -53,8 +54,8 @@ const PERSONAS: Record<PersonaKey, Persona> = {
   },
   woman: {
     name: 'Sunita Devi',
-    role: { en: 'Runs a small shop, 36', hi: 'छोटी दुकान चलाती हैं, 36 वर्ष' },
-    place: { en: 'Rajasthan · Rural', hi: 'राजस्थान · ग्रामीण' },
+    role: 'personaWomanRole',
+    place: 'personaWomanPlace',
     answers: {
       age: 36, gender: 'female', state: 'Rajasthan', residenceArea: 'rural', socialCategory: 'General',
       occupation: 'small_business_owner', annualIncomeBracket: 'below_1lakh', landholding: 'none', hasRationCard: 'bpl',
@@ -63,8 +64,8 @@ const PERSONAS: Record<PersonaKey, Persona> = {
   },
   senior: {
     name: 'Shivcharan Lal',
-    role: { en: 'Retired, 72', hi: 'सेवानिवृत्त, 72 वर्ष' },
-    place: { en: 'Madhya Pradesh · Rural', hi: 'मध्य प्रदेश · ग्रामीण' },
+    role: 'personaSeniorRole',
+    place: 'personaSeniorPlace',
     answers: {
       age: 72, gender: 'male', state: 'Madhya Pradesh', residenceArea: 'rural', socialCategory: 'SC',
       occupation: 'retired', annualIncomeBracket: 'below_1lakh', landholding: 'none', hasRationCard: 'bpl',
@@ -73,8 +74,8 @@ const PERSONAS: Record<PersonaKey, Persona> = {
   },
   artisan: {
     name: 'Mohan Lal Vishwakarma',
-    role: { en: 'Carpenter, 29', hi: 'बढ़ई, 29 वर्ष' },
-    place: { en: 'Gujarat · Rural', hi: 'गुजरात · ग्रामीण' },
+    role: 'personaArtisanRole',
+    place: 'personaArtisanPlace',
     answers: {
       age: 29, gender: 'male', state: 'Gujarat', residenceArea: 'rural', socialCategory: 'OBC',
       occupation: 'artisan_craftsperson', annualIncomeBracket: '1lakh_to_2.5lakh', landholding: 'none', hasRationCard: 'bpl'
@@ -82,12 +83,12 @@ const PERSONAS: Record<PersonaKey, Persona> = {
   }
 };
 
-const PERSONA_TABS: { key: PersonaKey; en: string; hi: string }[] = [
-  { key: 'farmer', en: 'Farmer', hi: 'किसान' },
-  { key: 'student', en: 'Student', hi: 'छात्रा' },
-  { key: 'woman', en: 'Woman', hi: 'महिला' },
-  { key: 'senior', en: 'Senior', hi: 'बुजुर्ग' },
-  { key: 'artisan', en: 'Artisan', hi: 'शिल्पी' }
+const PERSONA_TABS: { key: PersonaKey; label: MessageKey }[] = [
+  { key: 'farmer', label: 'personaTabFarmer' },
+  { key: 'student', label: 'personaTabStudent' },
+  { key: 'woman', label: 'personaTabWoman' },
+  { key: 'senior', label: 'personaTabSenior' },
+  { key: 'artisan', label: 'personaTabArtisan' }
 ];
 
 const Eyebrow: React.FC<{ children: React.ReactNode }> = ({ children }) => (
@@ -95,8 +96,7 @@ const Eyebrow: React.FC<{ children: React.ReactNode }> = ({ children }) => (
 );
 
 export const HomeView: React.FC = () => {
-  const { setCurrentView, setSelectedSchemeId, settings, setAnswers, openFindSchemes, addToast, t } = useApp();
-  const hi = settings.language === 'hi';
+  const { setCurrentView, setSelectedSchemeId, setAnswers, openFindSchemes, addToast, t, L } = useApp();
 
   const [activePersona, setActivePersona] = useState<PersonaKey>('farmer');
   const persona = PERSONAS[activePersona];
@@ -106,7 +106,7 @@ export const HomeView: React.FC = () => {
 
   const handleLoadPersonaReport = () => {
     setAnswers(persona.answers, true);
-    addToast(hi ? 'नमूना प्रोफ़ाइल लोड की गई' : 'Sample profile loaded — this is demo data', 'info');
+    addToast(t('sampleProfileLoadedThisIs'), 'info');
     setCurrentView('results');
   };
 
@@ -116,12 +116,12 @@ export const HomeView: React.FC = () => {
   };
 
   const tools: { view: AppView; icon: LucideIcon; tint: string; title: string; desc: string; cta: string }[] = [
-    { view: 'questionnaire', icon: Compass, tint: 'from-orange-400 to-rose-500', title: t('tool1Title'), desc: t('tool1Desc'), cta: hi ? 'प्रश्नावली शुरू करें' : 'Start questionnaire' },
-    { view: 'document_checker', icon: FileText, tint: 'from-emerald-400 to-teal-500', title: t('tool2Title'), desc: t('tool2Desc'), cta: hi ? 'दस्तावेज़ जांचें' : 'Check documents' },
-    { view: 'tracker', icon: CheckCircle2, tint: 'from-sky-400 to-blue-600', title: t('tool3Title'), desc: t('tool3Desc'), cta: hi ? 'ट्रैकर देखें' : 'Open tracker' },
-    { view: 'family_mode', icon: Users, tint: 'from-violet-400 to-purple-600', title: t('tool4Title'), desc: t('tool4Desc'), cta: hi ? 'परिवार योजना' : 'Plan for family' },
-    { view: 'nearby_help', icon: Building2, tint: 'from-amber-400 to-orange-600', title: t('tool5Title'), desc: t('tool5Desc'), cta: hi ? 'सहायता केंद्र' : 'Find help centres' },
-    { view: 'all_schemes', icon: Sparkles, tint: 'from-pink-400 to-fuchsia-600', title: t('tool6Title'), desc: t('tool6Desc'), cta: hi ? 'सभी योजनाएं' : 'Browse schemes' }
+    { view: 'questionnaire', icon: Compass, tint: 'from-orange-400 to-rose-500', title: t('tool1Title'), desc: t('tool1Desc'), cta: t('startQuestionnaire') },
+    { view: 'document_checker', icon: FileText, tint: 'from-emerald-400 to-teal-500', title: t('tool2Title'), desc: t('tool2Desc'), cta: t('checkDocuments') },
+    { view: 'tracker', icon: CheckCircle2, tint: 'from-sky-400 to-blue-600', title: t('tool3Title'), desc: t('tool3Desc'), cta: t('openTracker') },
+    { view: 'family_mode', icon: Users, tint: 'from-violet-400 to-purple-600', title: t('tool4Title'), desc: t('tool4Desc'), cta: t('planForFamily') },
+    { view: 'nearby_help', icon: Building2, tint: 'from-amber-400 to-orange-600', title: t('tool5Title'), desc: t('tool5Desc'), cta: t('findHelpCentres') },
+    { view: 'all_schemes', icon: Sparkles, tint: 'from-pink-400 to-fuchsia-600', title: t('tool6Title'), desc: t('tool6Desc'), cta: t('browseSchemes') }
   ];
 
   const openTool = (view: AppView) => (view === 'questionnaire' ? openFindSchemes() : setCurrentView(view));
@@ -141,23 +141,14 @@ export const HomeView: React.FC = () => {
           <div className="lg:col-span-7 space-y-7">
             <div className="inline-flex items-center gap-2 glass-toolbar rounded-full pl-2 pr-4 py-1.5 text-xs font-semibold text-[var(--text-secondary)]">
               <span className="px-2 py-0.5 rounded-full bg-[var(--accent-green-light)] text-[var(--accent-green-text)]">
-                {hi ? 'निःशुल्क' : 'Free'}
+                {t('free')}
               </span>
               <span>{t('heroEyebrow')}</span>
             </div>
 
             <h1 className="text-[2.6rem] leading-[1.05] sm:text-6xl lg:text-7xl font-bold tracking-tight text-[var(--text-primary)] text-balance">
-              {hi ? (
-                <>
-                  हर नागरिक का अधिकार,{' '}
-                  <span className="text-gradient-saffron">बिना बिचौलियों के।</span>
-                </>
-              ) : (
-                <>
-                  Find the schemes{' '}
-                  <span className="text-gradient-saffron">your family deserves.</span>
-                </>
-              )}
+              {t('heroLine1')}{' '}
+              <span className="text-gradient-saffron">{t('heroLine2')}</span>
             </h1>
 
             <p className="text-lg sm:text-xl text-[var(--text-secondary)] leading-relaxed max-w-2xl">{t('heroSubtitle')}</p>
@@ -194,13 +185,13 @@ export const HomeView: React.FC = () => {
               <span className="w-7 h-7 rounded-[9px] bg-gradient-to-br from-emerald-400 to-teal-600 flex items-center justify-center text-white">
                 <Landmark className="w-3.5 h-3.5" />
               </span>
-              <span>{hi ? 'सीधे बैंक खाते में (DBT)' : 'Direct to bank (DBT)'}</span>
+              <span>{t('directToBankDbt')}</span>
             </div>
             <div className="bobbin-satellite-chip absolute -bottom-5 -left-1 sm:-left-5 hidden sm:flex items-center gap-2 px-3.5 py-2 rounded-2xl z-20 text-xs font-semibold text-[var(--text-primary)]">
               <span className="w-7 h-7 rounded-[9px] bg-gradient-to-br from-rose-400 to-pink-600 flex items-center justify-center text-white">
                 <HeartPulse className="w-3.5 h-3.5" />
               </span>
-              <span>{hi ? '₹5 लाख स्वास्थ्य कवर' : '₹5 Lakh health cover'}</span>
+              <span>{t('n5LakhHealthCover')}</span>
             </div>
 
             <div className="bobbin-hero-panel rounded-[2rem] p-5 sm:p-6 space-y-5">
@@ -212,11 +203,11 @@ export const HomeView: React.FC = () => {
                 </div>
                 <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-[var(--accent-green-text)] bg-[var(--accent-green-light)] px-2.5 py-1 rounded-full">
                   <span className="w-1.5 h-1.5 rounded-full bg-[var(--accent-green)] animate-pulse" />
-                  {hi ? 'लाइव इंजन · आपके फोन पर' : 'Live engine · on your device'}
+                  {t('liveEngineOnYourDevice')}
                 </span>
               </div>
 
-              <div className="segmented w-full grid grid-cols-5 text-[12px] font-medium" role="tablist" aria-label={hi ? 'नमूना नागरिक' : 'Sample citizen'}>
+              <div className="segmented w-full grid grid-cols-5 text-[12px] font-medium" role="tablist" aria-label={t('sampleCitizen')}>
                 {PERSONA_TABS.map((p) => (
                   <button
                     key={p.key}
@@ -225,7 +216,7 @@ export const HomeView: React.FC = () => {
                     onClick={() => setActivePersona(p.key)}
                     className={`py-2 px-1 truncate ${activePersona === p.key ? 'font-semibold' : 'text-[var(--text-secondary)]'}`}
                   >
-                    {hi ? p.hi : p.en}
+                    {t(p.label)}
                   </button>
                 ))}
               </div>
@@ -238,13 +229,13 @@ export const HomeView: React.FC = () => {
                   <div className="min-w-0">
                     <p className="font-semibold text-[15px] text-[var(--text-primary)] truncate">{persona.name}</p>
                     <p className="text-xs text-[var(--text-secondary)] truncate">
-                      {hi ? persona.role.hi : persona.role.en} · {hi ? persona.place.hi : persona.place.en}
+                      {t(persona.role)} · {t(persona.place)}
                     </p>
                   </div>
                 </div>
                 <div className="text-right shrink-0">
                   <p className="text-3xl font-bold tabular-nums text-[var(--text-primary)] leading-none">{personaEligibleCount}</p>
-                  <p className="text-[11px] text-[var(--text-muted)] mt-1">{hi ? 'संभावित योजनाएं' : 'likely schemes'}</p>
+                  <p className="text-[11px] text-[var(--text-muted)] mt-1">{t('likelySchemes')}</p>
                 </div>
               </div>
 
@@ -257,14 +248,14 @@ export const HomeView: React.FC = () => {
                     />
                     <div className="min-w-0 flex-1">
                       <p className="text-[13px] font-semibold text-[var(--text-primary)] truncate">
-                        {hi ? m.scheme.nameHindi : m.scheme.shortCode + ' · ' + m.scheme.categoryLabel}
+                        {L.schemeName(m.scheme)}
                       </p>
                       <p className="text-xs text-[var(--text-secondary)] line-clamp-1">
-                        {hi ? m.scheme.benefitHeadlineHindi : m.scheme.benefitHeadline}
+                        {L.schemeBenefit(m.scheme)}
                       </p>
                     </div>
                     <span className="text-[10px] font-semibold text-[var(--text-muted)] shrink-0 mt-0.5">
-                      {m.status === 'strong_match' ? (hi ? 'पात्र' : 'Match') : hi ? 'जांचें' : 'Verify'}
+                      {m.status === 'strong_match' ? (t('match')) : t('verify')}
                     </span>
                   </li>
                 ))}
@@ -274,7 +265,7 @@ export const HomeView: React.FC = () => {
                 onClick={handleLoadPersonaReport}
                 className="w-full h-12 rounded-full bg-[var(--accent-saffron)] hover:bg-[var(--accent-saffron-hover)] text-white font-semibold text-sm flex items-center justify-center gap-1.5"
               >
-                <span>{hi ? 'इस प्रोफ़ाइल का पूरा परिणाम देखें' : 'See full results for this profile'}</span>
+                <span>{t('seeFullResultsForThis')}</span>
                 <ChevronRight className="w-4 h-4" />
               </button>
             </div>
@@ -285,7 +276,7 @@ export const HomeView: React.FC = () => {
       {/* 2. HOW IT WORKS */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
         <div className="max-w-2xl space-y-2">
-          <Eyebrow>{hi ? 'सरल प्रक्रिया' : 'How it works'}</Eyebrow>
+          <Eyebrow>{t('howItWorks')}</Eyebrow>
           <h2 className="text-3xl sm:text-5xl font-bold text-[var(--text-primary)]">{t('howItWorksTitle')}</h2>
           <p className="text-base sm:text-lg text-[var(--text-secondary)]">{t('howItWorksSubtitle')}</p>
         </div>
@@ -311,7 +302,7 @@ export const HomeView: React.FC = () => {
       {/* 3. TOOLS */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
         <div className="max-w-2xl space-y-2">
-          <Eyebrow>{hi ? 'नागरिक टूल्स' : 'Citizen tools'}</Eyebrow>
+          <Eyebrow>{t('citizenTools')}</Eyebrow>
           <h2 className="text-3xl sm:text-5xl font-bold text-[var(--text-primary)]">{t('featuredToolsTitle')}</h2>
           <p className="text-base sm:text-lg text-[var(--text-secondary)]">{t('featuredToolsSubtitle')}</p>
         </div>
@@ -343,7 +334,7 @@ export const HomeView: React.FC = () => {
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
           <div className="max-w-2xl space-y-2">
-            <Eyebrow>{hi ? 'राष्ट्रीय योजनाएं' : 'National schemes'}</Eyebrow>
+            <Eyebrow>{t('nationalSchemes')}</Eyebrow>
             <h2 className="text-3xl sm:text-5xl font-bold text-[var(--text-primary)]">{t('popularSchemesTitle')}</h2>
             <p className="text-base sm:text-lg text-[var(--text-secondary)]">{t('popularSchemesSubtitle')}</p>
           </div>
@@ -351,7 +342,7 @@ export const HomeView: React.FC = () => {
             onClick={() => setCurrentView('all_schemes')}
             className="inline-flex items-center gap-1.5 text-sm font-semibold text-[var(--accent-saffron)] hover:underline shrink-0"
           >
-            {hi ? `सभी ${SCHEMES_DATABASE.length} योजनाएं देखें` : `View all ${SCHEMES_DATABASE.length} schemes`}
+            {t('viewAllSchemes2', { length: SCHEMES_DATABASE.length })}
             <ArrowRight className="w-4 h-4" />
           </button>
         </div>
@@ -366,15 +357,15 @@ export const HomeView: React.FC = () => {
               <div className="space-y-3">
                 <div className="flex items-center justify-between text-xs">
                   <span className="font-semibold text-[var(--accent-saffron)]">
-                    {hi ? scheme.categoryLabelHindi : scheme.categoryLabel}
+                    {L.category(scheme.category)}
                   </span>
                   <span className="font-mono text-[11px] text-[var(--text-muted)]">{scheme.shortCode}</span>
                 </div>
                 <h3 className="font-semibold text-[17px] text-[var(--text-primary)] leading-snug">
-                  {hi ? scheme.nameHindi : scheme.name}
+                  {L.schemeName(scheme)}
                 </h3>
                 <p className="px-3 py-2 rounded-xl bg-[var(--accent-green-light)] text-[13px] font-medium text-[var(--accent-green-text)]">
-                  {hi ? scheme.benefitHeadlineHindi : scheme.benefitHeadline}
+                  {L.schemeBenefit(scheme)}
                 </p>
               </div>
               <span className="inline-flex items-center gap-1 text-sm font-semibold text-[var(--accent-saffron)]">
@@ -392,7 +383,7 @@ export const HomeView: React.FC = () => {
           <div className="max-w-2xl space-y-2">
             <span className="inline-flex items-center gap-1.5 text-[13px] font-semibold text-[var(--accent-green)]">
               <ShieldCheck className="w-4 h-4" />
-              {hi ? 'नागरिक गोपनीयता' : 'Privacy'}
+              {t('privacy')}
             </span>
             <h2 className="text-3xl sm:text-5xl font-bold text-[var(--text-primary)]">{t('privacySectionTitle')}</h2>
             <p className="text-base sm:text-lg text-[var(--text-secondary)]">{t('privacySectionSubtitle')}</p>

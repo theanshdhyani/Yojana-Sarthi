@@ -1,4 +1,6 @@
-export type AppLanguage = 'en' | 'hi' | 'mr' | 'ta' | 'bn' | 'te';
+import type { AppLanguage } from '../i18n/languages';
+
+export type { AppLanguage };
 
 export type AppFontSize = 'normal' | 'large' | 'extra-large';
 

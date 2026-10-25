@@ -3,12 +3,27 @@ import { QuestionnaireAnswers } from '../types/questionnaire';
 import { Scheme, EvaluatedScheme } from '../types/scheme';
 import { TrackedApplication } from '../types/tracker';
 import { FamilyMember } from '../types/family';
-import { UserPreferences, AppLanguage } from '../types/settings';
+import { UserPreferences } from '../types/settings';
 import { StorageService, SAMPLE_DEMO_DATA } from '../services/storageService';
-import { evaluateAllSchemes, evaluateSchemeEligibility } from '../services/eligibilityEngine';
+import { evaluateAllSchemes } from '../services/eligibilityEngine';
 import { SCHEMES_DATABASE } from '../data/schemesData';
-import { TRANSLATIONS } from '../data/translations';
 import { SpeechService } from '../services/speechService';
+import {
+  BUILTIN_MESSAGES,
+  LocaleContent,
+  Localizer,
+  MessageKey,
+  Messages,
+  Msg,
+  MsgParam,
+  ensureScriptFont,
+  formatMessage,
+  formatMsg,
+  languageInfo,
+  loadLocale,
+  makeLocalizer
+} from '../i18n';
+import { en } from '../i18n/messages/en';
 
 export type AppView =
   | 'home'
@@ -62,11 +77,20 @@ interface AppContextType {
   // Settings & Preferences
   settings: UserPreferences;
   updateSettings: (partial: Partial<UserPreferences>) => void;
-  t: (key: keyof typeof TRANSLATIONS.en) => string;
+  /** UI text in the current language; `{name}` placeholders are filled from params. */
+  t: (key: MessageKey, params?: Record<string, MsgParam>) => string;
+  /** Renders a message produced elsewhere (e.g. an eligibility reason). */
+  tm: (m: Msg) => string;
+  /** Scheme and document content in the current language. */
+  L: Localizer;
+  /** True while a chosen language's text is still downloading. */
+  isLanguageLoading: boolean;
 
   // Modals & Sheets
   isSettingsOpen: boolean;
   setIsSettingsOpen: (open: boolean) => void;
+  isLanguageSheetOpen: boolean;
+  setIsLanguageSheetOpen: (open: boolean) => void;
   isOnboardingOpen: boolean;
   setIsOnboardingOpen: (open: boolean) => void;
 
@@ -100,6 +124,14 @@ interface AppContextType {
 
 const AppContext = createContext<AppContextType | null>(null);
 
+const STATUS_KEYS: Record<TrackedApplication['status'], MessageKey> = {
+  to_apply: 'statusToApply',
+  under_review: 'statusUnderReview',
+  approved: 'statusApproved',
+  action_required: 'statusActionRequired',
+  rejected: 'statusActionRequired'
+};
+
 export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [currentView, setCurrentView] = useState<AppView>('home');
   const [selectedSchemeId, setSelectedSchemeId] = useState<string | null>(null);
@@ -113,7 +145,12 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   const [familyMembers, setFamilyMembers] = useState<FamilyMember[]>(StorageService.getFamilyMembers);
   const [settings, setSettingsState] = useState<UserPreferences>(StorageService.getSettings);
 
+  const [messages, setMessages] = useState<Messages>(() => BUILTIN_MESSAGES[settings.language] ?? en);
+  const [localeContent, setLocaleContent] = useState<LocaleContent | null>(null);
+  const [isLanguageLoading, setIsLanguageLoading] = useState(false);
+
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [isLanguageSheetOpen, setIsLanguageSheetOpen] = useState(false);
   const [isOnboardingOpen, setIsOnboardingOpen] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [isOnline, setIsOnline] = useState(typeof navigator !== 'undefined' ? navigator.onLine : true);
@@ -154,7 +191,6 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     }
 
     root.classList.toggle('reduce-motion', settings.reducedMotion);
-    root.lang = settings.language === 'hi' ? 'hi' : 'en';
 
     if (settings.fontSize === 'large') {
       root.style.fontSize = '18px';
@@ -168,6 +204,40 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       .querySelector('meta[name="theme-color"]')
       ?.setAttribute('content', settings.theme === 'dark' ? '#0B0D12' : '#F4F1EC');
   }, [settings]);
+
+  // Load the chosen language: built-in ones switch instantly, others download once and are cached.
+  useEffect(() => {
+    const lang = settings.language;
+    document.documentElement.lang = lang;
+    ensureScriptFont(lang);
+
+    const builtin = BUILTIN_MESSAGES[lang];
+    if (builtin) {
+      setMessages(builtin);
+      setLocaleContent(null);
+      setIsLanguageLoading(false);
+      return;
+    }
+
+    let cancelled = false;
+    setIsLanguageLoading(true);
+    loadLocale(lang)
+      .then((bundle) => {
+        if (cancelled) return;
+        setMessages(bundle?.messages ?? en);
+        setLocaleContent(bundle?.content ?? null);
+      })
+      .catch(() => {
+        // Offline before this language was ever downloaded: stay readable in English.
+        if (!cancelled) setMessages(en);
+      })
+      .finally(() => {
+        if (!cancelled) setIsLanguageLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [settings.language]);
 
   const updateSettings = (partial: Partial<UserPreferences>) => {
     const updated = { ...settings, ...partial };
@@ -211,7 +281,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     const next = [newApp, ...applications];
     setApplications(next);
     StorageService.saveApplications(next);
-    addToast('Application saved to tracker', 'success');
+    addToast(t('toastAppSaved'), 'success');
   };
 
   const updateApplicationStatus = (appId: string, status: TrackedApplication['status']) => {
@@ -225,8 +295,8 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
               ...app.timeline,
               {
                 date: new Date().toISOString().split('T')[0],
-                title: `Status updated to ${status.replace(/_/g, ' ')}`,
-                description: 'Updated by user'
+                title: t('timelineStatusUpdated', { status: t(STATUS_KEYS[status]) }),
+                description: t('timelineUpdatedByUser')
               }
             ]
           }
@@ -234,14 +304,14 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     );
     setApplications(next);
     StorageService.saveApplications(next);
-    addToast('Application status updated', 'success');
+    addToast(t('toastStatusUpdated'), 'success');
   };
 
   const deleteApplication = (appId: string) => {
     const next = applications.filter((a) => a.id !== appId);
     setApplications(next);
     StorageService.saveApplications(next);
-    addToast('Application removed from tracker', 'info');
+    addToast(t('toastAppRemoved'), 'info');
   };
 
   const addFamilyMember = (memberData: Omit<FamilyMember, 'id'>) => {
@@ -252,14 +322,14 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     const next = [...familyMembers, newMember];
     setFamilyMembers(next);
     StorageService.saveFamilyMembers(next);
-    addToast(`Added ${newMember.name} to family profile`, 'success');
+    addToast(t('toastMemberAdded', { name: newMember.name }), 'success');
   };
 
   const deleteFamilyMember = (id: string) => {
     const next = familyMembers.filter((m) => m.id !== id);
     setFamilyMembers(next);
     StorageService.saveFamilyMembers(next);
-    addToast('Family member removed', 'info');
+    addToast(t('toastMemberRemoved'), 'info');
   };
 
   const addToast = (message: string, type: ToastMessage['type'] = 'info') => {
@@ -275,13 +345,12 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   };
 
   const readAloud = (text: string) => {
-    setIsSpeaking(true);
-    SpeechService.speak(
-      text,
-      settings.language === 'hi' ? 'hi' : 'en',
-      () => setIsSpeaking(false),
-      settings.voiceSpeed
-    );
+    const info = languageInfo(settings.language);
+    const started = SpeechService.speak(text, info.speech, () => setIsSpeaking(false), settings.voiceSpeed);
+    setIsSpeaking(started);
+    if (!started && SpeechService.isSupported()) {
+      addToast(t('voiceUnavailable', { language: info.native }), 'info');
+    }
   };
 
   const stopReading = () => {
@@ -312,7 +381,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     setReadyDocumentIds(SAMPLE_DEMO_DATA.readyDocuments);
     setApplications(SAMPLE_DEMO_DATA.applications);
     setFamilyMembers(SAMPLE_DEMO_DATA.familyMembers);
-    addToast(settings.language === 'hi' ? 'नमूना डेटा लोड किया गया' : 'Sample demo profile loaded', 'success');
+    addToast(t('sampleDemoProfileLoaded'), 'success');
   };
 
   const startNewAssessment = () => {
@@ -354,11 +423,14 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const t = (key: keyof typeof TRANSLATIONS.en): string => {
-    const lang = settings.language === 'hi' ? 'hi' : 'en';
-    const dict = TRANSLATIONS[lang] || TRANSLATIONS.en;
-    return (dict as any)[key] || TRANSLATIONS.en[key] || String(key);
-  };
+  function t(key: MessageKey, params?: Record<string, MsgParam>): string {
+    return formatMessage(messages, key, params);
+  }
+  const tm = (m: Msg) => formatMsg(messages, m);
+  const L = useMemo(
+    () => makeLocalizer(settings.language, messages, localeContent),
+    [settings.language, messages, localeContent]
+  );
 
   const evaluatedResults = useMemo(() => evaluateAllSchemes(answers, readyDocumentIds), [answers, readyDocumentIds]);
 
@@ -393,8 +465,13 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         settings,
         updateSettings,
         t,
+        tm,
+        L,
+        isLanguageLoading,
         isSettingsOpen,
         setIsSettingsOpen,
+        isLanguageSheetOpen,
+        setIsLanguageSheetOpen,
         isOnboardingOpen,
         setIsOnboardingOpen: (open) => {
           setIsOnboardingOpen(open);

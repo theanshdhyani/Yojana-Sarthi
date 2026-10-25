@@ -12,7 +12,18 @@ import {
   Heart
 } from 'lucide-react';
 import { FamilyMember } from '../../types/family';
-import { evaluateAllSchemes } from '../../services/eligibilityEngine';
+import { evaluateAllSchemes, OCCUPATION_KEYS } from '../../services/eligibilityEngine';
+import { MessageKey } from '../../i18n';
+
+const RELATIONSHIP_KEYS: Record<FamilyMember['relationship'], MessageKey> = {
+  self: 'relSelf',
+  spouse: 'relSpouse',
+  father: 'relFather',
+  mother: 'relMother',
+  son: 'relSon',
+  daughter: 'relDaughter',
+  other: 'relOther'
+};
 
 export const FamilyModeView: React.FC = () => {
   const { 
@@ -23,8 +34,7 @@ export const FamilyModeView: React.FC = () => {
     setCurrentView,
     answers,
     settings, 
-    t 
-  } = useApp();
+    t, L } = useApp();
 
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
@@ -81,7 +91,7 @@ export const FamilyModeView: React.FC = () => {
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
         <div>
           <span className="text-xs font-bold uppercase tracking-wider text-purple-700 dark:text-purple-400">
-            {settings.language === 'hi' ? 'पारिवारिक लाभ योजना' : 'Household Welfare Planner'}
+            {t('householdWelfarePlanner')}
           </span>
           <h1 className="text-2xl sm:text-4xl font-serif font-bold text-[var(--text-primary)]">
             {t('familyModeTitle')}
@@ -106,18 +116,16 @@ export const FamilyModeView: React.FC = () => {
           <div className="flex items-center gap-2">
             <Users className="w-5 h-5 text-purple-700 dark:text-purple-400" />
             <h3 className="font-serif font-bold text-base text-[var(--text-primary)]">
-              {settings.language === 'hi' ? 'परिवार की संयुक्त पात्रता' : 'Aggregated Family Welfare Potential'}
+              {t('aggregatedFamilyWelfarePotential')}
             </h3>
           </div>
           <span className="text-xs font-semibold font-mono tabular-nums text-purple-700 dark:text-purple-400 bg-purple-50 dark:bg-purple-950 px-2 py-0.5 rounded border border-purple-200">
-            {familyMembers.length} {settings.language === 'hi' ? 'सदस्य' : 'Members Registered'}
+            {familyMembers.length} {t('membersRegistered')}
           </span>
         </div>
 
         <p className="text-xs text-[var(--text-secondary)] leading-relaxed">
-          {settings.language === 'hi'
-            ? 'भारतीय कल्याणकारी योजनाएं पूरे परिवार की विभिन्न पीढ़ियों के लिए बनाई गई हैं। अलग-अलग सदस्यों की पात्रता जोड़ने से परिवार को छात्रवृत्ति, मातृत्व लाभ, किसान किस्तें और बुजुर्ग पेंशन एक साथ मिल सकती हैं।'
-            : 'Government welfare programs are intergenerational. By planning together, a single household can simultaneously access farm input transfers, scholarships, maternity incentives, and sovereign old age pensions.'}
+          {t('governmentWelfareProgramsAreIntergenerational')}
         </p>
       </div>
 
@@ -143,11 +151,15 @@ export const FamilyModeView: React.FC = () => {
                         {member.name}
                       </h4>
                       <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-[var(--bg-subtle)] text-[var(--text-secondary)] border border-[var(--border-hairline)]">
-                        {member.relationship}
+                        {t(RELATIONSHIP_KEYS[member.relationship])}
                       </span>
                     </div>
                     <p className="text-xs text-[var(--text-secondary)] mt-0.5">
-                      {member.profile.age} yrs · {member.profile.gender} · {member.profile.occupation?.replace(/_/g, ' ')}
+                      {t('memberSummary', {
+                        age: member.profile.age ?? '',
+                        gender: member.profile.gender ? t(member.profile.gender === 'female' ? 'female' : member.profile.gender === 'male' ? 'male' : 'transgender') : '',
+                        occupation: member.profile.occupation ? t(OCCUPATION_KEYS[member.profile.occupation]) : ''
+                      })}
                     </p>
                     {member.notes && (
                       <p className="text-[11px] text-[var(--text-muted)] italic mt-1">
@@ -161,7 +173,8 @@ export const FamilyModeView: React.FC = () => {
                   <button
                     onClick={() => deleteFamilyMember(member.id)}
                     className="p-1.5 rounded-lg text-[var(--text-muted)] hover:text-red-600 transition-colors"
-                    title="Remove member"
+                    title={t('removeMember')}
+                    aria-label={t('removeMember')}
                   >
                     <Trash2 className="w-4 h-4" />
                   </button>
@@ -171,14 +184,12 @@ export const FamilyModeView: React.FC = () => {
               {/* Matched Schemes for this Member */}
               <div className="pt-3 border-t border-[var(--border-hairline)] space-y-2">
                 <div className="text-[11px] font-bold uppercase tracking-wider text-[var(--text-muted)]">
-                  {settings.language === 'hi' ? 'इस सदस्य के लिए मुख्य योजनाएं:' : 'Top Matched Entitlements for this Member:'}
+                  {t('topMatchedEntitlementsForThis')}
                 </div>
 
                 {topMatches.length === 0 ? (
                   <p className="text-xs text-[var(--text-secondary)] p-3 rounded-2xl bg-[var(--bg-subtle)]">
-                    {settings.language === 'hi'
-                      ? 'इस सदस्य के लिए अभी कोई योजना नहीं मिली। उम्र या व्यवसाय बदलने पर परिणाम बदल सकते हैं।'
-                      : 'No likely schemes for this member yet. Results change with age, occupation and household conditions.'}
+                    {t('noLikelySchemesForThis')}
                   </p>
                 ) : (
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -189,7 +200,7 @@ export const FamilyModeView: React.FC = () => {
                         className="p-3 rounded-2xl bg-[var(--bg-subtle)] hover:bg-[var(--bg-surface)] text-left transition-colors space-y-1"
                       >
                         <div className="flex items-center justify-between gap-2 text-xs font-semibold text-[var(--text-primary)]">
-                          <span>{settings.language === 'hi' ? m.scheme.nameHindi : m.scheme.name}</span>
+                          <span>{L.schemeName(m.scheme)}</span>
                           <span
                             className={`text-[10px] px-2 py-0.5 rounded-full shrink-0 ${
                               m.status === 'strong_match'
@@ -198,12 +209,12 @@ export const FamilyModeView: React.FC = () => {
                             }`}
                           >
                             {m.status === 'strong_match'
-                              ? settings.language === 'hi' ? 'पात्र' : 'Match'
-                              : settings.language === 'hi' ? 'जांचें' : 'Verify'}
+                              ? t('match')
+                              : t('verify')}
                           </span>
                         </div>
                         <p className="text-[11px] text-[var(--accent-green-text)] font-medium">
-                          {settings.language === 'hi' ? m.scheme.benefitHeadlineHindi : m.scheme.benefitHeadline}
+                          {L.schemeBenefit(m.scheme)}
                         </p>
                       </button>
                     ))}
@@ -229,7 +240,7 @@ export const FamilyModeView: React.FC = () => {
             <form onSubmit={handleAddMember} className="space-y-4 text-xs">
               <div>
                 <label className="block font-semibold text-[var(--text-primary)] mb-1">
-                  Full Name / Relationship Label
+                  {t('fullName')}
                 </label>
                 <input
                   type="text"
@@ -237,7 +248,6 @@ export const FamilyModeView: React.FC = () => {
                   maxLength={100}
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  placeholder="e.g. Sunita Devi (Spouse)"
                   className="w-full p-2.5 rounded-lg border border-[var(--border-hairline)] bg-[var(--bg-subtle)]"
                 />
               </div>
@@ -245,25 +255,25 @@ export const FamilyModeView: React.FC = () => {
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="block font-semibold text-[var(--text-primary)] mb-1">
-                    Relationship
+                    {t('relationship')}
                   </label>
                   <select
                     value={relationship}
                     onChange={(e) => setRelationship(e.target.value as any)}
                     className="w-full p-2.5 rounded-lg border border-[var(--border-hairline)] bg-[var(--bg-subtle)]"
                   >
-                    <option value="spouse">Spouse (पति/पत्नी)</option>
-                    <option value="father">Father (पिता)</option>
-                    <option value="mother">Mother (माता)</option>
-                    <option value="son">Son (बेटा)</option>
-                    <option value="daughter">Daughter (बेटी)</option>
-                    <option value="other">Other Relative</option>
+                    <option value="spouse">{t('relSpouse')}</option>
+                    <option value="father">{t('relFather')}</option>
+                    <option value="mother">{t('relMother')}</option>
+                    <option value="son">{t('relSon')}</option>
+                    <option value="daughter">{t('relDaughter')}</option>
+                    <option value="other">{t('relOther')}</option>
                   </select>
                 </div>
 
                 <div>
                   <label className="block font-semibold text-[var(--text-primary)] mb-1">
-                    Age (Years)
+                    {t('ageYears')}
                   </label>
                   <input
                     type="number"
@@ -279,48 +289,47 @@ export const FamilyModeView: React.FC = () => {
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="block font-semibold text-[var(--text-primary)] mb-1">
-                    Gender
+                    {t('gender')}
                   </label>
                   <select
                     value={gender}
                     onChange={(e) => setGender(e.target.value as any)}
                     className="w-full p-2.5 rounded-lg border border-[var(--border-hairline)] bg-[var(--bg-subtle)]"
                   >
-                    <option value="female">Female (महिला)</option>
-                    <option value="male">Male (पुरुष)</option>
+                    <option value="female">{t('female')}</option>
+                    <option value="male">{t('male')}</option>
                   </select>
                 </div>
 
                 <div>
                   <label className="block font-semibold text-[var(--text-primary)] mb-1">
-                    Occupation
+                    {t('occupation')}
                   </label>
                   <select
                     value={occupation}
                     onChange={(e) => setOccupation(e.target.value as any)}
                     className="w-full p-2.5 rounded-lg border border-[var(--border-hairline)] bg-[var(--bg-subtle)]"
                   >
-                    <option value="homemaker">Homemaker</option>
-                    <option value="student">Student</option>
-                    <option value="farmer">Farmer</option>
-                    <option value="artisan_craftsperson">Artisan</option>
-                    <option value="small_business_owner">Shop / Business</option>
-                    <option value="daily_wage_worker">Wage Worker</option>
-                    <option value="retired">Senior / Retired</option>
+                    <option value="homemaker">{t('homemaker')}</option>
+                    <option value="student">{t('studentHigherStudies')}</option>
+                    <option value="farmer">{t('farmerCultivator')}</option>
+                    <option value="artisan_craftsperson">{t('traditionalArtisanCraftsman')}</option>
+                    <option value="small_business_owner">{t('smallBusinessShopOwner')}</option>
+                    <option value="daily_wage_worker">{t('dailyWageWorker')}</option>
+                    <option value="retired">{t('retiredSenior')}</option>
                   </select>
                 </div>
               </div>
 
               <div>
                 <label className="block font-semibold text-[var(--text-primary)] mb-1">
-                  Notes (Optional)
+                  {t('notesOptional')}
                 </label>
                 <input
                   type="text"
                   maxLength={200}
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
-                  placeholder="e.g. Undergoing vocational training"
                   className="w-full p-2.5 rounded-lg border border-[var(--border-hairline)] bg-[var(--bg-subtle)]"
                 />
               </div>
@@ -331,13 +340,13 @@ export const FamilyModeView: React.FC = () => {
                   onClick={() => setIsAddModalOpen(false)}
                   className="px-4 py-2 rounded-lg border border-[var(--border-hairline)] text-[var(--text-secondary)]"
                 >
-                  Cancel
+                  {t('cancel')}
                 </button>
                 <button
                   type="submit"
                   className="px-5 py-2 rounded-lg bg-[var(--accent-saffron)] text-white font-semibold"
                 >
-                  Save Member
+                  {t('saveMember')}
                 </button>
               </div>
             </form>

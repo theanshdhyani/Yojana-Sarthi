@@ -19,6 +19,7 @@ import {
   Layers
 } from 'lucide-react';
 import { MASTER_DOCUMENTS } from '../../data/documentsData';
+import { languageInfo } from '../../i18n';
 
 export const MobileGlassDock: React.FC = () => {
   const { 
@@ -30,7 +31,8 @@ export const MobileGlassDock: React.FC = () => {
     applications, 
     setIsSettingsOpen, 
     settings, 
-    updateSettings, 
+    updateSettings,
+    setIsLanguageSheetOpen,
     openFindSchemes,
     continuePreviousAssessment,
     t 
@@ -100,32 +102,30 @@ export const MobileGlassDock: React.FC = () => {
     if (answeredCount > 0 && answeredCount < TOTAL_QUESTIONS - 1 && currentView !== 'questionnaire') {
       contextualAction = {
         icon: <Sparkles className="w-4 h-4 text-[var(--accent-saffron)] shrink-0" />,
-        title: settings.language === 'hi' ? 'प्रश्नावली जारी रखें' : 'Continue Questionnaire',
+        title: t('continueQuestionnaire'),
         subtitle:
-          settings.language === 'hi'
-            ? `${answeredCount}/${TOTAL_QUESTIONS} उत्तर दिए गए`
-            : `${answeredCount}/${TOTAL_QUESTIONS} questions filled`,
+          t('questionsFilled', { answeredCount, TOTAL_QUESTIONS }),
         targetView: 'questionnaire'
       };
     } else if (totalMatches > 0 && currentView !== 'results' && answeredCount >= 3) {
       contextualAction = {
         icon: <Layers className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />,
-        title: settings.language === 'hi' ? 'पात्र योजनाएं देखें' : 'Review Scheme Matches',
-        subtitle: settings.language === 'hi' ? `${totalMatches} योजनाएं मिलीं` : `${totalMatches} welfare schemes found`,
+        title: t('reviewSchemeMatches'),
+        subtitle: t('welfareSchemesFound', { totalMatches }),
         targetView: 'results'
       };
     } else if (readyDocsCount > 0 && readyDocsCount < totalDocsCount && currentView !== 'document_checker') {
       contextualAction = {
         icon: <FileCheck2 className="w-4 h-4 text-blue-600 dark:text-blue-400 shrink-0" />,
-        title: settings.language === 'hi' ? 'दस्तावेज़ चेकलिस्ट' : 'Document Readiness',
-        subtitle: settings.language === 'hi' ? `${readyDocsCount}/${totalDocsCount} तैयार हैं` : `${readyDocsCount}/${totalDocsCount} verified ready`,
+        title: t('documentReadiness'),
+        subtitle: t('verifiedReady', { readyDocsCount, totalDocsCount }),
         targetView: 'document_checker'
       };
     } else if (applications.length > 0 && currentView !== 'tracker') {
       contextualAction = {
         icon: <FolderCheck className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0" />,
-        title: settings.language === 'hi' ? 'आवेदन स्थिति ट्रैक करें' : 'Track Applications',
-        subtitle: settings.language === 'hi' ? `${applications.length} सक्रिय आवेदन` : `${applications.length} active in tracker`,
+        title: t('trackApplications'),
+        subtitle: t('activeInTracker', { length: applications.length }),
         targetView: 'tracker'
       };
     }
@@ -140,9 +140,6 @@ export const MobileGlassDock: React.FC = () => {
     setIsMoreOpen(false);
   };
 
-  const toggleLanguage = () => {
-    updateSettings({ language: settings.language === 'en' ? 'hi' : 'en' });
-  };
 
   const toggleTheme = () => {
     updateSettings({ theme: settings.theme === 'dark' ? 'light' : 'dark' });
@@ -187,7 +184,7 @@ export const MobileGlassDock: React.FC = () => {
               <button
                 onClick={() => setIsActionDismissed(true)}
                 className="p-1 text-[var(--text-muted)] hover:text-[var(--text-primary)] rounded-full shrink-0"
-                aria-label="Dismiss action notification"
+                aria-label={t('dismiss')}
               >
                 <X className="w-3.5 h-3.5" />
               </button>
@@ -205,12 +202,12 @@ export const MobileGlassDock: React.FC = () => {
           >
             <div className="flex items-center justify-between pb-2 border-b border-[var(--border-hairline)]">
               <span className="text-xs font-serif font-bold text-[var(--text-primary)]">
-                {settings.language === 'hi' ? 'नागरिक सुविधाएं एवं सेटिंग्स' : 'Civic Utilities & Tools'}
+                {t('civicUtilitiesTools')}
               </span>
               <button
                 onClick={() => setIsMoreOpen(false)}
                 className="p-1 rounded-full text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors"
-                aria-label="Close menu"
+                aria-label={t('close')}
               >
                 <X className="w-4 h-4" />
               </button>
@@ -232,7 +229,7 @@ export const MobileGlassDock: React.FC = () => {
                 <div className="flex-1 min-w-0">
                   <div className="text-xs font-semibold">{t('navDocumentChecker')}</div>
                   <div className="text-[10px] text-[var(--text-secondary)] truncate">
-                    {settings.language === 'hi' ? 'दस्तावेज़ तैयारी जांचें व सुधारें' : 'Eligibility & readiness checklist'}
+                    {t('eligibilityReadinessChecklist')}
                   </div>
                 </div>
                 <ChevronRight className="w-4 h-4 text-[var(--text-muted)] shrink-0" />
@@ -252,7 +249,7 @@ export const MobileGlassDock: React.FC = () => {
                 <div className="flex-1 min-w-0">
                   <div className="text-xs font-semibold">{t('navFamilyMode')}</div>
                   <div className="text-[10px] text-[var(--text-secondary)] truncate">
-                    {settings.language === 'hi' ? 'परिवार के सभी सदस्यों की योजनाएं' : 'Multi-generational welfare planner'}
+                    {t('multiGenerationalWelfarePlanner')}
                   </div>
                 </div>
                 <ChevronRight className="w-4 h-4 text-[var(--text-muted)] shrink-0" />
@@ -272,7 +269,7 @@ export const MobileGlassDock: React.FC = () => {
                 <div className="flex-1 min-w-0">
                   <div className="text-xs font-semibold">{t('navNearbyHelp')}</div>
                   <div className="text-[10px] text-[var(--text-secondary)] truncate">
-                    {settings.language === 'hi' ? 'सीएससी, बीडीओ व सहायता केंद्र' : 'Common Service Centers & BDO offices'}
+                    {t('commonServiceCentersBdoOffices')}
                   </div>
                 </div>
                 <ChevronRight className="w-4 h-4 text-[var(--text-muted)] shrink-0" />
@@ -293,11 +290,14 @@ export const MobileGlassDock: React.FC = () => {
               </button>
 
               <button
-                onClick={toggleLanguage}
+                onClick={() => {
+                  setIsLanguageSheetOpen(true);
+                  setIsMoreOpen(false);
+                }}
                 className="flex flex-col items-center justify-center p-2 rounded-xl bg-[var(--bg-subtle)] hover:bg-[var(--bg-surface)] text-[var(--text-primary)] text-[10px] font-semibold gap-1 transition-colors border border-[var(--border-hairline)]"
               >
                 <Languages className="w-4 h-4 text-[var(--accent-saffron)]" />
-                <span>{settings.language === 'en' ? 'हिन्दी' : 'English'}</span>
+                <span className="truncate max-w-full">{languageInfo(settings.language).native}</span>
               </button>
 
               <button
@@ -307,12 +307,12 @@ export const MobileGlassDock: React.FC = () => {
                 {settings.theme === 'dark' ? (
                   <>
                     <Sun className="w-4 h-4 text-amber-400" />
-                    <span>Light</span>
+                    <span>{t('themeLight')}</span>
                   </>
                 ) : (
                   <>
                     <Moon className="w-4 h-4 text-indigo-600" />
-                    <span>Dark</span>
+                    <span>{t('themeDark')}</span>
                   </>
                 )}
               </button>
@@ -333,7 +333,7 @@ export const MobileGlassDock: React.FC = () => {
             >
               <Home className={`w-4 h-4 ${currentView === 'home' ? 'text-[var(--accent-saffron)]' : ''}`} />
               <span className="mt-0.5 tracking-tight">
-                {settings.language === 'hi' ? 'होम' : 'Home'}
+                {t('home')}
               </span>
             </button>
 
@@ -345,7 +345,7 @@ export const MobileGlassDock: React.FC = () => {
             >
               <Sparkles className={`w-4 h-4 ${currentView === 'questionnaire' ? 'text-[var(--accent-saffron)]' : ''}`} />
               <span className="mt-0.5 tracking-tight">
-                {settings.language === 'hi' ? 'पात्रता' : 'Check'}
+                {t('check')}
               </span>
             </button>
 
@@ -357,7 +357,7 @@ export const MobileGlassDock: React.FC = () => {
             >
               <Compass className={`w-4 h-4 ${currentView === 'all_schemes' || currentView === 'scheme_detail' ? 'text-[var(--accent-saffron)]' : ''}`} />
               <span className="mt-0.5 tracking-tight">
-                {settings.language === 'hi' ? 'योजनाएं' : 'Explore'}
+                {t('explore')}
               </span>
             </button>
 
@@ -369,7 +369,7 @@ export const MobileGlassDock: React.FC = () => {
             >
               <FolderCheck className={`w-4 h-4 ${currentView === 'tracker' ? 'text-[var(--accent-saffron)]' : ''}`} />
               <span className="mt-0.5 tracking-tight">
-                {settings.language === 'hi' ? 'आवेदन' : 'Tracker'}
+                {t('tracker')}
               </span>
               {applications.length > 0 && (
                 <span className="absolute top-1.5 right-3 w-2 h-2 rounded-full bg-orange-500 ring-2 ring-[var(--glass-dock-active-bg)]" />
@@ -382,7 +382,7 @@ export const MobileGlassDock: React.FC = () => {
             ref={moreButtonRef}
             onClick={() => setIsMoreOpen((prev) => !prev)}
             aria-expanded={isMoreOpen}
-            aria-label="More destinations and options"
+            aria-label={t('menu')}
             className={`glass-more-button shadow-2xl ${isMoreOpen ? 'glass-dock-item-active' : ''}`}
           >
             {isMoreOpen ? (

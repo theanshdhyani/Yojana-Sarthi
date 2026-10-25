@@ -22,16 +22,23 @@ export const ApplicationTrackerView: React.FC = () => {
     addApplication, 
     updateApplicationStatus, 
     deleteApplication, 
-    settings, 
-    t 
+    settings,
+    t,
+    L
   } = useApp();
+
+  // Saved records keep their original names; show the scheme in the current language when we know it.
+  const schemeLabel = (app: TrackedApplication) => {
+    const scheme = SCHEMES_DATABASE.find((s) => s.id === app.schemeId);
+    return scheme ? L.schemeName(scheme) : app.schemeName;
+  };
 
   const [filterStatus, setFilterStatus] = useState<string>('all');
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
   // New application form state
   const [selectedSchemeId, setSelectedSchemeId] = useState(SCHEMES_DATABASE[0].id);
-  const [beneficiaryName, setBeneficiaryName] = useState('Self');
+  const [beneficiaryName, setBeneficiaryName] = useState('');
   const [refNumber, setRefNumber] = useState('');
   const [notes, setNotes] = useState('');
 
@@ -63,18 +70,18 @@ export const ApplicationTrackerView: React.FC = () => {
       schemeId: scheme.id,
       schemeName: scheme.name,
       schemeNameHindi: scheme.nameHindi,
-      beneficiaryName: beneficiaryName.trim() || 'Self',
+      beneficiaryName: beneficiaryName.trim() || t('relSelf'),
       // Never invent a reference number: a citizen could mistake it for an official acknowledgment.
       referenceNumber: refNumber.trim(),
       appliedDate: new Date().toISOString().split('T')[0],
       status: 'to_apply',
       portalUrl: scheme.officialPortalUrl,
-      notes: notes || 'Application initiated.',
+      notes: notes || t('applicationInitiated'),
       timeline: [
         {
           date: new Date().toISOString().split('T')[0],
-          title: 'Record Created',
-          description: 'Added to citizen preparation dashboard'
+          title: t('recordCreated'),
+          description: t('addedToDashboard')
         }
       ]
     });
@@ -88,22 +95,22 @@ export const ApplicationTrackerView: React.FC = () => {
     switch (status) {
       case 'approved':
         return {
-          label: settings.language === 'hi' ? 'स्वीकृत (Approved)' : 'Approved',
+          label: t('approved'),
           style: 'bg-emerald-50 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 border-emerald-300'
         };
       case 'under_review':
         return {
-          label: settings.language === 'hi' ? 'समीक्षाधीन (Under Review)' : 'Under Review',
+          label: t('underReview'),
           style: 'bg-blue-50 text-blue-800 dark:bg-blue-950 dark:text-blue-300 border-blue-300'
         };
       case 'action_required':
         return {
-          label: settings.language === 'hi' ? 'सुधार आवश्यक (Action Required)' : 'Action Required',
+          label: t('actionRequired'),
           style: 'bg-amber-50 text-amber-800 dark:bg-amber-950 dark:text-amber-300 border-amber-300'
         };
       default:
         return {
-          label: settings.language === 'hi' ? 'तैयारी में (To Apply)' : 'To Apply',
+          label: t('toApply'),
           style: 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 border-slate-300'
         };
     }
@@ -116,7 +123,7 @@ export const ApplicationTrackerView: React.FC = () => {
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
         <div>
           <span className="text-xs font-bold uppercase tracking-wider text-blue-700 dark:text-blue-400">
-            {settings.language === 'hi' ? 'आवेदन स्थिति' : 'Application Tracking'}
+            {t('applicationTracking')}
           </span>
           <h1 className="text-2xl sm:text-4xl font-serif font-bold text-[var(--text-primary)]">
             {t('trackerTitle')}
@@ -139,7 +146,7 @@ export const ApplicationTrackerView: React.FC = () => {
       <div className="glass-toolbar p-2 sm:p-2.5 rounded-2xl shadow-xs">
         <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
           {[
-            { id: 'all', label: settings.language === 'hi' ? 'सभी' : 'All', count: statusCounts.all },
+            { id: 'all', label: t('all'), count: statusCounts.all },
             { id: 'to_apply', label: t('statusToApply'), count: statusCounts.to_apply },
             { id: 'under_review', label: t('statusUnderReview'), count: statusCounts.under_review },
             { id: 'approved', label: t('statusApproved'), count: statusCounts.approved },
@@ -176,21 +183,21 @@ export const ApplicationTrackerView: React.FC = () => {
                 <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
                   <div className="space-y-1">
                     <h3 className="font-serif font-bold text-base sm:text-lg text-[var(--text-primary)]">
-                      {settings.language === 'hi' ? app.schemeNameHindi : app.schemeName}
+                      {schemeLabel(app)}
                     </h3>
                     <div className="flex flex-wrap items-center gap-2 text-xs text-[var(--text-secondary)]">
-                      <span>Beneficiary: <strong className="text-[var(--text-primary)]">{app.beneficiaryName}</strong></span>
+                      <span>{t('beneficiaryLabel')}: <strong className="text-[var(--text-primary)]">{app.beneficiaryName}</strong></span>
                       <span>·</span>
                       <span>
-                        Ref No:{' '}
+                        {t('refNoLabel')}:{' '}
                         {app.referenceNumber ? (
                           <span className="font-mono">{app.referenceNumber}</span>
                         ) : (
-                          <span className="italic text-[var(--text-muted)]">{settings.language === 'hi' ? 'अभी नहीं मिला' : 'not yet received'}</span>
+                          <span className="italic text-[var(--text-muted)]">{t('notYetReceived')}</span>
                         )}
                       </span>
                       <span>·</span>
-                      <span>Date: <span className="tabular-nums">{app.appliedDate}</span></span>
+                      <span>{t('dateLabel')}: <span className="tabular-nums">{app.appliedDate}</span></span>
                     </div>
                   </div>
 
@@ -202,7 +209,8 @@ export const ApplicationTrackerView: React.FC = () => {
                     <button
                       onClick={() => deleteApplication(app.id)}
                       className="p-1.5 rounded-lg text-[var(--text-muted)] hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/40 transition-colors"
-                      title="Delete record"
+                      title={t('deleteRecord')}
+                      aria-label={t('deleteRecord')}
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
@@ -212,7 +220,7 @@ export const ApplicationTrackerView: React.FC = () => {
                 {/* Status Switcher Bar */}
                 <div className="pt-2 border-t border-[var(--border-hairline)] flex flex-wrap items-center justify-between gap-2 text-xs">
                   <span className="text-[var(--text-muted)] font-medium">
-                    {settings.language === 'hi' ? 'स्थिति बदलें:' : 'Update Status:'}
+                    {t('updateStatus')}
                   </span>
                   <div className="flex flex-wrap gap-1.5">
                     {(['to_apply', 'under_review', 'approved', 'action_required'] as ApplicationStatus[]).map((st) => (
@@ -245,7 +253,7 @@ export const ApplicationTrackerView: React.FC = () => {
                         rel="noopener noreferrer"
                         className="font-semibold text-[var(--accent-saffron)] hover:underline inline-flex items-center gap-1 shrink-0 ml-2"
                       >
-                        <span>Official Portal</span>
+                        <span>{t('officialPortal')}</span>
                         <ExternalLink className="w-3 h-3" />
                       </a>
                     )}
@@ -256,7 +264,7 @@ export const ApplicationTrackerView: React.FC = () => {
                 {app.timeline && app.timeline.length > 0 && (
                   <div className="pt-2 space-y-2">
                     <span className="text-[11px] font-bold uppercase tracking-wider text-[var(--text-muted)]">
-                      {settings.language === 'hi' ? 'घटनाक्रम (Timeline)' : 'Milestone Timeline'}
+                      {t('milestoneTimeline')}
                     </span>
                     <div className="border-l-2 border-[var(--border-hairline)] ml-2 pl-3 space-y-2">
                       {app.timeline.map((ev, idx) => (
@@ -279,12 +287,10 @@ export const ApplicationTrackerView: React.FC = () => {
       ) : (
         <div className="p-12 text-center rounded-2xl border border-[var(--border-hairline)] bg-[var(--bg-surface)] space-y-3">
           <p className="text-sm font-semibold text-[var(--text-primary)]">
-            {settings.language === 'hi' ? 'इस श्रेणी में कोई आवेदन नहीं है' : 'No applications found in this status'}
+            {t('noApplicationsFoundInThis')}
           </p>
           <p className="text-xs text-[var(--text-secondary)]">
-            {settings.language === 'hi'
-              ? 'परिणाम पेज से किसी योजना को ट्रैकर में सहेजें या नया आवेदन जोड़ें।'
-              : 'Save schemes from your results or manually add an existing application reference.'}
+            {t('saveSchemesFromYourResults')}
           </p>
         </div>
       )}
@@ -303,7 +309,7 @@ export const ApplicationTrackerView: React.FC = () => {
             <form onSubmit={handleCreateApplication} className="space-y-4 text-xs">
               <div>
                 <label className="block font-semibold text-[var(--text-primary)] mb-1">
-                  Select Scheme
+                  {t('selectScheme')}
                 </label>
                 <select
                   value={selectedSchemeId}
@@ -312,7 +318,7 @@ export const ApplicationTrackerView: React.FC = () => {
                 >
                   {SCHEMES_DATABASE.map((s) => (
                     <option key={s.id} value={s.id}>
-                      {s.shortCode} - {settings.language === 'hi' ? s.nameHindi : s.name}
+                      {s.shortCode} - {L.schemeName(s)}
                     </option>
                   ))}
                 </select>
@@ -320,7 +326,7 @@ export const ApplicationTrackerView: React.FC = () => {
 
               <div>
                 <label className="block font-semibold text-[var(--text-primary)] mb-1">
-                  Beneficiary Name
+                  {t('beneficiaryName')}
                 </label>
                 <input
                   type="text"
@@ -334,7 +340,7 @@ export const ApplicationTrackerView: React.FC = () => {
 
               <div>
                 <label className="block font-semibold text-[var(--text-primary)] mb-1">
-                  Application / Acknowledgment Number (Optional)
+                  {t('ackNumberOptional')}
                 </label>
                 <input
                   type="text"
@@ -348,14 +354,14 @@ export const ApplicationTrackerView: React.FC = () => {
 
               <div>
                 <label className="block font-semibold text-[var(--text-primary)] mb-1">
-                  Notes / Next Action
+                  {t('notesNextAction')}
                 </label>
                 <textarea
                   value={notes}
                   maxLength={500}
                   onChange={(e) => setNotes(e.target.value)}
                   rows={2}
-                  placeholder="e.g. Lekhpal verification scheduled for Friday."
+  
                   className="w-full p-2.5 rounded-lg border border-[var(--border-hairline)] bg-[var(--bg-subtle)]"
                 />
               </div>
@@ -366,13 +372,13 @@ export const ApplicationTrackerView: React.FC = () => {
                   onClick={() => setIsAddModalOpen(false)}
                   className="px-4 py-2 rounded-lg border border-[var(--border-hairline)] text-[var(--text-secondary)]"
                 >
-                  Cancel
+                  {t('cancel')}
                 </button>
                 <button
                   type="submit"
                   className="px-5 py-2 rounded-lg bg-[var(--accent-saffron)] text-white font-semibold"
                 >
-                  Save Application
+                  {t('saveApplication')}
                 </button>
               </div>
             </form>

@@ -19,7 +19,7 @@ import { CenterType } from '../../types/helpCenter';
 const CSC_LOCATOR_URL = 'https://locator.csccloud.in';
 
 export const NearbyHelpView: React.FC = () => {
-  const { settings, answers, addToast, t } = useApp();
+  const { settings, answers, addToast, t, L } = useApp();
   const hi = settings.language === 'hi';
 
   const initialState =
@@ -46,7 +46,7 @@ export const NearbyHelpView: React.FC = () => {
       addToast(t('addressCopied'), 'success');
       setTimeout(() => setCopiedId(null), 2500);
     } catch {
-      addToast(hi ? 'कॉपी नहीं हो सका' : 'Could not copy — please select the text manually', 'error');
+      addToast(t('couldNotCopyPleaseSelect'), 'error');
     }
   };
 
@@ -57,7 +57,7 @@ export const NearbyHelpView: React.FC = () => {
       <div className="space-y-4">
         <div>
           <span className="text-xs font-bold uppercase tracking-wider text-orange-700 dark:text-orange-400">
-            {settings.language === 'hi' ? 'स्थानीय सहायता केंद्र' : 'Civic Assistance Directory'}
+            {t('civicAssistanceDirectory')}
           </span>
           <h1 className="text-2xl sm:text-4xl font-serif font-bold text-[var(--text-primary)]">
             {t('nearbyHelpTitle')}
@@ -75,10 +75,8 @@ export const NearbyHelpView: React.FC = () => {
           <div className="flex items-start gap-3">
             <ShieldCheck className="w-5 h-5 text-[var(--warning-icon)] shrink-0 mt-0.5" />
             <p className="text-[13px] text-[var(--warning-desc)] leading-relaxed">
-              <strong className="text-[var(--warning-text)]">{hi ? 'नमूना सूची: ' : 'Sample listings: '}</strong>
-              {hi
-                ? 'नीचे दिए केंद्र केवल उदाहरण हैं और इनके फोन नंबर सत्यापित नहीं हैं। अपने नज़दीकी असली सीएससी के लिए आधिकारिक लोकेटर देखें।'
-                : 'The centres below are examples and their phone numbers are not verified. Use the official locator to find your real nearest CSC.'}
+              <strong className="text-[var(--warning-text)]">{t('sampleListings')}</strong>
+              {t('theCentresBelowAreExamples')}
             </p>
           </div>
           <a
@@ -87,7 +85,7 @@ export const NearbyHelpView: React.FC = () => {
             rel="noopener noreferrer"
             className="inline-flex items-center justify-center gap-1.5 h-10 px-4 rounded-full bg-[var(--accent-saffron)] hover:bg-[var(--accent-saffron-hover)] text-white text-[13px] font-semibold shrink-0"
           >
-            {hi ? 'आधिकारिक सीएससी लोकेटर' : 'Official CSC locator'}
+            {t('officialCscLocator')}
             <ExternalLink className="w-3.5 h-3.5" />
           </a>
         </div>
@@ -108,7 +106,7 @@ export const NearbyHelpView: React.FC = () => {
             >
               {INDIAN_STATES_DISTRICTS.map((s) => (
                 <option key={s.state} value={s.state}>
-                  {s.state} ({s.stateHindi})
+                  {L.state(s.state, s.stateHindi)}
                 </option>
               ))}
             </select>
@@ -123,10 +121,10 @@ export const NearbyHelpView: React.FC = () => {
               onChange={(e) => setSelectedDistrict(e.target.value)}
               className="w-full p-2.5 rounded-lg border border-[var(--border-hairline)] bg-[var(--bg-subtle)] text-[var(--text-primary)]"
             >
-              <option value="all">{settings.language === 'hi' ? 'सभी जिले' : 'All Districts'}</option>
+              <option value="all">{t('allDistricts')}</option>
               {districtList.map((d) => (
                 <option key={d.name} value={d.name}>
-                  {d.name} ({d.nameHindi})
+                  {L.state(d.name, d.nameHindi)}
                 </option>
               ))}
             </select>
@@ -141,7 +139,7 @@ export const NearbyHelpView: React.FC = () => {
               onChange={(e) => setSelectedType(e.target.value)}
               className="w-full p-2.5 rounded-lg border border-[var(--border-hairline)] bg-[var(--bg-subtle)] text-[var(--text-primary)]"
             >
-              <option value="all">{settings.language === 'hi' ? 'सभी केंद्र प्रकार' : 'All Center Types'}</option>
+              <option value="all">{t('allCenterTypes')}</option>
               <option value="csc">Common Service Center (CSC / जन सेवा केंद्र)</option>
               <option value="bdo">Block Development Office (BDO / विकास खंड)</option>
               <option value="gram_panchayat">Gram Panchayat Kendra / सचिवालय</option>
@@ -165,14 +163,14 @@ export const NearbyHelpView: React.FC = () => {
                 <div className="space-y-1">
                   <div className="flex items-center gap-2">
                     <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-amber-50 text-amber-800 dark:bg-amber-950 dark:text-amber-300 border border-amber-200">
-                      {settings.language === 'hi' ? center.typeLabelHindi : center.typeLabel}
+                      {L.long(center.typeLabel, center.typeLabelHindi)}
                     </span>
                     <span className="text-xs text-[var(--text-muted)]">
                       {center.district}, {center.state}
                     </span>
                   </div>
                   <h3 className="font-serif font-bold text-base sm:text-lg text-[var(--text-primary)]">
-                    {settings.language === 'hi' ? center.nameHindi : center.name}
+                    {L.long(center.name, center.nameHindi)}
                   </h3>
                 </div>
 
@@ -180,7 +178,7 @@ export const NearbyHelpView: React.FC = () => {
                   {/* No tap-to-call: sample numbers could ring a real, unrelated person. */}
                   <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[var(--bg-subtle)] text-[var(--text-muted)] text-xs font-medium">
                     <Phone className="w-3.5 h-3.5" />
-                    <span>{hi ? 'नमूना' : 'Sample'}</span>
+                    <span>{t('sample')}</span>
                   </span>
 
                   <button
@@ -198,7 +196,7 @@ export const NearbyHelpView: React.FC = () => {
                 <div className="flex items-start gap-2">
                   <MapPin className="w-4 h-4 text-slate-400 shrink-0 mt-0.5" />
                   <p className="leading-relaxed">
-                    {settings.language === 'hi' ? center.addressHindi : center.address}
+                    {L.long(center.address, center.addressHindi)}
                   </p>
                 </div>
 
@@ -213,10 +211,10 @@ export const NearbyHelpView: React.FC = () => {
               {/* Services Offered Pills */}
               <div className="space-y-1.5 pt-2">
                 <span className="text-[11px] font-bold uppercase tracking-wider text-[var(--text-muted)]">
-                  {settings.language === 'hi' ? 'उपलब्ध नागरिक सेवाएं:' : 'Key Services Provided:'}
+                  {t('keyServicesProvided')}
                 </span>
                 <div className="flex flex-wrap gap-1.5">
-                  {(settings.language === 'hi' ? center.servicesProvidedHindi : center.servicesProvided).map((srv, idx) => (
+                  {(L.longList(center.servicesProvided, center.servicesProvidedHindi)).map((srv, idx) => (
                     <span
                       key={idx}
                       className="px-2.5 py-1 rounded-md bg-[var(--bg-subtle)] text-[11px] text-[var(--text-secondary)] border border-[var(--border-hairline)]"
@@ -232,12 +230,10 @@ export const NearbyHelpView: React.FC = () => {
       ) : (
         <div className="p-12 text-center rounded-2xl border border-[var(--border-hairline)] bg-[var(--bg-surface)] space-y-3">
           <p className="text-sm font-semibold text-[var(--text-primary)]">
-            {settings.language === 'hi' ? 'इस जिले में कोई केंद्र सूचीबद्ध नहीं है' : 'No centers found matching this filter'}
+            {t('noCentersFoundMatchingThis')}
           </p>
           <p className="text-xs text-[var(--text-secondary)]">
-            {settings.language === 'hi' 
-              ? 'कृपया राज्य या जिले का चयन बदलें या आधिकारिक सीएससी लोकेटर देखें।' 
-              : 'Try selecting a different district or check the central digital seva portal.'}
+            {t('trySelectingADifferentDistrict')}
           </p>
           <a
             href={CSC_LOCATOR_URL}
@@ -245,7 +241,7 @@ export const NearbyHelpView: React.FC = () => {
             rel="noopener noreferrer"
             className="inline-flex items-center gap-1.5 text-xs font-semibold text-[var(--accent-saffron)] underline"
           >
-            <span>Open National CSC Locator (locator.csccloud.in)</span>
+            <span>{t('officialCscLocator')} (locator.csccloud.in)</span>
             <ExternalLink className="w-3.5 h-3.5" />
           </a>
         </div>

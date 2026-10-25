@@ -3,6 +3,7 @@ import { TrackedApplication, ApplicationStatus } from '../types/tracker';
 import { FamilyMember } from '../types/family';
 import { UserPreferences } from '../types/settings';
 import { safeExternalUrl } from '../utils/safeUrl';
+import { detectLanguage, isAppLanguage } from '../i18n/languages';
 
 // ---------------------------------------------------------------------------
 // Validation: localStorage is user-controlled, so nothing read back from it is
@@ -98,10 +99,11 @@ const DEFAULT_SETTINGS: UserPreferences = {
 };
 
 function sanitizeSettings(raw: unknown): UserPreferences {
-  if (!isObj(raw)) return { ...DEFAULT_SETTINGS };
+  // First visit: start in the browser's language when we support it.
+  if (!isObj(raw)) return { ...DEFAULT_SETTINGS, language: detectLanguage() };
   const speed = typeof raw.voiceSpeed === 'number' ? Math.min(1.2, Math.max(0.8, raw.voiceSpeed)) : DEFAULT_SETTINGS.voiceSpeed;
   return {
-    language: oneOf(raw.language, ['en', 'hi'] as const) ?? DEFAULT_SETTINGS.language,
+    language: isAppLanguage(raw.language) ? raw.language : DEFAULT_SETTINGS.language,
     simpleLanguageMode: raw.simpleLanguageMode === true,
     fontSize: oneOf(raw.fontSize, ['normal', 'large', 'extra-large'] as const) ?? DEFAULT_SETTINGS.fontSize,
     highContrast: raw.highContrast === true,

@@ -8,8 +8,10 @@
    so every heading in the app picks up the SF / Inter look automatically.
    ========================================================================== */
 @theme {
-  --font-sans: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Inter', 'Noto Sans Devanagari', system-ui, sans-serif;
-  --font-serif: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Inter', 'Noto Sans Devanagari', system-ui, sans-serif;
+  /* --font-script is set at runtime to the Noto font for the chosen language's script; Nirmala UI covers
+     every Indic script on Windows, and Android/iOS ship their own Indic fonts as the final fallback. */
+  --font-sans: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Inter', var(--font-script, 'Noto Sans Devanagari'), 'Nirmala UI', system-ui, sans-serif;
+  --font-serif: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Inter', var(--font-script, 'Noto Sans Devanagari'), 'Nirmala UI', system-ui, sans-serif;
   --font-mono: 'SF Mono', ui-monospace, 'JetBrains Mono', Menlo, Consolas, monospace;
 
   --radius-md: 0.625rem;
@@ -242,21 +244,24 @@
     color: var(--text-primary);
     font-family: var(--font-sans);
     font-feature-settings: 'cv11', 'ss01';
-    letter-spacing: -0.006em;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     min-height: 100vh;
     overflow-x: hidden;
   }
 
-  h1, h2, h3, h4 {
+  /* Tight Apple-style tracking suits Latin only: negative letter-spacing breaks the joined
+     letters (conjuncts) of Indic scripts, so every other language keeps normal spacing. */
+  html:lang(en) body {
+    letter-spacing: -0.006em;
+  }
+
+  html:lang(en) h1, html:lang(en) h2, html:lang(en) h3, html:lang(en) h4 {
     letter-spacing: -0.022em;
   }
 
-  /* Devanagari needs normal tracking and a little more line height */
-  :lang(hi) body,
-  :lang(hi) h1, :lang(hi) h2, :lang(hi) h3, :lang(hi) h4 {
-    letter-spacing: 0;
+  html:not(:lang(en)) body {
+    line-height: 1.6;
   }
 
   ::selection {

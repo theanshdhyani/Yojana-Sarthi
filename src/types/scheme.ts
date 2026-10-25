@@ -1,3 +1,5 @@
+import type { Msg } from '../i18n/format';
+
 export type SchemeCategory =
   | 'agriculture'
   | 'health'
@@ -97,12 +99,14 @@ export interface EvaluatedScheme {
   scheme: Scheme;
   status: MatchStatus;
   matchScore: number; // 0 to 100
-  matchedReasons: string[];
-  matchedReasonsHindi: string[];
-  unmetCriteria: string[];
-  unmetCriteriaHindi: string[];
+  /** Translatable reasons, rendered in the user's language by the UI. */
+  matched: Msg[];
+  unmet: Msg[];
   // Criteria that could not be confirmed from the answers and need checking at the office.
+  verify: Msg[];
+  /** The same reasons in English (print slip, tests, logs). */
+  matchedReasons: string[];
+  unmetCriteria: string[];
   toVerify: string[];
-  toVerifyHindi: string[];
   missingDocuments: string[];
 }

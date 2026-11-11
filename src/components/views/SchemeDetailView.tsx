@@ -18,6 +18,7 @@ import {
   FileQuestion
 } from 'lucide-react';
 import { safeExternalUrl, safeTelHref } from '../../utils/safeUrl';
+import { todayISO } from '../../utils/date';
 
 export const SchemeDetailView: React.FC = () => {
   const {
@@ -61,13 +62,13 @@ export const SchemeDetailView: React.FC = () => {
       schemeNameHindi: s.nameHindi,
       beneficiaryName: 'Self',
       referenceNumber: '',
-      appliedDate: new Date().toISOString().split('T')[0],
+      appliedDate: todayISO(),
       status: 'to_apply',
       portalUrl: s.officialPortalUrl,
       notes: t('savedFromDetails', { days: s.processingTimeDays }),
       timeline: [
         {
-          date: new Date().toISOString().split('T')[0],
+          date: todayISO(),
           title: t('savedToTrackerTitle'),
           description: t('readyToPrepare')
         }

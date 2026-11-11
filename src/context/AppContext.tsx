@@ -24,6 +24,7 @@ import {
   makeLocalizer
 } from '../i18n';
 import { en } from '../i18n/messages/en';
+import { todayISO } from '../utils/date';
 
 export type AppView =
   | 'home'
@@ -228,8 +229,12 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         setLocaleContent(bundle?.content ?? null);
       })
       .catch(() => {
-        // Offline before this language was ever downloaded: stay readable in English.
-        if (!cancelled) setMessages(en);
+        // Offline before this language was ever downloaded: stay readable, consistently in English
+        // (dropping any content left over from the previous language).
+        if (cancelled) return;
+        setMessages(en);
+        setLocaleContent(null);
+        document.documentElement.lang = 'en';
       })
       .finally(() => {
         if (!cancelled) setIsLanguageLoading(false);
@@ -276,7 +281,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     const newApp: TrackedApplication = {
       ...appData,
       id: 'app_' + Date.now(),
-      lastUpdated: new Date().toISOString().split('T')[0]
+      lastUpdated: todayISO()
     };
     const next = [newApp, ...applications];
     setApplications(next);
@@ -290,11 +295,11 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         ? {
             ...app,
             status,
-            lastUpdated: new Date().toISOString().split('T')[0],
+            lastUpdated: todayISO(),
             timeline: [
               ...app.timeline,
               {
-                date: new Date().toISOString().split('T')[0],
+                date: todayISO(),
                 title: t('timelineStatusUpdated', { status: t(STATUS_KEYS[status]) }),
                 description: t('timelineUpdatedByUser')
               }

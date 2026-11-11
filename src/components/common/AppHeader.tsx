@@ -66,7 +66,7 @@ export const AppHeader: React.FC = () => {
         </div>
       )}
 
-      <div className="max-w-7xl mx-auto glass-nav rounded-[1.375rem] h-16 pl-3 pr-2 sm:pl-4 flex items-center justify-between gap-3">
+      <div className="max-w-7xl mx-auto glass-nav rounded-[1.375rem] h-16 pl-3 pr-2 sm:pl-4 flex items-center justify-between gap-2 sm:gap-3">
         <button
           onClick={() => handleNavClick('home')}
           className="flex items-center gap-2.5 text-left rounded-xl shrink-0"
@@ -95,7 +95,7 @@ export const AppHeader: React.FC = () => {
           ))}
         </nav>
 
-        <div className="flex items-center gap-1.5 sm:gap-2">
+        <div className="flex min-w-0 items-center gap-1.5 sm:gap-2">
           {isSpeaking && (
             <button onClick={stopReading} title={t('speechStop')} className={`${iconButton} text-[var(--accent-saffron-text)]`}>
               <VolumeX className="w-4 h-4" />
@@ -111,7 +111,7 @@ export const AppHeader: React.FC = () => {
             className={iconButton}
           >
             <Languages className="w-4 h-4 text-[var(--accent-saffron)]" />
-            <span className="max-w-[5.5rem] truncate">{languageInfo(settings.language).native}</span>
+            <span className="max-w-[4rem] sm:max-w-[5.5rem] truncate">{languageInfo(settings.language).native}</span>
           </button>
 
           <button onClick={() => setIsSettingsOpen(true)} title={t('settings')} aria-label={t('settings')} className={iconButton}>

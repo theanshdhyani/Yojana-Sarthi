@@ -1,4 +1,5 @@
 import type { Msg } from '../i18n/format';
+import type { MessageKey } from '../i18n/messages/en';
 
 export type SchemeCategory =
   | 'agriculture'
@@ -47,6 +48,9 @@ export interface SchemeEligibilityRules {
   beneficiaryIsHouseholdMember?: boolean;
   // Everyone at or above this age qualifies regardless of other criteria (e.g. PM-JAY 70+).
   universalFromAge?: number;
+  // Core conditions the questionnaire does not ask about (e.g. "no pucca house"). Always shown
+  // as "confirm at the office", so the scheme can never be reported as a certain match.
+  confirmAtOffice?: MessageKey[];
 }
 
 export interface Scheme {

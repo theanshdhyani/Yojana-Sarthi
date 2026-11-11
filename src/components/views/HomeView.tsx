@@ -146,7 +146,7 @@ export const HomeView: React.FC = () => {
               <span>{t('heroEyebrow')}</span>
             </div>
 
-            <h1 className="text-[2.6rem] leading-[1.05] sm:text-6xl lg:text-7xl font-bold tracking-tight text-[var(--text-primary)] text-balance">
+            <h1 className="hero-title text-[2.6rem] leading-[1.05] sm:text-6xl lg:text-7xl font-bold tracking-tight text-[var(--text-primary)] text-balance">
               {t('heroLine1')}{' '}
               <span className="text-gradient-saffron">{t('heroLine2')}</span>
             </h1>

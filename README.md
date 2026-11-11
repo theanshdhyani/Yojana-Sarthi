@@ -1,6 +1,6 @@
 # Yojana Sarthi · योजना सारथी
 
-**Find the government welfare schemes your family may qualify for — in simple Hindi or English, free, private, and offline.**
+**Find the government welfare schemes your family may qualify for — in 11 Indian languages, free, private, and offline.**
 
 Live: https://yoajanasarthi.netlify.app
 
@@ -16,7 +16,7 @@ Many eligible families never claim central welfare benefits because the rules ar
 | | |
 |---|---|
 | Eligibility check | 10-question flow; 15 central schemes; every result explains what matched, what failed, and what to verify |
-| Bilingual + voice | Full Hindi/English UI, simple-language mode, text-to-speech |
+| 11 languages + voice | English, हिन्दी, বাংলা, मराठी, తెలుగు, தமிழ், ગુજરાતી, ಕನ್ನಡ, ଓଡ଼ିଆ, മലയാളം, ਪੰਜਾਬੀ; simple-language mode; read-aloud in the chosen language |
 | Family planner | Evaluate each household member separately |
 | Document checker | Readiness checklist with issuing office, fee and time |
 | Application tracker | Status timeline per application |
@@ -44,6 +44,8 @@ Design decisions worth noting:
 - **Income brackets are compared as ranges**, not a single point, so a family is never wrongly rejected because its bracket's upper bound is above a limit.
 - **Household-member schemes** (Sukanya Samriddhi, widow and old-age pensions, PMMVY) check the *member's* condition, not the age/gender of whoever fills in the form.
 - **Missing answers are never treated as a pass.**
+- **Conditions the form does not ask are never assumed.** PMAY requires "no pucca house" and Ujjwala requires "no existing LPG connection". These always appear under *Confirm at the office*, so those schemes are never shown as a certain match.
+- **Rules follow the official criteria, not convenient proxies.** NSAP pensions depend on BPL status, so the engine applies no invented rupee cap.
 - Results are preliminary; the app says so everywhere and never claims final eligibility.
 
 ## Privacy & security
@@ -55,6 +57,15 @@ Design decisions worth noting:
 - Strict **Content-Security-Policy**, `X-Frame-Options: DENY`, HSTS, `nosniff` and a locked-down `Permissions-Policy` via `netlify.toml`.
 - No source maps in production; `npm audit` reports 0 vulnerabilities in runtime dependencies.
 
+## Languages
+
+The interface, all 15 schemes, the document guide and every eligibility explanation are available in 11 languages (`src/i18n/`).
+
+- **Type-checked completeness:** every language file must contain every message key, or `npm run lint` fails.
+- **Small first load:** English and Hindi ship with the app. Each of the other nine downloads (~70 kB) only when chosen, then works offline.
+- **Right fonts and voices:** each script's Noto font loads on demand. Read-aloud uses a voice for that language, or tells the user none is installed.
+- **Honest about quality:** the nine newer translations are AI-drafted. The app shows a notice on them until a fluent speaker has reviewed them.
+
 ## Tech stack
 
 React 19 · TypeScript · Vite · Tailwind CSS 4 · Vitest · Service Worker (PWA) · Netlify
@@ -64,7 +75,7 @@ React 19 · TypeScript · Vite · Tailwind CSS 4 · Vitest · Service Worker (PW
 ```bash
 npm install
 npm run dev        # http://localhost:3000
-npm test           # unit tests for the engine, storage validation and URL safety
+npm test           # unit tests for the engine, storage validation, URL safety and dates
 npm run lint       # type-check
 npm run build      # production build in dist/
 ```
@@ -77,7 +88,10 @@ src/
   services/storageService.ts      validated local persistence (+ .test.ts)
   utils/safeUrl.ts                link sanitising (+ .test.ts)
   data/schemesData.ts             scheme rules, documents, steps, helplines
-  data/translations.ts            English / Hindi strings
+  data/statesAndDistricts.ts      all 28 states and 8 union territories
+  i18n/messages/                  English and Hindi (bundled)
+  i18n/locales/                   9 more languages, loaded on demand
+  i18n/languages.ts               language list, fonts, speech voices
   components/views/               one file per screen
 public/sw.js                      offline service worker
 netlify.toml                      deploy + security headers
@@ -88,12 +102,15 @@ netlify.toml                      deploy + security headers
 - Covers 15 central schemes; state schemes are not yet included.
 - Scheme figures (amounts, interest rates) change — always confirm on the official portal linked from each scheme.
 - The help-centre directory contains **sample entries only**; the app links to the official CSC locator for real centres.
+- Translations other than English and Hindi are AI-drafted and need review by fluent speakers. Long scheme details (application steps, rejection reasons) are still English/Hindi only.
+- Urdu is not included yet: it is written right-to-left and needs a layout pass.
 
 ## Roadmap
 
 - Add schemes for our pilot state, each with a source link and "last verified" date
 - Field-volunteer survey mode with an anonymised "unclaimed benefits" summary per village/ward
-- Hindi voice input
+- Voice input in Indian languages
+- Native-speaker review of every translation, then Urdu (right-to-left)
 
 ---
 

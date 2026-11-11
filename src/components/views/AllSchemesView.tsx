@@ -61,7 +61,11 @@ export const AllSchemesView: React.FC = () => {
       scheme.summaryHindi.includes(q) ||
       scheme.benefitHeadline.toLowerCase().includes(q) ||
       scheme.benefitHeadlineHindi.includes(q) ||
-      scheme.categoryLabel.toLowerCase().includes(q);
+      scheme.categoryLabel.toLowerCase().includes(q) ||
+      // Text in the reader's own language (Tamil, Bengali, …)
+      L.schemeName(scheme).toLowerCase().includes(q) ||
+      L.schemeBenefit(scheme).toLowerCase().includes(q) ||
+      L.schemeSimple(scheme).toLowerCase().includes(q);
 
     // Category filter
     const matchesCategory = selectedCategory === 'all' || scheme.category === selectedCategory;

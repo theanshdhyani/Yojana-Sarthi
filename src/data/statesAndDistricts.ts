@@ -4,7 +4,8 @@ export interface StateWithDistricts {
   districts: { name: string; nameHindi: string }[];
 }
 
-export const INDIAN_STATES_DISTRICTS: StateWithDistricts[] = [
+// All 28 states and 8 union territories (districts are a representative sample). Sorted A–Z below.
+const STATES_UNSORTED: StateWithDistricts[] = [
   {
     state: 'Uttar Pradesh',
     stateHindi: 'उत्तर प्रदेश',
@@ -200,5 +201,202 @@ export const INDIAN_STATES_DISTRICTS: StateWithDistricts[] = [
       { name: 'Jorhat', nameHindi: 'जोरहाट' },
       { name: 'Nagaon', nameHindi: 'नगांव' }
     ]
+  },
+  {
+    state: 'Andhra Pradesh',
+    stateHindi: 'आंध्र प्रदेश',
+    districts: [
+      { name: 'Visakhapatnam', nameHindi: 'विशाखापत्तनम' },
+      { name: 'Vijayawada (NTR)', nameHindi: 'विजयवाड़ा (एनटीआर)' },
+      { name: 'Guntur', nameHindi: 'गुंटूर' },
+      { name: 'Tirupati', nameHindi: 'तिरुपति' },
+      { name: 'Kurnool', nameHindi: 'कुरनूल' }
+    ]
+  },
+  {
+    state: 'Arunachal Pradesh',
+    stateHindi: 'अरुणाचल प्रदेश',
+    districts: [
+      { name: 'Papum Pare (Itanagar)', nameHindi: 'पापुम पारे (ईटानगर)' },
+      { name: 'Tawang', nameHindi: 'तवांग' },
+      { name: 'West Siang', nameHindi: 'पश्चिम सियांग' }
+    ]
+  },
+  {
+    state: 'Chhattisgarh',
+    stateHindi: 'छत्तीसगढ़',
+    districts: [
+      { name: 'Raipur', nameHindi: 'रायपुर' },
+      { name: 'Bilaspur', nameHindi: 'बिलासपुर' },
+      { name: 'Durg', nameHindi: 'दुर्ग' },
+      { name: 'Bastar', nameHindi: 'बस्तर' },
+      { name: 'Korba', nameHindi: 'कोरबा' }
+    ]
+  },
+  {
+    state: 'Goa',
+    stateHindi: 'गोवा',
+    districts: [
+      { name: 'North Goa', nameHindi: 'उत्तरी गोवा' },
+      { name: 'South Goa', nameHindi: 'दक्षिणी गोवा' }
+    ]
+  },
+  {
+    state: 'Himachal Pradesh',
+    stateHindi: 'हिमाचल प्रदेश',
+    districts: [
+      { name: 'Shimla', nameHindi: 'शिमला' },
+      { name: 'Kangra', nameHindi: 'कांगड़ा' },
+      { name: 'Mandi', nameHindi: 'मंडी' },
+      { name: 'Kullu', nameHindi: 'कुल्लू' }
+    ]
+  },
+  {
+    state: 'Jharkhand',
+    stateHindi: 'झारखंड',
+    districts: [
+      { name: 'Ranchi', nameHindi: 'रांची' },
+      { name: 'Dhanbad', nameHindi: 'धनबाद' },
+      { name: 'East Singhbhum (Jamshedpur)', nameHindi: 'पूर्वी सिंहभूम (जमशेदपुर)' },
+      { name: 'Hazaribagh', nameHindi: 'हजारीबाग' },
+      { name: 'Dumka', nameHindi: 'दुमका' }
+    ]
+  },
+  {
+    state: 'Kerala',
+    stateHindi: 'केरल',
+    districts: [
+      { name: 'Thiruvananthapuram', nameHindi: 'तिरुवनंतपुरम' },
+      { name: 'Ernakulam', nameHindi: 'एर्नाकुलम' },
+      { name: 'Kozhikode', nameHindi: 'कोझिकोड' },
+      { name: 'Thrissur', nameHindi: 'त्रिशूर' },
+      { name: 'Malappuram', nameHindi: 'मलप्पुरम' }
+    ]
+  },
+  {
+    state: 'Manipur',
+    stateHindi: 'मणिपुर',
+    districts: [
+      { name: 'Imphal West', nameHindi: 'इंफाल पश्चिम' },
+      { name: 'Imphal East', nameHindi: 'इंफाल पूर्व' },
+      { name: 'Churachandpur', nameHindi: 'चुराचांदपुर' }
+    ]
+  },
+  {
+    state: 'Meghalaya',
+    stateHindi: 'मेघालय',
+    districts: [
+      { name: 'East Khasi Hills (Shillong)', nameHindi: 'पूर्वी खासी हिल्स (शिलांग)' },
+      { name: 'West Garo Hills (Tura)', nameHindi: 'पश्चिमी गारो हिल्स (तुरा)' },
+      { name: 'Jaintia Hills', nameHindi: 'जयंतिया हिल्स' }
+    ]
+  },
+  {
+    state: 'Mizoram',
+    stateHindi: 'मिज़ोरम',
+    districts: [
+      { name: 'Aizawl', nameHindi: 'आइज़ोल' },
+      { name: 'Lunglei', nameHindi: 'लुंगलेई' },
+      { name: 'Champhai', nameHindi: 'चम्फाई' }
+    ]
+  },
+  {
+    state: 'Nagaland',
+    stateHindi: 'नागालैंड',
+    districts: [
+      { name: 'Kohima', nameHindi: 'कोहिमा' },
+      { name: 'Dimapur', nameHindi: 'दीमापुर' },
+      { name: 'Mokokchung', nameHindi: 'मोकोकचुंग' }
+    ]
+  },
+  {
+    state: 'Sikkim',
+    stateHindi: 'सिक्किम',
+    districts: [
+      { name: 'Gangtok', nameHindi: 'गंगटोक' },
+      { name: 'Namchi', nameHindi: 'नामची' },
+      { name: 'Mangan', nameHindi: 'मंगन' }
+    ]
+  },
+  {
+    state: 'Telangana',
+    stateHindi: 'तेलंगाना',
+    districts: [
+      { name: 'Hyderabad', nameHindi: 'हैदराबाद' },
+      { name: 'Warangal', nameHindi: 'वारंगल' },
+      { name: 'Karimnagar', nameHindi: 'करीमनगर' },
+      { name: 'Nizamabad', nameHindi: 'निज़ामाबाद' },
+      { name: 'Khammam', nameHindi: 'खम्मम' }
+    ]
+  },
+  {
+    state: 'Tripura',
+    stateHindi: 'त्रिपुरा',
+    districts: [
+      { name: 'West Tripura (Agartala)', nameHindi: 'पश्चिम त्रिपुरा (अगरतला)' },
+      { name: 'Gomati', nameHindi: 'गोमती' },
+      { name: 'Dhalai', nameHindi: 'धलाई' }
+    ]
+  },
+  {
+    state: 'Andaman & Nicobar Islands',
+    stateHindi: 'अंडमान और निकोबार द्वीपसमूह',
+    districts: [
+      { name: 'South Andaman (Port Blair)', nameHindi: 'दक्षिण अंडमान (पोर्ट ब्लेयर)' },
+      { name: 'Nicobar', nameHindi: 'निकोबार' }
+    ]
+  },
+  {
+    state: 'Chandigarh',
+    stateHindi: 'चंडीगढ़',
+    districts: [
+      { name: 'Chandigarh', nameHindi: 'चंडीगढ़' }
+    ]
+  },
+  {
+    state: 'Dadra & Nagar Haveli and Daman & Diu',
+    stateHindi: 'दादरा और नगर हवेली तथा दमन और दीव',
+    districts: [
+      { name: 'Dadra & Nagar Haveli', nameHindi: 'दादरा और नगर हवेली' },
+      { name: 'Daman', nameHindi: 'दमन' },
+      { name: 'Diu', nameHindi: 'दीव' }
+    ]
+  },
+  {
+    state: 'Jammu & Kashmir',
+    stateHindi: 'जम्मू और कश्मीर',
+    districts: [
+      { name: 'Srinagar', nameHindi: 'श्रीनगर' },
+      { name: 'Jammu', nameHindi: 'जम्मू' },
+      { name: 'Anantnag', nameHindi: 'अनंतनाग' },
+      { name: 'Baramulla', nameHindi: 'बारामूला' }
+    ]
+  },
+  {
+    state: 'Ladakh',
+    stateHindi: 'लद्दाख',
+    districts: [
+      { name: 'Leh', nameHindi: 'लेह' },
+      { name: 'Kargil', nameHindi: 'करगिल' }
+    ]
+  },
+  {
+    state: 'Lakshadweep',
+    stateHindi: 'लक्षद्वीप',
+    districts: [
+      { name: 'Lakshadweep', nameHindi: 'लक्षद्वीप' }
+    ]
+  },
+  {
+    state: 'Puducherry',
+    stateHindi: 'पुडुचेरी',
+    districts: [
+      { name: 'Puducherry', nameHindi: 'पुडुचेरी' },
+      { name: 'Karaikal', nameHindi: 'कराईकल' }
+    ]
   }
 ];
+
+export const INDIAN_STATES_DISTRICTS: StateWithDistricts[] = [...STATES_UNSORTED].sort((a, b) =>
+  a.state.localeCompare(b.state, 'en')
+);

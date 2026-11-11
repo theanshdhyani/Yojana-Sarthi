@@ -256,7 +256,7 @@ export const QuestionnaireView: React.FC = () => {
 
       {/* Top Header & Progress */}
       <div className="p-5 sm:p-6 rounded-3xl glass-card space-y-4 shadow-sm border border-[var(--glass-panel-border)]">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-wrap items-center justify-between gap-2">
           <button
             onClick={handleBack}
             className="inline-flex items-center gap-1.5 text-xs font-semibold text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors p-1"
@@ -265,7 +265,7 @@ export const QuestionnaireView: React.FC = () => {
             <span>{t('back')}</span>
           </button>
 
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center justify-end gap-2">
             {Object.keys(answers).length > 0 && (
               <button
                 type="button"

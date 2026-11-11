@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import { StorageService } from '../../services/storageService';
 import { LanguageGrid } from '../common/LanguagePicker';
+import { todayISO } from '../../utils/date';
 
 export const SettingsModal: React.FC = () => {
   const { 
@@ -44,7 +45,7 @@ export const SettingsModal: React.FC = () => {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `yojana-sarthi-backup-${new Date().toISOString().split('T')[0]}.json`;
+    a.download = `yojana-sarthi-backup-${todayISO()}.json`;
     document.body.appendChild(a);
     a.click();
     a.remove();

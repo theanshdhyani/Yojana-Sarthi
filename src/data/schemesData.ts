@@ -121,7 +121,8 @@ export const SCHEMES_DATABASE: Scheme[] = [
     eligibilityDescriptionHindi: 'ऐसे परिवार जिनके पास भारत में कहीं भी पक्का मकान न हो और जो कच्चे मकान में रहते हों। एससी/एसटी, महिला मुखिया एवं दिव्यांगों को प्राथमिकता।',
     rules: {
       maxAnnualIncome: 300000,
-      gender: 'all'
+      gender: 'all',
+      confirmAtOffice: ['cNoPuccaHouse']
     },
     requiredDocuments: [
       { id: 'doc_aadhaar', name: 'Aadhaar Card of all family members', nameHindi: 'परिवार के सभी सदस्यों का आधार कार्ड', isMandatory: true, purpose: 'De-duplication and identity verification', purposeHindi: 'पहचान एवं दोहराव रोकथाम' },
@@ -167,7 +168,8 @@ export const SCHEMES_DATABASE: Scheme[] = [
     rules: {
       minAge: 18,
       gender: 'female',
-      maxAnnualIncome: 250000
+      maxAnnualIncome: 250000,
+      confirmAtOffice: ['cNoLpgConnection']
     },
     requiredDocuments: [
       { id: 'doc_aadhaar', name: 'Aadhaar Card of Woman Applicant', nameHindi: 'महिला आवेदिका का आधार कार्ड', isMandatory: true, purpose: 'Identity & eKYC verification', purposeHindi: 'पहचान व ई-केवाईसी सत्यापन' },
@@ -394,7 +396,6 @@ export const SCHEMES_DATABASE: Scheme[] = [
     rules: {
       minAge: 60,
       requiresBPL: true,
-      maxAnnualIncome: 100000,
       gender: 'all',
       specialFlags: ['senior_citizen'],
       beneficiaryIsHouseholdMember: true
@@ -444,7 +445,6 @@ export const SCHEMES_DATABASE: Scheme[] = [
       maxAge: 79,
       gender: 'female',
       requiresBPL: true,
-      maxAnnualIncome: 120000,
       specialFlags: ['widow'],
       beneficiaryIsHouseholdMember: true
     },

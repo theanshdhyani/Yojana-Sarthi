@@ -324,7 +324,7 @@ export const MobileGlassDock: React.FC = () => {
         <div className="pointer-events-auto flex items-center gap-2 w-full justify-between">
           
           {/* Main 4-Destination Capsule */}
-          <div className="glass-dock flex-1 p-1.5 flex items-center justify-around shadow-2xl">
+          <div className="glass-dock flex-1 min-w-0 p-1.5 flex items-center justify-around gap-0.5 shadow-2xl">
             {/* 1. Home */}
             <button
               onClick={() => handleNav('home')}
@@ -383,7 +383,7 @@ export const MobileGlassDock: React.FC = () => {
             onClick={() => setIsMoreOpen((prev) => !prev)}
             aria-expanded={isMoreOpen}
             aria-label={t('menu')}
-            className={`glass-more-button shadow-2xl ${isMoreOpen ? 'glass-dock-item-active' : ''}`}
+            className={`glass-more-button shrink-0 shadow-2xl ${isMoreOpen ? 'glass-dock-item-active' : ''}`}
           >
             {isMoreOpen ? (
               <X className="w-5 h-5 text-[var(--text-primary)]" />

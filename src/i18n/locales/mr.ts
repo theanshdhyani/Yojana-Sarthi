@@ -512,6 +512,8 @@ const bundle: LocaleBundle = {
     eStateMet: "{state} मध्ये उपलब्ध",
     eStateFail: "फक्त या राज्यांत: {list}",
     eOpenToAll: "सर्व नागरिकांसाठी — कोणतीही खास अट नाही",
+    cNoPuccaHouse: "कुटुंबातील कोणाच्याही नावे भारतात कुठेही पक्के घर नाही",
+    cNoLpgConnection: "कुटुंबात कोणाच्याही नावे आधीपासून LPG जोडणी नाही",
     listSeparator: ", ",
     gdFemale: "महिलांसाठी खास योजना व अनुदान",
     gdMale: "सामान्य व कौटुंबिक कल्याण योजना",

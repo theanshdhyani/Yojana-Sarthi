@@ -30,17 +30,14 @@ describe('income limits', () => {
   });
 
   it('does not reject someone whose bracket straddles the limit (old bug: bracket mapped to its upper bound)', () => {
-    // Widow pension limit is ₹1.2L; the ₹1–2.5L bracket includes eligible incomes like ₹1.1L.
-    const r = evaluateSchemeEligibility(scheme('nsap-widow-pension'), {
+    // PM-JAY's limit is ₹3L; the ₹2.5–5L bracket includes eligible incomes like ₹2.8L.
+    const r = evaluateSchemeEligibility(scheme('ayushman-bharat-pmjay'), {
       ...farmer,
-      gender: 'female',
-      age: 45,
-      occupation: 'homemaker',
-      specialAttributes: ['widow']
+      annualIncomeBracket: '2.5lakh_to_5lakh'
     });
     expect(r.status).toBe('possible_match');
     expect(r.unmetCriteria).toHaveLength(0);
-    expect(r.toVerify.some((v) => v.includes('1.2 Lakh'))).toBe(true);
+    expect(r.toVerify.some((v) => v.includes('3 Lakh'))).toBe(true);
   });
 
   it('rejects when the whole bracket is above the limit', () => {
@@ -76,6 +73,22 @@ describe('household-member schemes', () => {
       specialAttributes: ['senior_citizen']
     });
     expect(r.unmetCriteria).toHaveLength(0);
+  });
+
+  it('matches old-age pension for a BPL household whatever its income bracket (old bug: invented ₹1L cap)', () => {
+    const r = evaluateSchemeEligibility(scheme('nsap-old-age-pension'), { ...farmer, age: 68, occupation: 'retired' });
+    expect(r.status).toBe('strong_match');
+  });
+});
+
+describe('conditions the questionnaire does not ask', () => {
+  it('never reports PMAY or Ujjwala as certain, because house and LPG ownership are not asked', () => {
+    const pmay = evaluateSchemeEligibility(scheme('pm-awas-yojana'), farmer);
+    const ujjwala = evaluateSchemeEligibility(scheme('pm-ujjwala-yojana'), { ...farmer, gender: 'female' });
+    expect(pmay.status).toBe('possible_match');
+    expect(pmay.toVerify.some((v) => v.includes('pucca house'))).toBe(true);
+    expect(ujjwala.status).toBe('possible_match');
+    expect(ujjwala.toVerify.some((v) => v.includes('LPG connection'))).toBe(true);
   });
 });
 

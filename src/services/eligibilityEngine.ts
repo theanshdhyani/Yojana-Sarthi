@@ -259,6 +259,9 @@ export function evaluateSchemeEligibility(
     else fail(msg('eStateFail', { list }));
   }
 
+  // 12. Conditions the questionnaire cannot check
+  for (const key of rules.confirmAtOffice || []) check(msg(key));
+
   const matchScore = total > 0 ? Math.round((passed / total) * 100) : 100;
   const status: MatchStatus = unmet.length > 0 ? 'review_required' : verify.length > 0 ? 'possible_match' : 'strong_match';
   return result(status, matchScore);

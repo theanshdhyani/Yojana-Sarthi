@@ -8,13 +8,15 @@
  * Only same-origin GET requests and the two font hosts are ever cached;
  * nothing the user types is sent anywhere, so there is nothing private to cache.
  */
-const VERSION = 'ys-v2';
+const VERSION = 'ys-v3';
 const SHELL_CACHE = `${VERSION}-shell`;
 const ASSET_CACHE = `${VERSION}-assets`;
 const FONT_CACHE = `${VERSION}-fonts`;
 const SHELL_URLS = ['/', '/index.html', '/manifest.webmanifest', '/icon.svg'];
 const FONT_HOSTS = ['fonts.googleapis.com', 'fonts.gstatic.com'];
-const MAX_ASSET_ENTRIES = 12; // old builds' hashed files are evicted oldest-first
+// One build is ~12 files (app, styles, one per language). Room for two builds, so a new deploy
+// never evicts files the running version still needs; older builds go oldest-first.
+const MAX_ASSET_ENTRIES = 30;
 
 async function trimCache(name, max) {
   const cache = await caches.open(name);

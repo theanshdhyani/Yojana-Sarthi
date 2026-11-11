@@ -85,7 +85,7 @@ export const OnboardingModal: React.FC = () => {
           </div>
           <button
             onClick={handleSkip}
-            className="text-xs font-semibold text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors"
+            className="-my-2 -mr-2 px-3 py-2.5 min-h-11 rounded-xl text-xs font-semibold text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-subtle)] transition-colors"
           >
             {t('skip')}
           </button>

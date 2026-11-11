@@ -12,6 +12,9 @@ export default defineConfig({
   },
   build: {
     // Never ship source maps to production; they expose the full source tree.
-    sourcemap: false
+    sourcemap: false,
+    // The app is deliberately one bundle (~170 kB gzipped): every screen must work offline after
+    // the first visit, and split screens would only be cached once someone opened them.
+    chunkSizeWarningLimit: 700
   }
 });

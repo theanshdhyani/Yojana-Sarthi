@@ -510,6 +510,8 @@ export const en = {
   eStateMet: "Available in {state}",
   eStateFail: "Only available in: {list}",
   eOpenToAll: "Open to all citizens — no specific criteria",
+  cNoPuccaHouse: "No one in the family owns a pucca house anywhere in India",
+  cNoLpgConnection: "No one in the household already has an LPG connection",
   listSeparator: ", ",
   gdFemale: "Women-specific schemes and subsidies",
   gdMale: "General and family welfare schemes",

@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import { TrackedApplication, ApplicationStatus } from '../../types/tracker';
 import { SCHEMES_DATABASE } from '../../data/schemesData';
+import { todayISO } from '../../utils/date';
 
 export const ApplicationTrackerView: React.FC = () => {
   const { 
@@ -73,13 +74,13 @@ export const ApplicationTrackerView: React.FC = () => {
       beneficiaryName: beneficiaryName.trim() || t('relSelf'),
       // Never invent a reference number: a citizen could mistake it for an official acknowledgment.
       referenceNumber: refNumber.trim(),
-      appliedDate: new Date().toISOString().split('T')[0],
+      appliedDate: todayISO(),
       status: 'to_apply',
       portalUrl: scheme.officialPortalUrl,
       notes: notes || t('applicationInitiated'),
       timeline: [
         {
-          date: new Date().toISOString().split('T')[0],
+          date: todayISO(),
           title: t('recordCreated'),
           description: t('addedToDashboard')
         }

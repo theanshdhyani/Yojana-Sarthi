@@ -15,6 +15,7 @@ import {
   XCircle
 } from 'lucide-react';
 import { EvaluatedScheme, MatchStatus } from '../../types/scheme';
+import { todayISO } from '../../utils/date';
 
 type Tab = 'eligible' | MatchStatus;
 
@@ -55,7 +56,7 @@ export const ResultsView: React.FC = () => {
 
   const handleSaveToTracker = (item: EvaluatedScheme) => {
     if (applications.some((a) => a.schemeId === item.scheme.id)) return;
-    const today = new Date().toISOString().split('T')[0];
+    const today = todayISO();
     addApplication({
       schemeId: item.scheme.id,
       schemeName: item.scheme.name,

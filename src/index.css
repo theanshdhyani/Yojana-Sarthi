@@ -439,10 +439,13 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 6px 12px;
+  flex: 1 1 0;
+  padding: 6px 4px;
   border-radius: 9999px;
   min-height: 46px;
-  min-width: 56px;
+  /* Shares the dock evenly; long labels (Malayalam, Tamil) truncate instead of pushing
+     the More button off-screen. */
+  min-width: 0;
   font-size: 10.5px;
   font-weight: 500;
   color: var(--text-secondary);
@@ -450,6 +453,13 @@
   transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   user-select: none;
   -webkit-tap-highlight-color: transparent;
+}
+
+.glass-dock-item > span {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .glass-dock-item:active {
@@ -659,4 +669,23 @@
   .print-only {
     display: none !important;
   }
+}
+
+/* Indic words are long and cannot break between letters, so on phones the hero headline
+   is a little smaller outside English; overflow-wrap is the last resort on very narrow screens. */
+.hero-title {
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 639px) {
+  html:not(:lang(en)) .hero-title {
+    font-size: 2.1rem;
+    line-height: 1.2;
+  }
+}
+
+/* Some Malayalam/Tamil words are wider than a phone screen. Let text break inside a word only
+   when the whole word cannot fit, rather than widening the page. */
+html:not(:lang(en)) :is(h1, h2, h3, h4, p, li) {
+  overflow-wrap: anywhere;
 }

@@ -24,11 +24,9 @@ export const SCHEMES_DATABASE: Scheme[] = [
     eligibilityDescriptionHindi: 'सभी किसान परिवार जिनके नाम खेती योग्य भूमि है। सरकारी कर्मचारी, पेंशनधारक (₹10,000+) और आयकर दाता पात्र नहीं हैं।',
     rules: {
       minAge: 18,
-      occupations: ['farmer'],
       requiresLandholding: true,
-      maxAnnualIncome: 800000,
       gender: 'all',
-      excludedOccupations: ['government_employee']
+      requiresOfficialEligibilityCheck: true
     },
     requiredDocuments: [
       { id: 'doc_aadhaar', name: 'Aadhaar Card', nameHindi: 'आधार कार्ड', isMandatory: true, purpose: 'Biometric identity & eKYC verification', purposeHindi: 'पहचान व ई-केवाईसी सत्यापन' },
@@ -74,10 +72,9 @@ export const SCHEMES_DATABASE: Scheme[] = [
     eligibilityDescription: 'Families listed in SECC 2011 database, NFSA ration card holders, Antyodaya Anna Yojana (AAY) families, and all senior citizens aged 70+ irrespective of income.',
     eligibilityDescriptionHindi: 'एसईसीसी 2011 सूची में शामिल परिवार, अंत्योदय कार्ड धारक, बीपीएल परिवार तथा 70 वर्ष से अधिक आयु के सभी वरिष्ठ नागरिक (आय सीमा मुक्त)।',
     rules: {
-      maxAnnualIncome: 300000,
-      requiresBPL: true,
       gender: 'all',
-      universalFromAge: 70
+      universalFromAge: 70,
+      requiresOfficialEligibilityCheck: true
     },
     requiredDocuments: [
       { id: 'doc_aadhaar', name: 'Aadhaar Card', nameHindi: 'आधार कार्ड', isMandatory: true, purpose: 'Individual biometric KYC', purposeHindi: 'व्यक्तिगत बायोमेट्रिक केवाईसी' },
@@ -120,8 +117,8 @@ export const SCHEMES_DATABASE: Scheme[] = [
     eligibilityDescription: 'Families without any pucca house anywhere in India. Families living in zero, one, or two-room houses with kutcha walls and roof. Preference for SC/ST, women, and disabled heads of household.',
     eligibilityDescriptionHindi: 'ऐसे परिवार जिनके पास भारत में कहीं भी पक्का मकान न हो और जो कच्चे मकान में रहते हों। एससी/एसटी, महिला मुखिया एवं दिव्यांगों को प्राथमिकता।',
     rules: {
-      maxAnnualIncome: 300000,
-      gender: 'all'
+      gender: 'all',
+      requiresOfficialEligibilityCheck: true
     },
     requiredDocuments: [
       { id: 'doc_aadhaar', name: 'Aadhaar Card of all family members', nameHindi: 'परिवार के सभी सदस्यों का आधार कार्ड', isMandatory: true, purpose: 'De-duplication and identity verification', purposeHindi: 'पहचान एवं दोहराव रोकथाम' },
@@ -586,7 +583,7 @@ export const SCHEMES_DATABASE: Scheme[] = [
       minAge: 18,
       residence: 'rural',
       gender: 'all',
-      occupations: ['agricultural_labour', 'daily_wage_worker', 'farmer', 'unemployed']
+      specialFlags: ['willing_unskilled_manual_work']
     },
     requiredDocuments: [
       { id: 'doc_aadhaar', name: 'Aadhaar Card of all adult members', nameHindi: 'सभी वयस्क सदस्यों का आधार कार्ड', isMandatory: true, purpose: 'ABPS wage disbursement linkage', purposeHindi: 'आधार आधारित मजदूरी भुगतान' },

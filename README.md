@@ -43,29 +43,25 @@ India runs hundreds of welfare schemes: cash for farmers, free hospital cover, p
 
 <table>
   <tr>
-    <td width="50%" valign="top">
-      <img src="docs/screenshots/results.png" alt="Results page showing 4 strong matches, 1 to verify and 10 unlikely, with PM-KISAN explained" />
-      <p><b>Results with reasons.</b> Every scheme says <i>what matched</i>, <i>what failed</i> and <i>what to confirm at the office</i>. Nothing is a black box.</p>
+    <td valign="top">
+      <img src="docs/screenshots/results.png" alt="Results page showing 4 strong matches, 1 to verify and 10 unlikely, with PM-KISAN explained" width="400" />
+      <br /><b>Results with reasons.</b> Every scheme says <i>what matched</i>, <i>what failed</i> and <i>what to confirm at the office</i>. Nothing is a black box.
     </td>
-    <td width="50%" valign="top">
-      <img src="docs/screenshots/scheme-detail.png" alt="PM-KISAN detail page with plain-language summary, listen-aloud and official portal button" />
-      <p><b>Plain-language scheme pages.</b> Each page has a simple summary, read-aloud, the documents needed, step-by-step application, common rejection reasons and the official <code>.gov.in</code> link.</p>
+    <td valign="top">
+      <img src="docs/screenshots/scheme-detail.png" alt="PM-KISAN detail page with plain-language summary, listen-aloud and official portal button" width="400" />
+      <br /><b>Plain-language scheme pages.</b> Simple summary, read-aloud, documents, step-by-step application, common rejection reasons and the official <code>.gov.in</code> link.
     </td>
   </tr>
   <tr>
-    <td width="50%" valign="top">
-      <img src="docs/screenshots/family.png" alt="Family planner showing a 68-year-old mother matched to the old-age pension and PM-JAY" />
-      <p><b>Family planner.</b> Checks each household member separately, so a grandmother's pension and a daughter's scholarship aren't missed.</p>
+    <td valign="top">
+      <img src="docs/screenshots/family.png" alt="Family planner showing a 68-year-old mother matched to the old-age pension and PM-JAY" width="400" />
+      <br /><b>Family planner.</b> Checks each household member separately, so a grandmother's pension and a daughter's scholarship aren't missed.
     </td>
-    <td width="50%" valign="top">
-      <table>
-        <tr>
-          <td><img src="docs/screenshots/mobile-tamil.png" alt="Home page in Tamil on a phone" /></td>
-          <td><img src="docs/screenshots/mobile-languages.png" alt="Language picker with 11 Indian languages" /></td>
-          <td><img src="docs/screenshots/mobile-hindi-results.png" alt="Results in Hindi on a phone" /></td>
-        </tr>
-      </table>
-      <p><b>Built for the phone in your pocket.</b> Shown here in Tamil, the language picker and Hindi. Every language is tested down to a 320&nbsp;px screen.</p>
+    <td valign="top" align="center">
+      <img src="docs/screenshots/mobile-tamil.png" alt="Home page in Tamil on a phone" width="126" />
+      <img src="docs/screenshots/mobile-languages.png" alt="Language picker with 11 Indian languages" width="126" />
+      <img src="docs/screenshots/mobile-hindi-results.png" alt="Results in Hindi on a phone" width="126" />
+      <br /><b>Built for the phone in your pocket.</b> Tamil, the language picker, and Hindi. Every language is tested down to a 320&nbsp;px screen.
     </td>
   </tr>
 </table>

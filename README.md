@@ -96,14 +96,14 @@ India runs hundreds of welfare schemes: cash for farmers, free hospital cover, p
 
 ```mermaid
 flowchart LR
-    A["10 plain answers<br/>(age, work, income, land,<br/>category, ration card...)"] --> B{"Rule engine<br/>runs on your device"}
-    B -->|every rule| C["✅ Met"]
-    B -->|every rule| D["❌ Not met"]
-    B -->|every rule| E["❔ To verify"]
-    C & D & E --> F["Strong match<br/>all rules met"]
-    C & D & E --> G["Possible — verify<br/>nothing fails, something to confirm"]
-    C & D & E --> H["Likely not eligible<br/>a rule definitely fails"]
-    F & G --> I["Documents · Steps ·<br/>Print slip · Tracker"]
+    A["10 plain answers<br/>age, work, income, land,<br/>category, ration card…"] --> B["Rule engine checks<br/>every rule of every scheme<br/><i>on your device</i>"]
+    B --> Q1{"Any rule<br/>not met?"}
+    Q1 -->|yes| H["❌ Likely not eligible"]
+    Q1 -->|no| Q2{"Anything to<br/>confirm at office?"}
+    Q2 -->|yes| G["❔ Possible — verify"]
+    Q2 -->|no| F["✅ Strong match"]
+    G --> I["Documents · Steps ·<br/>Print slip · Tracker"]
+    F --> I
 ```
 
 Each scheme's rules live as data in [`src/data/schemesData.ts`](src/data/schemesData.ts). The engine in [`src/services/eligibilityEngine.ts`](src/services/eligibilityEngine.ts) checks every rule and resolves it to exactly one outcome:

@@ -39,7 +39,7 @@ const LANDHOLDING_MAX_HECTARES: Record<NonNullable<QuestionnaireAnswers['landhol
 
 // What ticking a household condition already tells us about the member who receives the benefit.
 const FLAG_IMPLIES: Record<string, { gender?: 'female'; minAge?: number; maxAge?: number }> = {
-  girl_child_under_10: { gender: 'female', maxAge: 10 },
+  girl_child_under_10: { gender: 'female', maxAge: 9 },
   senior_citizen: { minAge: 60 },
   widow: { gender: 'female' },
   pregnant_lactating: { gender: 'female' }
@@ -53,7 +53,8 @@ const FLAG_KEYS: Record<string, MessageKey> = {
   senior_citizen: 'fSeniorCitizen',
   artisan: 'fArtisan',
   artisan_craftsperson: 'fArtisan',
-  has_unshaded_rooftop: 'fHasUnshadedRooftop'
+  has_unshaded_rooftop: 'fHasUnshadedRooftop',
+  willing_unskilled_manual_work: 'fWillingUnskilledManualWork'
 };
 
 export const OCCUPATION_KEYS: Record<string, MessageKey> = {
@@ -90,6 +91,7 @@ const hasFlag = (answers: QuestionnaireAnswers, f: string): boolean => {
     return userFlags.includes('artisan') || userFlags.includes('artisan_craftsperson') || answers.occupation === 'artisan_craftsperson';
   }
   if (f === 'senior_citizen') return answers.age !== undefined && answers.age >= 60;
+  if (f === 'girl_child_under_10') return answers.gender === 'female' && answers.age !== undefined && answers.age < 10;
   return false;
 };
 
@@ -206,7 +208,9 @@ export function evaluateSchemeEligibility(
     } else {
       const [min, max] = INCOME_RANGES[answers.annualIncomeBracket];
       if (max <= rules.maxAnnualIncome) met(msg('eIncomeMet', { limit }));
-      else if (min >= rules.maxAnnualIncome) fail(msg('eIncomeFail', { limit }));
+      // The lower endpoint can equal an inclusive scheme ceiling. Keep that exact
+      // boundary in the verification bucket instead of rejecting it outright.
+      else if (min > rules.maxAnnualIncome) fail(msg('eIncomeFail', { limit }));
       else check(msg('eIncomeCheck', { limit }));
     }
   }
@@ -258,6 +262,10 @@ export function evaluateSchemeEligibility(
     else if (rules.statesSupported.some((s) => s.toLowerCase() === answers.state!.toLowerCase())) met(msg('eStateMet', { state: answers.state }));
     else fail(msg('eStateFail', { list }));
   }
+
+  // Some schemes rely on beneficiary databases, housing status, or statutory
+  // exclusions that this short questionnaire cannot establish.
+  if (rules.requiresOfficialEligibilityCheck) check(msg('eOfficialEligibilityCheck'), 0);
 
   const matchScore = total > 0 ? Math.round((passed / total) * 100) : 100;
   const status: MatchStatus = unmet.length > 0 ? 'review_required' : verify.length > 0 ? 'possible_match' : 'strong_match';

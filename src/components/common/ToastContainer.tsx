@@ -8,7 +8,7 @@ export const ToastContainer: React.FC = () => {
   if (toasts.length === 0) return null;
 
   return (
-    <div className="fixed bottom-5 right-5 z-50 flex flex-col gap-2 max-w-sm w-full pointer-events-none no-print">
+    <div className="fixed bottom-28 left-4 right-4 md:bottom-5 md:left-auto md:right-5 md:w-full z-50 flex flex-col gap-2 max-w-sm mx-auto md:mx-0 pointer-events-none no-print">
       {toasts.map((toast) => {
         const isSuccess = toast.type === 'success';
         const isError = toast.type === 'error';

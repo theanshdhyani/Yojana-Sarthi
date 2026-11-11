@@ -24,7 +24,8 @@ export interface LocaleContent {
   documents: Record<string, DocText>;
 }
 export interface LocaleBundle {
-  messages: Messages;
+  // New strings fall back to English until each lazy locale is refreshed.
+  messages: Partial<Messages>;
   content: LocaleContent;
 }
 

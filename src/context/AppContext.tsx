@@ -24,6 +24,7 @@ import {
   makeLocalizer
 } from '../i18n';
 import { en } from '../i18n/messages/en';
+import { formatLocalDate } from '../utils/localDate';
 
 export type AppView =
   | 'home'
@@ -129,7 +130,7 @@ const STATUS_KEYS: Record<TrackedApplication['status'], MessageKey> = {
   under_review: 'statusUnderReview',
   approved: 'statusApproved',
   action_required: 'statusActionRequired',
-  rejected: 'statusActionRequired'
+  rejected: 'statusRejected'
 };
 
 export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
@@ -224,7 +225,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     loadLocale(lang)
       .then((bundle) => {
         if (cancelled) return;
-        setMessages(bundle?.messages ?? en);
+        setMessages({ ...en, ...bundle?.messages });
         setLocaleContent(bundle?.content ?? null);
       })
       .catch(() => {
@@ -276,7 +277,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     const newApp: TrackedApplication = {
       ...appData,
       id: 'app_' + Date.now(),
-      lastUpdated: new Date().toISOString().split('T')[0]
+      lastUpdated: formatLocalDate()
     };
     const next = [newApp, ...applications];
     setApplications(next);
@@ -290,11 +291,11 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         ? {
             ...app,
             status,
-            lastUpdated: new Date().toISOString().split('T')[0],
+            lastUpdated: formatLocalDate(),
             timeline: [
               ...app.timeline,
               {
-                date: new Date().toISOString().split('T')[0],
+                date: formatLocalDate(),
                 title: t('timelineStatusUpdated', { status: t(STATUS_KEYS[status]) }),
                 description: t('timelineUpdatedByUser')
               }

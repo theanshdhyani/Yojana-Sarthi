@@ -39,6 +39,8 @@ export interface SchemeEligibilityRules {
   requiresLandholding?: boolean;
   maxLandholdingHectares?: number;
   requiresBPL?: boolean;
+  /** The questionnaire cannot establish every statutory or registry condition. */
+  requiresOfficialEligibilityCheck?: boolean;
   specialFlags?: string[]; // 'disability', 'widow', 'girl_child', 'senior_citizen', 'street_vendor', 'artisan', 'rooftop_access', 'pregnant_lactating'
   statesSupported?: string[]; // empty means all India
   excludedOccupations?: string[]; // e.g. serving government employees are excluded from PM-KISAN
